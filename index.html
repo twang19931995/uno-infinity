@@ -162,6 +162,10 @@
                 </div>
             </div>
         </div>
+                    <!-- 新增：一键分享只读链接按钮 -->
+            <button id="shareReadOnlyBtn" class="w-9 h-9 sm:w-10 sm:h-10 bg-[#4ADE80] border-[3px] sm:border-4 border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" title="一键分享只读链接">
+                <i class="fa-solid fa-share-nodes text-[#5E4B8B] text-sm sm:text-base"></i>
+            </button>
 
 <header id="mainHeader" class="text-center mb-6" style="order: 0;">
             <h1 class="text-4xl md:text-6xl font-black text-white drop-shadow-[0_4px_0_#5E4B8B] py-2 tracking-wide">UNO INFINITY</h1>
@@ -844,6 +848,7 @@
         ];
 
         let gameData = { 
+            let isReadOnly = false;
             players:[], rounds:[], achievements: {}, 
             bgIndex: 0, cardBg: '#ffffff', 
             fonts: { num: "'Fredoka'", en: "'Fredoka'", zh: "'Microsoft YaHei', sans-serif" },
@@ -1092,6 +1097,7 @@ badgeInfoRound: document.getElementById('badgeInfoRound'),
             closeMethodDetailBtn: document.getElementById('closeMethodDetailBtn'),
             methodDetailTitle: document.getElementById('methodDetailTitle'),
             methodDetailPlayerTable: document.getElementById('methodDetailPlayerTable'),
+                        shareReadOnlyBtn: document.getElementById('shareReadOnlyBtn'),
             methodDetailRoundTable: document.getElementById('methodDetailRoundTable')
         };
 
@@ -1219,7 +1225,16 @@ function renderSessionSelectorUI() {
         }
 
 function init() {
-            
+                        // 【只读模式检测 - 朋友点链接时自动进入】
+            const params = new URLSearchParams(window.location.search);
+            const dataStr = params.get('data');
+            if (dataStr) {
+                try {
+                    const decoded = decodeURIComponent(escape(atob(dataStr)));
+                    gameData = JSON.parse(decoded);
+                    isReadOnly = true;
+                } catch(e) { console.log("链接数据无效"); }
+            }
             const saved = localStorage.getItem('unoInfinityPro');
             let dataValid = false;
             
@@ -1262,12 +1277,31 @@ syncMethodsLists(); // 启动时同步一次列表
             els.fontZhSelect.value = gameData.fonts.zh;
 
 updateViewRounds(); // 【新增】启动时先分配好当前的区间数据
+                if (isReadOnly) applyReadOnlyMode();
             recalculateStats();
             renderBgPalette();
             renderPlayerManager();
             renderScoreInputs();
             updateAllUI();
             bindEvents();
+                // 【一键分享只读链接】
+            if (els.shareReadOnlyBtn) {
+                els.shareReadOnlyBtn.onclick = function() {
+                    const json = JSON.stringify(gameData);
+                    const encoded = btoa(unescape(encodeURIComponent(json)));
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('data', encoded);
+                    const shareUrl = url.toString();
+                    
+                    if (navigator.share) {
+                        navigator.share({ title: 'UNO 计分器只读链接', url: shareUrl });
+                    } else {
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            alert('✅ 链接已复制！\n快粘贴到微信群吧～\n朋友点开就是只读模式！');
+                        });
+                    }
+                };
+            }
             updateUndoRedoButtons();
             
             initModuleToggles();
@@ -1802,6 +1836,7 @@ function renderScoreInputs() {
         renderV2ScoreArea(); // 【V2新增】旧的不用了，直接呼叫新版的胶囊画笔
     }
         function updateAllUI() {
+                        if (isReadOnly) applyReadOnlyMode();
             const active = gameData.players.filter(p => p.isActive).sort((a,b) => b.total - a.total);
             const champ = active[0];
             
@@ -4448,6 +4483,31 @@ gameData.currentSessionIndex = -1;
                }
            };
        }
+        function applyReadOnlyMode() {
+    if (!isReadOnly) return;
+    // 显示只读横幅
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#10B981;color:white;padding:8px 20px;border-radius:9999px;font-weight:bold;z-index:99999;box-shadow:0 4px 0 #5E4B8B;';
+    banner.innerHTML = '👀 只读查看模式（朋友看到的版本）';
+    document.body.appendChild(banner);
+
+    // 隐藏所有修改按钮和区域
+    const hideIds = ['playerSection','inputSection','methodManagerSection','dataIOSection','resetBtn'];
+    hideIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    // V2 按钮全部隐藏
+    if (els.v2CalculateBtn) els.v2CalculateBtn.style.display = 'none';
+    if (els.v2UndoBtn) els.v2UndoBtn.style.display = 'none';
+    if (els.v2RedoBtn) els.v2RedoBtn.style.display = 'none';
+    if (els.earlyWinBtn) els.earlyWinBtn.style.display = 'none';
+
+    // 禁用计时器按钮（只读模式不让改时间）
+    const timerBtns = document.querySelectorAll('#timerSubBtn,#timerAddBtn,#timerResetBtn,#timerToggleBtn');
+    timerBtns.forEach(b => { if(b) b.disabled = true; });
+}
         window.onload = init;
 // ==========================================
 // 【终极纠错霸体引擎：全功能修复版 (找回丢失的导入导出)】
