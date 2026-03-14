@@ -1530,15 +1530,6 @@ initCloudUI(); // 【新增】启动云端身份识别UI
             if (isAudienceMode) {
                 const savedView = localStorage.getItem('activeAudienceView');
                 if (savedView) applyAudienceView(JSON.parse(savedView));
-// 【自动救命逻辑】
-            // 如果是观众模式，且本地还没存过云端数据，或者检测到是从新链接进来的
-            if (isAudienceMode && cloudBinId) {
-                // 延迟一秒钟自动拉取，确保页面其他内容都加载好了
-                setTimeout(() => {
-                    console.log("检测到观众模式，正在尝试自动同步...");
-                    fetchDataFromCloud();
-                }, 1000);
-            }
 }
 // 1. 【主机端】点击生成分享链接
             const genBtn = document.getElementById('generateShareLinkBtn');
