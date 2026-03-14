@@ -1482,21 +1482,7 @@ if (response.ok && result.record.data) {
                 statusBadge.classList.replace('text-gray-400', 'text-[#F43F5E]');
                 statusBadge.classList.add('border-[#F43F5E]');
                 
-                // 暴力锁死：让观众无法点击任何修改分数的按钮
-                const disableBtnIds = ['calculateBtn', 'undoBtn', 'redoBtn', 'resetBtn', 'importBtn', 'v2CalculateBtn', 'v2UndoBtn', 'v2RedoBtn', 'earlyWinBtn', 'addSessionBtn', 'penaltyAddBtn', 'penaltyUndoBtn', 'penaltyRedoBtn'];
-                disableBtnIds.forEach(id => {
-                    const btn = document.getElementById(id);
-                    if(btn) {
-                        btn.disabled = true;
-                        btn.classList.add('opacity-50', 'cursor-not-allowed');
-                        // 覆盖原有的点击事件，弹出警告
-                        btn.onclick = (e) => { 
-                            e.preventDefault(); 
-                            e.stopPropagation(); 
-                            alert("您当前处于观众模式，仅供查看，无法修改数据喔！"); 
-                        };
-                    }
-                });
+
             } else {
                 // 主机模式：保持默认的主机面板
                 hostPanel.classList.remove('hidden');
