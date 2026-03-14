@@ -1307,13 +1307,21 @@ function renderSessionSelectorUI() {
         // 【全新新增】云端同步与分享核心逻辑
         // ==========================================
         const CLOUD_API_KEY = "$2a$10$QIpfAXWpKRuC9hRiCVNz1.V4182RJx9SaHuotcsOapPlMy2GYAtdC"; // 【预留】接下来我们会在这里填入 JSONBin 的 API Key
-        let cloudBinId = localStorage.getItem('unoCloudBinId') || null;
+        let cloudBinId = null; 
         let isAudienceMode = false;
 
         // 核心引擎1：判断当前是不是观众端（通过网址链接里有没有 ?view=xxx 来判断）
-        function checkAudienceMode() {
+function checkAudienceMode() {
             const urlParams = new URLSearchParams(window.location.search);
             const viewId = urlParams.get('view');
+            const forceReset = urlParams.get('reset'); // 看看有没有重置指令
+
+            if (forceReset) {
+                // 如果链接里带了 reset，就清空本地的坏设置
+                localStorage.removeItem('activeAudienceView');
+                localStorage.removeItem('unoInfinityPro');
+            }
+
             if (viewId) {
                 isAudienceMode = true;
                 cloudBinId = viewId;
@@ -1370,8 +1378,6 @@ const payload = {
                 const result = await response.json();
                 if (response.ok) {
                     if (!cloudBinId) cloudBinId = result.metadata.id;
-// 【新增】刻在记忆里，下次打开还记得这个房间
-                    localStorage.setItem('unoCloudBinId', cloudBinId);
                     statusBadge.textContent = "同步成功";
                     statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
                     return true;
@@ -1443,11 +1449,11 @@ if (response.ok && result.record.data) {
             });
         }
 
-        // 核心功能6：【关键】观众端根据配置自动调整界面
+// 核心功能6：【关键】观众端根据配置自动调整界面
         function applyAudienceView(config) {
-            if (!config || !config.modules || config.modules.length === 0) return;
+            if (!config || !config.modules) return;
             
-            // 1. 先隐藏所有模块
+            // 1. 先把所有模块藏起来
             modulesConfig.forEach(mod => {
                 const el = document.getElementById(mod.id);
                 if (el) el.style.display = 'none';
@@ -1456,9 +1462,16 @@ if (response.ok && result.record.data) {
             // 2. 根据配置显示并排序
             config.modules.forEach(item => {
                 const el = document.getElementById(item.id);
-                if (el && item.visible) {
+                // --- 【核心修复：强制显示逻辑】 ---
+                // 如果是“云端同步视窗”，无论开关怎么选，都必须强制显示！
+                if (item.id === 'cloudShareSection') {
+                    if (el) {
+                        el.style.display = 'block';
+                        el.style.order = "-999"; // 让它永远排在最上面，方便观众一眼看到
+                    }
+                } else if (el && item.visible) {
                     el.style.display = 'block';
-                    el.style.order = item.order; // 利用 Flexbox 的 order 属性实现排序
+                    el.style.order = item.order;
                 }
             });
         }
@@ -1482,7 +1495,21 @@ if (response.ok && result.record.data) {
                 statusBadge.classList.replace('text-gray-400', 'text-[#F43F5E]');
                 statusBadge.classList.add('border-[#F43F5E]');
                 
-
+                // 暴力锁死：让观众无法点击任何修改分数的按钮
+                const disableBtnIds = ['calculateBtn', 'undoBtn', 'redoBtn', 'resetBtn', 'importBtn', 'v2CalculateBtn', 'v2UndoBtn', 'v2RedoBtn', 'earlyWinBtn', 'addSessionBtn', 'penaltyAddBtn', 'penaltyUndoBtn', 'penaltyRedoBtn'];
+                disableBtnIds.forEach(id => {
+                    const btn = document.getElementById(id);
+                    if(btn) {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
+                        // 覆盖原有的点击事件，弹出警告
+                        btn.onclick = (e) => { 
+                            e.preventDefault(); 
+                            e.stopPropagation(); 
+                            alert("您当前处于观众模式，仅供查看，无法修改数据喔！"); 
+                        };
+                    }
+                });
             } else {
                 // 主机模式：保持默认的主机面板
                 hostPanel.classList.remove('hidden');
@@ -1503,7 +1530,16 @@ initCloudUI(); // 【新增】启动云端身份识别UI
             if (isAudienceMode) {
                 const savedView = localStorage.getItem('activeAudienceView');
                 if (savedView) applyAudienceView(JSON.parse(savedView));
+// 【自动救命逻辑】
+            // 如果是观众模式，且本地还没存过云端数据，或者检测到是从新链接进来的
+            if (isAudienceMode && cloudBinId) {
+                // 延迟一秒钟自动拉取，确保页面其他内容都加载好了
+                setTimeout(() => {
+                    console.log("检测到观众模式，正在尝试自动同步...");
+                    fetchDataFromCloud();
+                }, 1000);
             }
+}
 // 1. 【主机端】点击生成分享链接
             const genBtn = document.getElementById('generateShareLinkBtn');
             if (genBtn) {
