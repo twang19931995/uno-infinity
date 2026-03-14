@@ -1307,7 +1307,7 @@ function renderSessionSelectorUI() {
         // 【全新新增】云端同步与分享核心逻辑
         // ==========================================
         const CLOUD_API_KEY = "$2a$10$QIpfAXWpKRuC9hRiCVNz1.V4182RJx9SaHuotcsOapPlMy2GYAtdC"; // 【预留】接下来我们会在这里填入 JSONBin 的 API Key
-        let cloudBinId = null; 
+        let cloudBinId = localStorage.getItem('unoCloudBinId') || null;
         let isAudienceMode = false;
 
         // 核心引擎1：判断当前是不是观众端（通过网址链接里有没有 ?view=xxx 来判断）
@@ -1370,6 +1370,8 @@ const payload = {
                 const result = await response.json();
                 if (response.ok) {
                     if (!cloudBinId) cloudBinId = result.metadata.id;
+// 【新增】刻在记忆里，下次打开还记得这个房间
+                    localStorage.setItem('unoCloudBinId', cloudBinId);
                     statusBadge.textContent = "同步成功";
                     statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
                     return true;
@@ -1495,18 +1497,22 @@ if (response.ok && result.record.data) {
                         };
                     }
                 });
-            } else {
-                // 主机模式：保持默认的主机面板
+} else {
+                // 主机模式：显示主机面板
                 hostPanel.classList.remove('hidden');
                 hostPanel.classList.add('flex');
                 audPanel.classList.add('hidden');
                 audPanel.classList.remove('flex');
                 
-                statusBadge.textContent = "主机模式 (可写)";
-                statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
-                statusBadge.classList.add('border-[#4ADE80]');
+                if (cloudBinId) {
+                    statusBadge.textContent = "云端已连接";
+                    statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
+                    statusBadge.classList.add('border-[#4ADE80]');
+                } else {
+                    statusBadge.textContent = "待生成链接";
+                    statusBadge.classList.add('text-gray-400');
+                }
             }
-        }
         // ==========================================
 
 function init() {
