@@ -1497,22 +1497,18 @@ if (response.ok && result.record.data) {
                         };
                     }
                 });
-} else {
-                // 主机模式：显示主机面板
+            } else {
+                // 主机模式：保持默认的主机面板
                 hostPanel.classList.remove('hidden');
                 hostPanel.classList.add('flex');
                 audPanel.classList.add('hidden');
                 audPanel.classList.remove('flex');
                 
-                if (cloudBinId) {
-                    statusBadge.textContent = "云端已连接";
-                    statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
-                    statusBadge.classList.add('border-[#4ADE80]');
-                } else {
-                    statusBadge.textContent = "待生成链接";
-                    statusBadge.classList.add('text-gray-400');
-                }
+                statusBadge.textContent = "主机模式 (可写)";
+                statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
+                statusBadge.classList.add('border-[#4ADE80]');
             }
+        }
         // ==========================================
 
 function init() {
