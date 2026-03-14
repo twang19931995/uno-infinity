@@ -105,9 +105,15 @@
                     <div id="presetListContainer" class="flex flex-col gap-2 mb-3">
                         <!-- JS动态填充 -->
                     </div>
-                    <button id="savePresetBtn" class="w-full kawaii-btn bg-success text-white py-1.5 text-sm shadow-sm hover:brightness-110 border-[3px]">
+<button id="savePresetBtn" class="w-full kawaii-btn bg-success text-white py-1.5 text-sm shadow-sm hover:brightness-110 border-[3px]">
                         <i class="fa-solid fa-plus mr-1"></i>保存当前布局
                     </button>
+                    <!-- 新增的导出导入按钮 -->
+                    <div class="flex gap-2 mt-2">
+                        <button id="exportPresetsBtn" class="flex-1 kawaii-btn bg-white text-[#5E4B8B] py-1.5 text-sm shadow-sm hover:bg-gray-50 border-[3px]">导出</button>
+                        <button id="importPresetsBtn" class="flex-1 kawaii-btn bg-white text-[#5E4B8B] py-1.5 text-sm shadow-sm hover:bg-gray-50 border-[3px]">导入</button>
+                        <input type="file" id="importPresetsFile" class="hidden" accept=".xlsx, .xls">
+                    </div>
                 </div>
             </div>
 
@@ -285,15 +291,7 @@
                     </button>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center bg-white border-[3px] border-[#5E4B8B] rounded-xl p-2 sm:p-3 shadow-inner mt-1">
-                    <span class="font-bold text-[#5E4B8B] text-sm shrink-0 whitespace-nowrap"><i class="fa-solid fa-eye mr-1"></i>观众端视图:</span>
-                    <select id="audienceViewSelect" class="w-full sm:flex-1 border-[2px] border-[#5E4B8B] rounded-lg p-1 text-sm font-bold text-[#5E4B8B] bg-gray-50 focus:outline-none cursor-pointer">
-                        <option value="default">默认视图 (与主机当前界面同步)</option>
-                    </select>
-                    <button id="setAudienceViewBtn" class="w-full sm:w-auto bg-[#FDE047] border-[3px] border-[#5E4B8B] rounded-lg px-4 py-1.5 font-black text-[#5E4B8B] text-sm shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all whitespace-nowrap mt-1 sm:mt-0">
-                        <i class="fa-solid fa-sliders mr-1"></i>设置视图
-                    </button>
-                </div>
+
             </div>
 
             <div id="audienceSharePanel" class="hidden flex-col gap-3 transition-all">
@@ -1351,9 +1349,8 @@ function checkAudienceMode() {
 const payload = {
                 data: currentData,
                 theme: currentTheme, // 【新增】带上皮肤
-                timestamp: Date.now(),
-                // 这里的 viewConfig 之后会根据下拉框动态获取
-                viewConfig: viewConfigs[document.getElementById('audienceViewSelect').value] || 'default'
+                hidden: localStorage.getItem('unoHiddenModules') || '[]', // 记录当前隐藏的模块
+                timestamp: Date.now()
             };
             try {
                 let url = "https://api.jsonbin.io/v3/b";
@@ -1408,9 +1405,9 @@ const payload = {
 if (response.ok && result.record.data) {
                     // 覆盖本地数据
                     localStorage.setItem('unoInfinityPro', result.record.data);
-                    // 如果云端有视图配置，也保存下来
-                    if (result.record.viewConfig && result.record.viewConfig !== 'default') {
-                        localStorage.setItem('activeAudienceView', JSON.stringify(result.record.viewConfig));
+                    // 强制同步主机的模块隐藏状态
+                    if (result.record.hidden) {
+                        localStorage.setItem('unoHiddenModules', result.record.hidden);
                     }
                     // 刷新页面
                     location.reload(); 
@@ -1526,11 +1523,6 @@ if (response.ok && result.record.data) {
 
 function init() {
 initCloudUI(); // 【新增】启动云端身份识别UI
-// 如果是观众端且有保存的视图，则应用它
-            if (isAudienceMode) {
-                const savedView = localStorage.getItem('activeAudienceView');
-                if (savedView) applyAudienceView(JSON.parse(savedView));
-}
 // 1. 【主机端】点击生成分享链接
             const genBtn = document.getElementById('generateShareLinkBtn');
             if (genBtn) {
@@ -1565,62 +1557,45 @@ initCloudUI(); // 【新增】启动云端身份识别UI
             if (audUpBtn) {
                 audUpBtn.onclick = () => fetchDataFromCloud();
             }
-// 4. 点击“设置视图”按钮
-            const setViewBtn = document.getElementById('setAudienceViewBtn');
-            if (setViewBtn) {
-                setViewBtn.onclick = () => {
-                    renderModuleSettings();
-                    document.getElementById('viewSettingsModal').classList.replace('hidden', 'flex');
+// 【新增】布局预设导出为 Excel 功能
+            document.getElementById('exportPresetsBtn').onclick = () => {
+                if (typeof XLSX === 'undefined') return alert('请等待 Excel 库加载完成！');
+                const wb = XLSX.utils.book_new();
+                const jsonStr = JSON.stringify(gameData.presets ||[]);
+                const ws = XLSX.utils.aoa_to_sheet([[jsonStr]]);
+                XLSX.utils.book_append_sheet(wb, ws, "Presets_Config");
+                XLSX.writeFile(wb, `UNO-布局预设备份-${Date.now()}.xlsx`);
+            };
+
+            // 【新增】布局预设从 Excel 导入功能
+            document.getElementById('importPresetsBtn').onclick = () => {
+                document.getElementById('importPresetsFile').click();
+            };
+            document.getElementById('importPresetsFile').onchange = (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const workbook = XLSX.read(evt.target.result, {type:'array'});
+                        const sheet = workbook.Sheets["Presets_Config"] || workbook.Sheets[workbook.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(sheet, {header:1});
+                        if(json[0] && json[0][0]) {
+                            const parsed = JSON.parse(json[0][0]);
+                            if(Array.isArray(parsed)) {
+                                gameData.presets = parsed;
+                                saveData();
+                                renderPresetList();
+                                alert("布局预设导入成功！");
+                            } else {
+                                throw new Error("数据格式不对");
+                            }
+                        }
+                    } catch(err) { alert("导入失败，请确保您选择的是之前导出的备份文件！"); }
                 };
-            }
-
-            // 5. 点击“保存视图”按钮
-            const saveBtn = document.getElementById('saveViewConfigBtn');
-            if (saveBtn) {
-                saveBtn.onclick = async () => {
-                    const name = document.getElementById('newViewName').value || "未命名视图";
-                    const configModules = [];
-                    
-                    modulesConfig.forEach(mod => {
-                        configModules.push({
-                            id: mod.id,
-                            visible: document.getElementById(`check-${mod.id}`).checked,
-                            order: parseInt(document.getElementById(`order-${mod.id}`).value) || 0
-                        });
-                    });
-
-                    const newId = 'view_' + Date.now();
-                    viewConfigs[newId] = { name: name, modules: configModules };
-                    localStorage.setItem('unoViewConfigs', JSON.stringify(viewConfigs));
-                    
-                    // 更新下拉菜单
-                    const select = document.getElementById('audienceViewSelect');
-                    const opt = document.createElement('option');
-                    opt.value = newId;
-                    opt.textContent = name;
-                    select.appendChild(opt);
-                    select.value = newId;
-
-                    // 立即上传一次到云端
-                    await uploadDataToCloud();
-                    
-                    document.getElementById('viewSettingsModal').classList.replace('flex', 'hidden');
-                    alert(`视图“${name}”已保存并上传云端！观众端更新后即可看到效果。`);
-                };
-            }
-
-// 6. 【主机端】下拉框选择视图时，立即尝试同步一次
-            const viewSelect = document.getElementById('audienceViewSelect');
-            if (viewSelect) {
-                viewSelect.onchange = async () => {
-                    const statusBadge = document.getElementById('shareStatusBadge');
-                    statusBadge.textContent = "同步视图中...";
-                    const success = await uploadDataToCloud();
-                    if(success) {
-                        alert("观众端视图已更新为：" + viewSelect.options[viewSelect.selectedIndex].text);
-                    }
-                };
-            }
+                reader.readAsArrayBuffer(file);
+                e.target.value = '';
+            };
             
             const saved = localStorage.getItem('unoInfinityPro');
             let dataValid = false;
@@ -6310,33 +6285,5 @@ if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
     }
 })();
     </script>
-<div id="viewSettingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-        <div class="bg-[#FDFCF0] border-[4px] border-[#5E4B8B] rounded-3xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col shadow-[0_8px_0_#5E4B8B]">
-            <div class="p-4 border-b-[3px] border-[#5E4B8B] bg-[#FDE047] flex justify-between items-center">
-                <h3 class="text-xl font-black text-[#5E4B8B] tracking-widest"><i class="fa-solid fa-layer-group mr-2"></i>观众端视图设置</h3>
-                <button onclick="document.getElementById('viewSettingsModal').classList.replace('flex','hidden')" class="text-2xl text-[#5E4B8B] hover:scale-110 transition-transform"><i class="fa-solid fa-circle-xmark"></i></button>
-            </div>
-            
-            <div class="p-5 overflow-y-auto flex-1 custom-scrollbar">
-                <div class="mb-4">
-                    <label class="block text-sm font-black text-[#5E4B8B] mb-2">当前视图名称：</label>
-                    <input id="newViewName" type="text" placeholder="例如：极简模式 / 全量模式" class="w-full border-[3px] border-[#5E4B8B] rounded-xl p-2 font-bold text-[#5E4B8B] outline-none focus:bg-white">
-                </div>
-                
-                <p class="text-xs font-bold text-gray-500 mb-3 bg-white/50 p-2 rounded-lg border border-dashed border-[#5E4B8B]/30">
-                    勾选以下模块以在观众端显示，拖动（暂用输入数字代替）可调整顺序：
-                </p>
-                
-                <div id="moduleListContainer" class="space-y-2">
-                    </div>
-            </div>
-            
-            <div class="p-4 bg-white border-t-[3px] border-[#5E4B8B] flex gap-3">
-                <button id="saveViewConfigBtn" class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">
-                    保存并应用视图
-                </button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
