@@ -198,6 +198,31 @@
         </section>
         </header>
 
+<!-- 【全新新增】1V1-擂台区 -->
+        <section id="oneVsOneSection" class="kawaii-card p-3 sm:p-5 mb-6 hidden" style="background-color: #FEFCE8; order: 0;">
+            <!-- 头部标题与切换按钮 -->
+            <div class="flex justify-between items-center mb-3 relative">
+                <div class="flex-1"></div> <!-- 占位撑开空间 -->
+                
+                <!-- 居中标题 -->
+                <div class="bg-[#FFD93D] border-[4px] border-[#5E4B8B] rounded-[2rem] px-8 py-1 shadow-[0_3px_0_#5E4B8B] z-10 absolute left-1/2 transform -translate-x-1/2 flex justify-center items-center">
+                    <span class="font-black text-[#E11D48] text-xl sm:text-2xl tracking-widest text-stroke" style="text-shadow: 2px 2px 0 #5E4B8B, -2px -2px 0 #5E4B8B, 2px -2px 0 #5E4B8B, -2px 2px 0 #5E4B8B, 0 2px 0 #5E4B8B, 0 -2px 0 #5E4B8B, 2px 0 0 #5E4B8B, -2px 0 0 #5E4B8B;">1V1-擂台区</span>
+                </div>
+                
+                <!-- 右侧切换控制台 -->
+                <div class="flex-1 flex justify-end items-center gap-2 relative z-20">
+                    <button id="ovoPrevBtn" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:translate-y-1 hover:bg-gray-100"><i class="fa-solid fa-chevron-left text-sm"></i></button>
+                    <div id="ovoTabLabel" class="bg-[#06B6D4] border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-6 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-sm min-w-[80px] text-center">主信息</div>
+                    <button id="ovoNextBtn" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:translate-y-1 hover:bg-gray-100"><i class="fa-solid fa-chevron-right text-sm"></i></button>
+                </div>
+            </div>
+
+            <!-- 动态内容渲染容器 -->
+            <div id="ovoContent" class="w-full border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl overflow-hidden bg-white shadow-sm mt-3 relative transition-all">
+                <!-- JS 会把画好的内容塞进这里 -->
+            </div>
+        </section>
+
 <!-- 【新增】罚牌张数输入区 (图1复刻) -->
         <section id="penaltySection" class="kawaii-card p-4 sm:p-5 mb-6" style="background-color: #FEFCE8;">
             <div class="flex justify-between items-center mb-4">
@@ -260,15 +285,38 @@
             </div>
         </section>
 
-<!-- 【全新新增】罚牌详细统计区 (图1复刻) -->
-        <section id="penaltyStatsSection" class="kawaii-card p-3 sm:p-5 mb-6 bg-[#FEFCE8]">
-            <h2 class="text-lg sm:text-xl font-bold text-[#5E4B8B] flex items-center mb-4 tracking-widest">
-                <i class="fa-solid fa-clone text-primary mr-2"></i>罚牌数详细统计区
-            </h2>
-            <div id="penaltyStatsContainer" class="flex flex-col gap-5">
-                <!-- JS将会在这里动态生成图1的卡片 -->
+<!-- 【全新复刻版】罚牌详细统计区 (完美还原图1) -->
+        <section id="penaltyStatsSection" class="kawaii-card p-3 sm:p-5 mb-6" style="background-color: #FEFCE8;">
+            
+            <!-- 1. 顶部红底圆角标题 -->
+            <div class="flex justify-center mb-4 mt-2">
+                <div class="bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-8 py-1.5 shadow-[0_3px_0_rgba(94,75,139,1)]">
+                    <h2 class="text-lg sm:text-xl font-black text-white tracking-widest text-stroke" style="text-shadow: 1px 1px 0 #5E4B8B, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B, 0 2px 0 #5E4B8B, 0 -2px 0 #5E4B8B, 2px 0 0 #5E4B8B, -2px 0 0 #5E4B8B;">
+                        罚牌张数统计区
+                    </h2>
+                </div>
+            </div>
+
+            <!-- 2. 分类切换控制台 (默认隐藏，无数据时显示) -->
+            <div id="penaltyCategorySwitcher" class="flex items-center justify-center gap-3 mb-4 hidden">
+                <button onclick="changePenaltyCategory(-1)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 transition-transform shadow-sm">
+                    <i class="fa-solid fa-chevron-left text-xs sm:text-sm font-black"></i>
+                </button>
+                
+                <div id="penaltyCategoryName" class="border-[3px] border-[#5E4B8B] rounded-full px-6 py-1 font-black text-[#5E4B8B] text-sm sm:text-base tracking-widest shadow-sm bg-white min-w-[100px] text-center">
+                    分类名
+                </div>
+
+                <button onclick="changePenaltyCategory(1)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 transition-transform shadow-sm">
+                    <i class="fa-solid fa-chevron-right text-xs sm:text-sm font-black"></i>
+                </button>
+            </div>
+
+            <!-- 3. 卡片渲染容器 -->
+            <div id="penaltyStatsContainer" class="flex flex-col gap-4">
                 <div class="text-center text-gray-400 font-bold text-sm py-4">暂无罚牌数据</div>
             </div>
+            
         </section>
 
 <section id="cloudShareSection" class="kawaii-card p-4 sm:p-5 mb-6" style="background-color: #F0FDF4; order: 0;">
@@ -959,6 +1007,7 @@
 
 const modulesConfig =[
 { id: 'cloudShareSection', name: '云端同步与分享', icon: 'fa-cloud' },
+{ id: 'oneVsOneSection', name: '1V1-擂台区', icon: 'fa-khanda' },
             { id: 'methodManagerSection', name: '淘汰条目管理区', icon: 'fa-clone' }, // 【图1复刻新增】
             { id: 'penaltyStatsSection', name: '罚牌详细统计区', icon: 'fa-clone' }, // 【图1复刻新增】
 { id: 'penaltySection', name: '罚牌记录区', icon: 'fa-clone' }, // <--- 这是你刚加的
@@ -1214,6 +1263,13 @@ function syncMethodsLists() {
         let audioCtx = null;
 // 【新增】区间筛选核心变量与逻辑
         let viewRounds =[]; // 当前UI需要展示的轮次数据（根据区间筛选后）
+// 【新增】1V1擂台区专用状态
+let ovoState = {
+    viewIndex: 0, // 0:主信息, 1:轮次信息, 2:对局信息
+    subjectPlayerId: null // 在对局信息视图中，当前选中的主角玩家ID
+};
+const ovoViewNames = ['主信息', '轮次信息', '对局信息'];
+const ovoViewColors = ['bg-[#06B6D4]', 'bg-[#EAB308]', 'bg-[#E11D48]']; // 蓝, 黄, 红
         
         function updateViewRounds() {
             if (gameData.currentSessionIndex === undefined || gameData.currentSessionIndex === -1 || !gameData.sessions || gameData.sessions.length === 0) {
@@ -2256,8 +2312,277 @@ renderRadarChart();
         renderBarRanking();
 renderMethodStatsTable(); // 【V2新增】同步更新统计表格
         renderEliminationOrder(); // 【新增】画出淘汰顺序表
+if(typeof window.renderOneVsOneArena === 'function') window.renderOneVsOneArena();
         renderV2ScoreArea(); // 【修复1】每次算完分，强制让胶囊和输入框洗牌重置
     }
+
+// ==========================================
+// 【全新新增】1V1-擂台区 核心渲染画笔 (像素级完美复刻)
+// ==========================================
+window.renderOneVsOneArena = function() {
+    const section = document.getElementById('oneVsOneSection');
+    const content = document.getElementById('ovoContent');
+    const tabLabel = document.getElementById('ovoTabLabel');
+    if (!section || !content) return;
+
+    const active = gameData.players.filter(p => p.isActive);
+    if (active.length < 2) {
+        section.classList.add('hidden');
+        return;
+    }
+
+    // --- 1. 获取所有的1V1对局 ---
+    let ovoMatches =[];
+    viewRounds.forEach(r => {
+        if (r.v2Stats && r.v2Stats.eliminationEvents && r.v2Stats.eliminationEvents.length > 0) {
+            let lastEvent = r.v2Stats.eliminationEvents[r.v2Stats.eliminationEvents.length - 1];
+            if (lastEvent.length === 1 && r.winner) {
+                let loserId = lastEvent[0];
+                let winnerId = r.winner;
+                if (active.find(p=>p.id===winnerId) && active.find(p=>p.id===loserId)) {
+                    ovoMatches.push({
+                        round: r.round,
+                        winner: winnerId,
+                        loser: loserId,
+                        time: r.v2Stats.timerRemainAtEnd,
+                        method: r.v2Stats.winMethod || '默认胜利'
+                    });
+                }
+            }
+        }
+    });
+
+    if (ovoMatches.length === 0) {
+        section.classList.add('hidden');
+        return;
+    } else {
+        section.classList.remove('hidden');
+    }
+
+    // 顶部标签文字和颜色
+    tabLabel.textContent = ovoViewNames[ovoState.viewIndex];
+    tabLabel.className = `${ovoViewColors[ovoState.viewIndex]} border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-6 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-sm min-w-[80px] text-center transition-colors`;
+
+    const getShort = (name) => name ? name.slice(-1) : '?';
+
+    // --- 辅助函数：绘制图1和图3中的单个玩家表格列 ---
+    const buildStatsCol = (p, matchesInfo, headerBgColor) => {
+        let wins = 0; let loses = 0;
+        matchesInfo.forEach(m => {
+            if (m.winner === p.id) wins++;
+            else if (m.loser === p.id) loses++;
+        });
+        let total = wins + loses;
+        let winPct = total > 0 ? Math.round((wins/total)*100) + '%' : '0%';
+        let losePct = total > 0 ? Math.round((loses/total)*100) + '%' : '0%';
+
+        return `
+        <div class="flex-1 flex flex-col border-r-[2px] border-[#5E4B8B] last:border-r-0 min-w-0 bg-white">
+            <!-- 1. 颜色表头：头像+名字 -->
+            <div class="h-8 sm:h-9 flex items-center justify-center gap-1 border-b-[2px] border-[#5E4B8B]" style="background-color: ${headerBgColor};">
+                <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-md border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
+                    <img src="${p.avatar}" class="w-full h-full object-cover">
+                </div>
+                <span class="font-black text-white text-stroke text-xs sm:text-sm truncate tracking-widest leading-none">${getShort(p.name)}</span>
+            </div>
+            <!-- 2. 总次数 (蓝字白底) -->
+            <div class="h-7 sm:h-8 flex items-center justify-center text-[#3B82F6] font-black text-[15px] sm:text-[17px] border-b-[2px] border-[#5E4B8B] bg-white">${total}</div>
+            <!-- 3. WIN / LOSE -->
+            <div class="h-6 sm:h-7 flex border-b-[2px] border-[#5E4B8B] text-[10px] sm:text-[11px] font-black tracking-widest leading-none">
+                <div class="flex-1 bg-[#FACC15] text-white flex items-center justify-center border-r-[2px] border-[#5E4B8B] text-stroke">WIN</div>
+                <div class="flex-1 bg-[#E11D48] text-white flex items-center justify-center text-stroke">LOSE</div>
+            </div>
+            <!-- 4. 具体次数 -->
+            <div class="h-7 sm:h-8 flex border-b-[2px] border-[#5E4B8B] text-sm sm:text-[15px] font-black bg-white leading-none">
+                <div class="flex-1 text-[#10B981] flex items-center justify-center border-r-[2px] border-[#5E4B8B]">${wins}</div>
+                <div class="flex-1 text-[#EF4444] flex items-center justify-center">${loses}</div>
+            </div>
+            <!-- 5. 百分比 -->
+            <div class="h-6 sm:h-7 flex text-[10px] sm:text-[11px] font-black leading-none">
+                <div class="flex-1 text-[#5E4B8B] flex items-center justify-center border-r-[2px] border-[#5E4B8B] bg-[#FEF08A]">${winPct}</div>
+                <div class="flex-1 text-[#5E4B8B] flex items-center justify-center bg-[#FECDD3]">${losePct}</div>
+            </div>
+        </div>`;
+    };
+
+    let html = '';
+
+    // ==========================================
+    // 视图 0：主信息 (图1 像素级复刻)
+    // ==========================================
+    if (ovoState.viewIndex === 0) {
+        // 图1特点：外围有个白色的留白（padding），里面是紧凑的网格，没有任何额外描边
+        let colsHtml = active.map(p => buildStatsCol(p, ovoMatches, p.color)).join('');
+        html = `
+        <div class="p-2 sm:p-3 w-full">
+            <div class="flex w-full border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md overflow-hidden shadow-sm">
+                ${colsHtml}
+            </div>
+        </div>`;
+    } 
+    
+    // ==========================================
+    // 视图 1：轮次信息 (图2 像素级复刻 - 修复图片撑爆)
+    // ==========================================
+    else if (ovoState.viewIndex === 1) {
+        let reversedMatches = [...ovoMatches].reverse();
+        
+        // 图2特点：外围有个留白，里面是一条一条单独的卡片
+        html = `<div class="p-2 sm:p-3 flex flex-col gap-2 max-h-[400px] overflow-y-auto custom-scroll">`;
+        
+        reversedMatches.forEach(m => {
+            let wp = active.find(p=>p.id===m.winner);
+            let lp = active.find(p=>p.id===m.loser);
+            if(!wp || !lp) return;
+
+            let timeStr = m.time > 0 ? `${Math.floor(m.time/60)}:${String(m.time%60).padStart(2,'0')}` : '耗尽';
+            let timeBg = m.time > 0 ? 'bg-white' : 'bg-[#E11D48]';
+            let timeText = m.time > 0 ? 'text-[#5E4B8B]' : 'text-white text-stroke';
+
+            let methodUrl = 'https://via.placeholder.com/150?text=?';
+            if (gameData.customMethods && gameData.customMethods.win) {
+                let mItem = gameData.customMethods.win.items.find(i => i.name === m.method);
+                if (mItem && mItem.url) methodUrl = mItem.url;
+            }
+
+            // 【重磅修复】：强制锁死整个行的高度 `h-[52px]`，图片区为 `w-[52px]` 的正方形！它绝对不可能再撑破屏幕了！
+            html += `
+            <div class="flex w-full border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] bg-white h-[52px] sm:h-[60px] overflow-hidden">
+                
+                <!-- 第X局 -->
+                <div class="w-12 sm:w-16 flex items-center justify-center border-r-[2px] sm:border-[3px] border-[#5E4B8B] shrink-0">
+                    <span class="font-bold text-[#5E4B8B] text-[10px] sm:text-xs">第${m.round}局</span>
+                </div>
+                
+                <!-- 中间对战详情区 -->
+                <div class="flex-1 flex border-r-[2px] sm:border-[3px] border-[#5E4B8B] min-w-0">
+                    <!-- WIN栏 -->
+                    <div class="flex-1 flex flex-col border-r-[2px] sm:border-[3px] border-[#5E4B8B]">
+                        <div class="h-1/2 bg-[#FACC15] flex items-center justify-center border-b-[2px] sm:border-b-[3px] border-[#5E4B8B]">
+                            <span class="text-white font-black text-[9px] sm:text-[11px] text-stroke">WIN</span>
+                        </div>
+                        <div class="h-1/2 flex items-center justify-center gap-1" style="background-color: ${wp.color};">
+                            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0"><img src="${wp.avatar}" class="w-full h-full object-cover"></div>
+                            <span class="text-white font-black text-[10px] sm:text-xs text-stroke leading-none">${getShort(wp.name)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 红字 PK -->
+                    <div class="w-8 sm:w-10 flex items-center justify-center bg-white border-r-[2px] sm:border-[3px] border-[#5E4B8B] shrink-0">
+                        <span class="text-[#E11D48] font-black text-lg sm:text-xl">PK</span>
+                    </div>
+                    
+                    <!-- LOSE栏 -->
+                    <div class="flex-1 flex flex-col border-r-[2px] sm:border-[3px] border-[#5E4B8B]">
+                        <div class="h-1/2 bg-[#E11D48] flex items-center justify-center border-b-[2px] sm:border-b-[3px] border-[#5E4B8B]">
+                            <span class="text-white font-black text-[9px] sm:text-[11px] text-stroke">LOSE</span>
+                        </div>
+                        <div class="h-1/2 flex items-center justify-center gap-1" style="background-color: ${lp.color};">
+                            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0"><img src="${lp.avatar}" class="w-full h-full object-cover"></div>
+                            <span class="text-white font-black text-[10px] sm:text-xs text-stroke leading-none">${getShort(lp.name)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 剩余时间 -->
+                    <div class="w-[50px] sm:w-[60px] flex flex-col shrink-0">
+                        <div class="h-1/2 bg-[#84CC16] flex items-center justify-center border-b-[2px] sm:border-b-[3px] border-[#5E4B8B]">
+                            <span class="text-white font-bold text-[9px] sm:text-[10px]">剩余时间</span>
+                        </div>
+                        <div class="h-1/2 ${timeBg} flex items-center justify-center">
+                            <span class="${timeText} font-bold text-[10px] sm:text-xs">${timeStr}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 终结技文字 -->
+                <div class="w-10 sm:w-14 bg-[#06B6D4] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] shrink-0">
+                    <span class="text-white font-bold text-[10px] sm:text-xs">终结技</span>
+                </div>
+                
+                <!-- 终结技图片区：严格正方形，绝对不会撑大 -->
+                <div class="w-[52px] sm:w-[60px] h-full bg-white flex items-center justify-center p-0.5 shrink-0">
+                    <img src="${methodUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
+                </div>
+            </div>`;
+        });
+        html += `</div>`;
+    }
+
+    // ==========================================
+    // 视图 2：对局信息 (图3 像素级复刻 - 玩家依次向下排列)
+    // ==========================================
+    else if (ovoState.viewIndex === 2) {
+        html = `<div class="p-2 sm:p-3 flex flex-col gap-3 max-h-[500px] overflow-y-auto custom-scroll">`;
+        
+        // 遍历每一个活跃玩家，画出一整行
+        active.forEach(subject => {
+            let opponents = active.filter(p => p.id !== subject.id);
+            let subjectMatches = ovoMatches.filter(m => m.winner === subject.id || m.loser === subject.id);
+            
+            // 对手小表格的拼装
+            let oppColsHtml = opponents.map(opp => {
+                let mockMatches =[];
+                subjectMatches.forEach(m => {
+                    if (m.winner === subject.id && m.loser === opp.id) {
+                        mockMatches.push({ winner: opp.id, loser: null }); // 主角赢
+                    } else if (m.loser === subject.id && m.winner === opp.id) {
+                        mockMatches.push({ winner: null, loser: opp.id }); // 主角输
+                    }
+                });
+                // 对手头像是浅蓝色背景 (采用图3的复刻细节，提取透明度为0.5)
+                let headerBg = hexToRgba(opp.color, 0.5); 
+                return buildStatsCol(opp, mockMatches, headerBg);
+            }).join('');
+
+            html += `
+            <div class="flex items-center gap-2">
+                <!-- 1. 左侧玩家头像区 (单纯的颜色底块) -->
+                <div class="w-16 sm:w-20 h-[72px] sm:h-[86px] rounded-md border-[2px] sm:border-[3px] border-[#5E4B8B] flex flex-col items-center justify-center shrink-0 shadow-sm" style="background-color: ${subject.color};">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-[6px] border-[2px] sm:border-[3px] border-[#5E4B8B] bg-black overflow-hidden mb-0.5">
+                        <img src="${subject.avatar}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-white font-black text-[11px] sm:text-sm text-stroke leading-none">${getShort(subject.name)}</span>
+                </div>
+                
+                <!-- 2. 中间大红字 PK -->
+                <div class="flex items-center justify-center shrink-0 w-8 sm:w-10">
+                    <span class="text-[#E11D48] font-black text-[22px] sm:text-[28px] tracking-tighter">PK</span>
+                </div>
+                
+                <!-- 3. 右侧包含所有对手的小表格 (带外框) -->
+                <div class="flex-1 flex border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md overflow-hidden bg-white shadow-sm min-w-0">
+                    ${oppColsHtml}
+                </div>
+            </div>`;
+        });
+        
+        html += `</div>`;
+    }
+
+    content.innerHTML = html;
+};
+
+// 绑定顶部左右切换按键事件
+document.addEventListener('DOMContentLoaded', () => {
+    // 因为这块代码可能比按钮早执行，我们用事件委托绑在 document 上最安全
+    document.addEventListener('click', (e) => {
+        const prevBtn = e.target.closest('#ovoPrevBtn');
+        const nextBtn = e.target.closest('#ovoNextBtn');
+        
+        if (prevBtn) {
+            ovoState.viewIndex--;
+            if (ovoState.viewIndex < 0) ovoState.viewIndex = 2;
+            window.renderOneVsOneArena();
+        }
+        if (nextBtn) {
+            ovoState.viewIndex++;
+            if (ovoState.viewIndex > 2) ovoState.viewIndex = 0;
+            window.renderOneVsOneArena();
+        }
+    });
+});
+// ==========================================
+
 function renderSessionSection() {
         if (!gameData.sessions) gameData.sessions =[];
         
@@ -3345,39 +3670,53 @@ ${elimDetailsHtml}
  // ==========================================
         // 【完美修复】罚牌详细统计区 (图2 一级面板像素级复刻)
         // ==========================================
+// ==========================================
+        // 【完美复刻】罚牌详细统计区 (支持分类切换与图1完美排版)
+        // ==========================================
+        let currentPenaltyCatIndex = 0; // 记录当前显示第几个分类
+        let penaltyGroupedData =[];    // 整理好的分类数据缓存
+
+        // 提供给左右按钮的点击事件
+        window.changePenaltyCategory = function(dir) {
+            if (penaltyGroupedData.length === 0) return;
+            currentPenaltyCatIndex += dir;
+            if (currentPenaltyCatIndex < 0) currentPenaltyCatIndex = penaltyGroupedData.length - 1;
+            if (currentPenaltyCatIndex >= penaltyGroupedData.length) currentPenaltyCatIndex = 0;
+            window.renderPenaltyStatsUI(); // 重新画界面
+        };
+
         window.renderPenaltyStats = function() {
             const container = document.getElementById('penaltyStatsContainer');
+            const switcher = document.getElementById('penaltyCategorySwitcher');
             if(!container) return;
 
             const active = gameData.players.filter(p => p.isActive);
             if (active.length === 0 || viewRounds.length === 0) {
+                switcher.classList.add('hidden');
                 container.innerHTML = '<div class="text-center text-gray-400 font-bold text-sm py-4">暂无对局或玩家数据</div>';
                 return;
             }
 
-            // 1. 数据收集与计算
-            let stats = {}; 
-
+            // 1. 数据收集 (所有惩罚记录)
+            let rawStats = {}; 
             viewRounds.forEach(r => {
                 if(!r.v2Stats) return;
                 
-                // 处理自动淘汰的罚牌
                 if (r.v2Stats.eliminated && r.v2Stats.eliminationDetails) {
                     for (let pid in r.v2Stats.eliminated) {
                         const method = r.v2Stats.eliminated[pid];
                         const details = r.v2Stats.eliminationDetails[pid];
                         if (details && details.cards > 0) {
                             let killerId = details.killerId || parseInt(pid);
-                            recordPenalty(stats, method, parseInt(pid), killerId, parseInt(details.cards), r.round);
+                            recordPenalty(rawStats, method, parseInt(pid), killerId, parseInt(details.cards), r.round);
                         }
                     }
                 }
 
-                // 处理手动录入的罚牌
                 if (r.v2Stats.manualPenalties) {
                     r.v2Stats.manualPenalties.forEach(mp => {
                         if (mp.cards > 0) {
-                            recordPenalty(stats, mp.method, mp.victim, mp.user, parseInt(mp.cards), r.round);
+                            recordPenalty(rawStats, mp.method, mp.victim, mp.user, parseInt(mp.cards), r.round);
                         }
                     });
                 }
@@ -3385,13 +3724,25 @@ ${elimDetailsHtml}
 
             function recordPenalty(statsObj, method, victimId, killerId, cards, roundNum) {
                 if (!statsObj[method]) {
+                    // 默认值
                     let imgUrl = 'https://via.placeholder.com/150?text=?';
+                    let catId = 'cl_def';
+                    let catName = '无分类';
+                    let catColor = '#E2E8F0';
+
+                    // 尝试从自定义设置里找归属信息
                     if (gameData.customMethods && gameData.customMethods.lose) {
                         let item = gameData.customMethods.lose.items.find(i => i.name === method);
-                        if (item && item.url) imgUrl = item.url;
+                        if (item) {
+                            if (item.url) imgUrl = item.url;
+                            catId = item.categoryId;
+                            let cat = gameData.customMethods.lose.categories.find(c => c.id === catId);
+                            if (cat) { catName = cat.name; catColor = cat.color; }
+                        }
                     }
-                    statsObj[method] = { imgUrl: imgUrl, players: {} };
+                    statsObj[method] = { imgUrl, catId, catName, catColor, players: {} };
                 }
+                
                 let pData = statsObj[method].players;
                 if (!pData[victimId]) {
                     pData[victimId] = { times: 0, totalCards: 0, maxCards: 0, maxRound: '-', punisher: null, rounds: {} };
@@ -3408,118 +3759,159 @@ ${elimDetailsHtml}
                 vp.rounds[roundNum].push({ killerId: killerId, cards: cards });
             }
 
-            if (Object.keys(stats).length === 0) {
+            if (Object.keys(rawStats).length === 0) {
+                switcher.classList.add('hidden');
                 container.innerHTML = '<div class="text-center text-gray-400 font-bold text-sm py-4">暂无任何罚牌记录</div>';
                 return;
             }
 
-            const getShort = (name) => name ? name.slice(-1) : '?';
+            // 2. 将数据按“分类”进行归类打包
+            let groupedMap = {};
+            for (let method in rawStats) {
+                let s = rawStats[method];
+                if (!groupedMap[s.catId]) {
+                    groupedMap[s.catId] = {
+                        catId: s.catId,
+                        catName: s.catName,
+                        catColor: s.catColor,
+                        methods: {}
+                    };
+                }
+                groupedMap[s.catId].methods[method] = s;
+            }
+            
+            // 转化为数组并保存到全局变量，方便翻页
+            penaltyGroupedData = Object.values(groupedMap);
 
-            // 2. 画出图2同款的完美UI (一级面板)
+            // 越界保护
+            if (currentPenaltyCatIndex >= penaltyGroupedData.length) {
+                currentPenaltyCatIndex = 0;
+            }
+
+            // 调用专门的画笔函数去画界面
+            window.renderPenaltyStatsUI();
+        };
+
+        // 【核心画笔】只画当前选中分类的 UI
+        window.renderPenaltyStatsUI = function() {
+            const container = document.getElementById('penaltyStatsContainer');
+            const switcher = document.getElementById('penaltyCategorySwitcher');
+            const catNameDisplay = document.getElementById('penaltyCategoryName');
+            const active = gameData.players.filter(p => p.isActive);
+
+            if (penaltyGroupedData.length === 0) return;
+
+            // 显示切换器
+            switcher.classList.remove('hidden');
+            
+            // 获取当前分类数据
+            const currentCatData = penaltyGroupedData[currentPenaltyCatIndex];
+            
+            // 顶部胶囊颜色和文字设置
+            catNameDisplay.textContent = currentCatData.catName;
+            catNameDisplay.style.backgroundColor = currentCatData.catColor;
+
+            // 获取分类底色的超浅色作为大卡片背景（透明度 20%）
+            const cardBgColor = hexToRgba(currentCatData.catColor, 0.2);
+
+            // 准备动态字体大小
+            const colCount = active.length;
+            let nameTextClass = colCount >= 6 ? 'text-[9px] sm:text-[11px]' : 'text-[11px] sm:text-[13px]';
+            let numTextClass = colCount >= 6 ? 'text-[11px] sm:text-[13px]' : 'text-[13px] sm:text-[15px]';
+
             let html = '';
-            for (let method in stats) {
-                let mData = stats[method];
-                
-                // 找出被罚最多的玩家，用于红框高亮
+
+            // 遍历当前分类下的所有罚牌方式 (每种方式画一个大长方形框)
+            for (let method in currentCatData.methods) {
+                let mData = currentCatData.methods[method];
+
+                // 找极值：谁被罚得最狠（为了画红框）
                 let globalMaxCards = -1;
-                let kingOfPenaltyIds =[];
+                let kingOfPenaltyIds = [];
                 active.forEach(p => {
                     let c = mData.players[p.id] ? mData.players[p.id].maxCards : 0;
                     if (c > globalMaxCards && c > 0) { globalMaxCards = c; kingOfPenaltyIds = [p.id]; }
                     else if (c === globalMaxCards && c > 0) { kingOfPenaltyIds.push(p.id); }
                 });
 
-                // 完美复刻图2的五行颜色标签
-                const rowLabels =[
-                    { name: '爆分', bg: '#C2E0B4', text: '#5E4B8B' },
-                    { name: '被罚总次数', bg: '#BDC3D1', text: '#5E4B8B' },
-                    { name: '惩罚者', bg: '#FEE599', text: '#5E4B8B' },
-                    { name: '最高张数', bg: '#FE0000', text: '#FFFFFF' },
-                    { name: '最高数轮次', bg: '#5B9BD5', text: '#FFFFFF' }
-                ];
-
-                // 魔法网格排版开始：外框利用紫色边框，内框利用gap生成完美1px/2px极细分隔线
+                // --- 魔法排版开始：复刻图1的布局 ---
                 html += `
-                <div class="border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-[1rem] shadow-[0_4px_0_rgba(94,75,139,0.2)] flex bg-white w-full cursor-pointer hover:scale-[1.01] transition-transform penalty-stat-block relative overflow-hidden mb-4" data-method="${method}">
+                <div class="p-2 sm:p-3 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-[1rem] flex items-stretch gap-2 sm:gap-3 cursor-pointer hover:scale-[1.01] transition-transform penalty-stat-block shadow-sm" style="background-color: ${cardBgColor};" data-method="${method}">
                     
-                    <!-- 第一列：卡片图片单独成列，纵贯所有行 -->
-                    <div class="w-[70px] sm:w-[110px] shrink-0 bg-white flex items-center justify-center p-1 sm:p-2 z-10">
-                        <img src="${mData.imgUrl}" class="max-w-full max-h-full object-contain drop-shadow-md">
+                    <!-- 左侧：紧贴图片的描边容器 (严格遵循指令：高度跟随右边，等比缩放，描边紧贴) -->
+                    <div class="shrink-0 flex items-center justify-center relative w-[25%] max-w-[120px]">
+                        <!-- 这张图片的高度会拉伸到 100%，宽度自适应(w-auto)，描边直接打在图片本身上！ -->
+                        <img src="${mData.imgUrl}" class="h-full w-auto object-contain border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md bg-white shadow-sm absolute inset-0 m-auto" crossorigin="anonymous">
                     </div>
 
-                    <!-- 右侧：标签与玩家网格 (这里利用紫色背景+细微缝隙(gap)，制造出完美的表格边框效果) -->
-                    <div class="flex flex-1 min-w-0 bg-[#5E4B8B] gap-[1px] sm:gap-[2px] pl-[1px] sm:pl-[2px]">
+                    <!-- 右侧：信息框表格容器 (利用背景色和gap实现完美网格) -->
+                    <div class="flex-1 flex bg-[#5E4B8B] gap-[1.5px] sm:gap-[2px] border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md overflow-hidden relative shadow-sm">
                         
-                        <!-- 标签列 (图2同款5种颜色) -->
-                        <div class="flex flex-col w-[65px] sm:w-[90px] shrink-0 bg-[#5E4B8B] gap-[1px] sm:gap-[2px]">
-                            <div class="h-[30px] sm:h-[40px] flex items-center justify-center font-black text-[10px] sm:text-sm tracking-widest" style="background-color: ${rowLabels[0].bg}; color: ${rowLabels[0].text};">${method}</div>
-                            <div class="h-[30px] sm:h-[40px] flex items-center justify-center font-bold text-[9px] sm:text-[12px]" style="background-color: ${rowLabels[1].bg}; color: ${rowLabels[1].text};">${rowLabels[1].name}</div>
-                            <div class="h-[30px] sm:h-[40px] flex items-center justify-center font-bold text-[9px] sm:text-[12px]" style="background-color: ${rowLabels[2].bg}; color: ${rowLabels[2].text};">${rowLabels[2].name}</div>
-                            <div class="h-[30px] sm:h-[40px] flex items-center justify-center font-bold text-[9px] sm:text-[12px] tracking-widest text-stroke" style="background-color: ${rowLabels[3].bg}; color: ${rowLabels[3].text};">${rowLabels[3].name}</div>
-                            <div class="h-[30px] sm:h-[40px] flex items-center justify-center font-bold text-[9px] sm:text-[12px]" style="background-color: ${rowLabels[4].bg}; color: ${rowLabels[4].text};">${rowLabels[4].name}</div>
+                        <!-- 第一列：表头文字 (严格复刻图1的5种颜色) -->
+                        <div class="flex flex-col shrink-0 gap-[1.5px] sm:gap-[2px] w-[35px] sm:w-[50px] bg-[#5E4B8B]">
+                            <div class="flex-1 flex items-center justify-center bg-[#A6A6A6] text-white font-black text-[10px] sm:text-xs tracking-widest min-h-[22px] sm:min-h-[28px] w-full px-0.5">极值</div>
+                            <div class="flex-1 flex items-center justify-center bg-[#8DA4D0] text-white font-black text-[9px] sm:text-[11px] min-h-[22px] sm:min-h-[28px] w-full px-0.5 whitespace-nowrap">总次数</div>
+                            <div class="flex-1 flex items-center justify-center bg-[#F4A7B9] text-white font-black text-[9px] sm:text-[11px] min-h-[22px] sm:min-h-[28px] w-full px-0.5 whitespace-nowrap">最高值</div>
+                            <div class="flex-1 flex items-center justify-center bg-[#F3D27B] text-white font-black text-[9px] sm:text-[11px] min-h-[22px] sm:min-h-[28px] w-full px-0.5 whitespace-nowrap">惩罚者</div>
+                            <div class="flex-1 flex items-center justify-center bg-[#A0B0C4] text-white font-black text-[9px] sm:text-[11px] tracking-widest min-h-[22px] sm:min-h-[28px] w-full px-0.5">轮次</div>
                         </div>
 
-                        <!-- 活跃玩家列渲染 -->
+                        <!-- 后续列：动态生成玩家列 -->
                         ${active.map(p => {
                             let pd = mData.players[p.id];
                             let isKing = kingOfPenaltyIds.includes(p.id);
                             
                             let tTimes = pd ? pd.times : '/';
+                            let tMax = pd ? pd.maxCards : '/';
+                            let tRound = pd ? pd.maxRound : '/';
                             
-                            let tPunisher = '/'; 
-                            let tPunBg = '#FFFFFF';
-                            let tPunColorText = '#5E4B8B';
-                            let tPunStroke = '';
-                            
-                            // 惩罚者格子：有名字时，底色为惩罚者的代表色，文字白色带描边
+                            let tPunisher = '/';
+                            let tPunColor = '#CBD5E1'; // 默认斜杠颜色
+
                             if (pd && pd.punisher) {
-                                let kp = gameData.players.find(x=>x.id===pd.punisher);
-                                if(kp) { 
-                                    tPunisher = getShort(kp.name); 
-                                    tPunBg = kp.color; 
-                                    tPunColorText = '#FFFFFF';
-                                    tPunStroke = 'text-stroke';
+                                let kp = gameData.players.find(x => x.id === pd.punisher);
+                                if (kp) {
+                                    tPunisher = kp.name ? kp.name.slice(-1) : '?';
+                                    tPunColor = kp.color; // 采用惩罚者的代表色
                                 }
                             }
-                            
-                            // 罚牌张数格子：数字一律红色，斜杠则为默认紫色
-                            let tMax = pd ? pd.maxCards : '/';
-                            let tMaxColor = tMax === '/' ? '#5E4B8B' : '#FE0000';
-                            
-                            // 轮次格子：数字一律蓝色，斜杠则为默认紫色
-                            let tRound = pd ? pd.maxRound : '/';
-                            let tRoundColor = tRound === '/' ? '#5E4B8B' : '#5B9BD5';
+
+                            // 极简短名
+                            let shortName = p.name ? p.name.slice(-1) : '?';
 
                             return `
-                            <div class="flex flex-col flex-1 min-w-0 bg-[#5E4B8B] gap-[1px] sm:gap-[2px] relative z-10">
-                                <!-- 玩家头像 -->
-                                <div class="h-[30px] sm:h-[40px] flex items-center justify-center gap-0.5 sm:gap-1" style="background-color: ${hexToRgba(p.color, 0.3)};">
-                                    <div class="w-4 h-4 sm:w-6 sm:h-6 rounded-[4px] border-[1.5px] sm:border-[2px] border-[#5E4B8B] overflow-hidden bg-black shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div>
-                                    <span class="text-white font-black text-[11px] sm:text-sm text-stroke tracking-widest leading-none">${getShort(p.name)}</span>
-                                </div>
-                                <!-- 次数 -->
-                                <div class="h-[30px] sm:h-[40px] bg-white flex items-center justify-center font-black text-[#5E4B8B] text-xs sm:text-base">${tTimes}</div>
-                                <!-- 惩罚者 -->
-                                <div class="h-[30px] sm:h-[40px] flex items-center justify-center font-black text-[11px] sm:text-[15px] tracking-widest ${tPunStroke}" style="background-color: ${tPunBg}; color: ${tPunColorText};">${tPunisher}</div>
-                                <!-- 最高张数 -->
-                                <div class="h-[30px] sm:h-[40px] bg-white flex items-center justify-center font-black text-[14px] sm:text-[18px]" style="color:${tMaxColor};">${tMax}</div>
-                                <!-- 最高数轮次 -->
-                                <div class="h-[30px] sm:h-[40px] bg-white flex items-center justify-center font-black text-[12px] sm:text-[15px]" style="color:${tRoundColor};">${tRound}</div>
+                            <div class="flex-1 flex flex-col bg-[#5E4B8B] gap-[1.5px] sm:gap-[2px] relative z-10 min-w-[20px]">
+                                <!-- 1. 玩家名底色 -->
+                                <div class="flex-1 flex items-center justify-center min-h-[22px] sm:min-h-[28px] text-white font-black ${nameTextClass} text-stroke" style="background-color: ${p.color};">${shortName}</div>
+                                
+                                <!-- 2. 总次数 (深蓝色字) -->
+                                <div class="flex-1 flex items-center justify-center min-h-[22px] sm:min-h-[28px] bg-white text-[#5E4B8B] font-black ${numTextClass}">${tTimes}</div>
+                                
+                                <!-- 3. 最高值 (图1是深红色字) -->
+                                <div class="flex-1 flex items-center justify-center min-h-[22px] sm:min-h-[28px] bg-white text-[#E11D48] font-black ${numTextClass}">${tMax}</div>
+                                
+                                <!-- 4. 惩罚者 (对方颜色) -->
+                                <div class="flex-1 flex items-center justify-center min-h-[22px] sm:min-h-[28px] bg-white font-black ${nameTextClass} text-stroke" style="color: ${tPunColor};">${tPunisher}</div>
+                                
+                                <!-- 5. 轮次 (深蓝色字) -->
+                                <div class="flex-1 flex items-center justify-center min-h-[22px] sm:min-h-[28px] bg-white text-[#5E4B8B] font-black ${numTextClass}">${tRound}</div>
 
-                                <!-- 图2同款：覆盖下方4行的悬浮红框，带酷炫黑光阴影！ -->
-                                ${isKing ? `<div class="absolute top-[31px] sm:top-[42px] left-[-2px] sm:left-[-3px] right-[-2px] sm:right-[-3px] bottom-0 border-[3px] sm:border-[4px] border-[#E11D48] shadow-[0_0_10px_rgba(0,0,0,0.6)] z-20 pointer-events-none"></div>` : ''}
-                            </div>`;
+                                <!-- ★ 核心：醒目红色高亮框 (只套在王者的这一列上，绝对定位覆盖，稍微向外扩展实现套牢效果) -->
+                                ${isKing ? `<div class="absolute inset-[-2px] sm:inset-[-3px] border-[2px] sm:border-[3px] border-[#E11D48] rounded-[3px] sm:rounded-[5px] pointer-events-none z-20 shadow-[0_0_6px_rgba(225,29,72,0.8)]"></div>` : ''}
+                            </div>
+                            `;
                         }).join('')}
                     </div>
                 </div>`;
             }
-            
+
             container.innerHTML = html;
 
+            // 绑定点击弹出详细表格事件 (图2二级界面保持原样)
             document.querySelectorAll('.penalty-stat-block').forEach(block => {
                 block.onclick = () => {
                     const mName = block.dataset.method;
-                    window.openPenaltyDetailModal(mName, stats[mName]);
+                    window.openPenaltyDetailModal(mName, currentCatData.methods[mName]);
                 };
             });
         };
@@ -5377,10 +5769,16 @@ const oldReset = window.resetV2State;
             </div>
         </div>
 
-        <div id="v2DialogSelectMethod" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-5 max-w-[340px] w-full mx-4 shadow-2xl flex flex-col items-center max-h-[85vh]">
-                <div id="selectMethodTitle" class="bg-[#F43F5E] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-5 shadow-sm w-[85%] text-center tracking-widest">选择方式</div>
-                <div class="w-full overflow-y-auto custom-scroll pr-2 flex flex-col gap-5" id="selectMethodList"></div>
+<div id="v2DialogSelectMethod" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-2 sm:p-4 w-[96%] max-w-[800px] mx-auto shadow-2xl flex flex-col items-center max-h-[90vh]">
+                <!-- 顶部的红色胶囊大标题 -->
+                <div id="selectMethodTitle" class="bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full py-1.5 px-8 font-black text-white text-xl sm:text-2xl mb-4 shadow-sm w-auto min-w-[50%] text-center tracking-widest mt-2">选择方式</div>
+                
+                <!-- 中间的动态内容区 -->
+                <div class="w-full overflow-y-auto custom-scroll px-1 flex flex-col gap-4 flex-1 mb-4" id="selectMethodList"></div>
+                
+                <!-- 底部超大取消按钮 -->
+                <button id="selectMethodCancelBtn" class="bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-12 py-1.5 sm:py-2 font-black text-white text-stroke text-xl sm:text-2xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest mb-2 w-[60%] shrink-0">取消</button>
             </div>
         </div>
 
@@ -5929,20 +6327,59 @@ window.openSelectPlayerDialog = function(context) {
 window.openSelectMethodDialog = function(context) {
             let titleEl = document.getElementById('selectMethodTitle');
             let data = (context === 'elim_method' || context === 'penalty_method') ? gameData.customMethods.lose : gameData.customMethods.win;
-            titleEl.className = context === 'win_method' ? "bg-[#65A30D] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-5 shadow-sm w-[85%] text-center tracking-widest" : "bg-[#F43F5E] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-5 shadow-sm w-[85%] text-center tracking-widest";
-            if(context === 'penalty_method') titleEl.className = "bg-[#3B4C9B] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-5 shadow-sm w-[85%] text-center tracking-widest";
-            titleEl.textContent = context === 'win_method' ? '选择胜利方式' : '选择方式/终结技';
-            // ... 后面的 let html = ''; 继续保留不用动
+            
+            // 顶层大标题文字设定
+            titleEl.textContent = context === 'win_method' ? '选择胜利方式' : (context === 'penalty_method' ? '选择终结技' : '选择淘汰方式');
+
             let html = '';
             data.categories.forEach(cat => {
-                const catItems = data.items.filter(item => item.categoryId === cat.id); if (catItems.length === 0) return;
-                html += `<div class="flex flex-col items-center w-full mb-4"><div class="border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 mb-2.5 font-black text-[#5E4B8B] shadow-sm text-base tracking-widest" style="background-color: ${cat.color};">${cat.name}</div><div class="border-[3px] border-[#5E4B8B] rounded-2xl bg-white p-3 w-full shadow-sm"><div class="grid grid-cols-3 gap-2 sm:gap-3">${catItems.map(m => `<button class="border-[2px] border-[#5E4B8B] rounded-xl py-1.5 px-1 text-[11px] sm:text-xs font-black text-[#5E4B8B] shadow-sm hover:brightness-95 truncate select-method-item" data-name="${m.name}" data-context="${context}" style="background-color: ${cat.color}99;">${m.name}</button>`).join('')}</div></div></div>`;
+                const catItems = data.items.filter(item => item.categoryId === cat.id); 
+                if (catItems.length === 0) return;
+                
+                // 完全按照图1 1:1 像素级复刻 HTML排版
+                html += `
+                <div class="flex flex-col items-center w-full mb-3 px-1">
+                    <!-- 分类标题胶囊：利用z-10压在下面的外框上 -->
+                    <div class="border-[2.5px] border-[#5E4B8B] rounded-full px-8 py-0.5 font-black text-[#5E4B8B] shadow-sm text-[12px] sm:text-sm tracking-widest z-10 relative" style="background-color: ${cat.color};">
+                        ${cat.name}
+                    </div>
+                    
+                    <!-- 方式列表区域大外框：利用 -mt-3 向上移动，实现标题穿插边框的效果 -->
+                    <div class="border-[2.5px] border-[#5E4B8B] rounded-[0.5rem] bg-white p-1 sm:p-2 w-full shadow-sm relative -mt-3 pt-4 sm:pt-5">
+                        <!-- 一行强制固定8个： grid-cols-8 -->
+                        <div class="grid grid-cols-8 gap-[2px] sm:gap-1 w-full">
+                            ${catItems.map(m => {
+                                let imgUrl = m.url || 'https://via.placeholder.com/150?text=?';
+                                return `
+                                <div class="flex flex-col items-center w-full cursor-pointer hover:scale-105 transition-transform select-method-item" data-name="${m.name}" data-context="${context}">
+                                    <!-- 图片区域：黑底，等比缩放，原图显示，不要边框 -->
+                                    <div class="w-full aspect-[2/3] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[2px]">
+                                        <img src="${imgUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
+                                    </div>
+                                    
+                                    <!-- 图片与文字之间的间隙 -->
+                                    <div class="h-[2px] sm:h-1 w-full"></div>
+                                    
+                                    <!-- 文字名称区域：底色与分类一致，带细边框 -->
+                                    <div class="w-full border-[1.5px] border-[#5E4B8B] flex items-center justify-center py-[1px] sm:py-0.5 rounded-[1px]" style="background-color: ${cat.color};">
+                                        <span class="font-black text-[#5E4B8B] text-[8px] sm:text-[10px] truncate w-full text-center leading-none px-0.5 transform scale-95">${m.name}</span>
+                                    </div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>`;
             });
+
             document.getElementById('selectMethodList').innerHTML = html;
+            
+            // 隐藏上一个弹窗，显示当前弹窗
             if (context === 'elim_method') document.getElementById('v2DialogSetElimInfo').classList.add('hidden');
             if (context === 'win_method') document.getElementById('v2DialogSetWinInfo').classList.add('hidden');
-            document.getElementById('v2DialogSelectMethod').classList.remove('hidden'); document.getElementById('v2DialogSelectMethod').dataset.context = context;
-if (context === 'penalty_method') document.getElementById('v2DialogSetPenalty').classList.add('hidden');
+            if (context === 'penalty_method') document.getElementById('v2DialogSetPenalty').classList.add('hidden');
+            
+            document.getElementById('v2DialogSelectMethod').classList.remove('hidden'); 
+            document.getElementById('v2DialogSelectMethod').dataset.context = context;
         };
 
         // V2 弹窗事件委派
@@ -5970,6 +6407,14 @@ else if (context === 'penalty_method') { window.v2App.tempPenalty.methodName = n
         safeBind('selectPlayerCancelBtn', () => {
             const ctx = document.getElementById('v2DialogSelectPlayer').dataset.context; document.getElementById('v2DialogSelectPlayer').classList.add('hidden');
             if (ctx.startsWith('elim')) document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); else if (ctx === 'win_select' && typeof timerRemain !== 'undefined' && timerRemain > 0 && !isTimerRunning && typeof startTimer === 'function') startTimer();
+        });
+safeBind('selectMethodCancelBtn', () => {
+            const ctx = document.getElementById('v2DialogSelectMethod').dataset.context;
+            document.getElementById('v2DialogSelectMethod').classList.add('hidden');
+            // 退回到对应的上一个弹窗
+            if (ctx === 'elim_method') document.getElementById('v2DialogSetElimInfo').classList.remove('hidden');
+            else if (ctx === 'win_method') document.getElementById('v2DialogSetWinInfo').classList.remove('hidden');
+            else if (ctx === 'penalty_method') document.getElementById('v2DialogSetPenalty').classList.remove('hidden');
         });
         
         safeBind('elimInfoCancelBtn', () => document.getElementById('v2DialogSetElimInfo').classList.add('hidden'));
