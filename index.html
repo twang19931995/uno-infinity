@@ -54,22 +54,22 @@
             .kawaii-btn { @apply border-4 border-[#5E4B8B] rounded-full font-bold transition-all active:translate-y-1 shadow-[0_4px_0_#5E4B8B]; }
             .kawaii-input { @apply bg-[#F1F5F9] border-4 border-[#5E4B8B] rounded-2xl focus:outline-none; }
             
-            .smooth-outline {
+.smooth-outline {
                 color: white;
-                text-shadow: 
-                    4px 4px 0 #5E4B8B, -4px -4px 0 #5E4B8B, 
-                    4px -4px 0 #5E4B8B, -4px 4px 0 #5E4B8B,
-                    4px 0 0 #5E4B8B, -4px 0 0 #5E4B8B, 
-                    0 4px 0 #5E4B8B, 0 -4px 0 #5E4B8B;
-                paint-order: stroke fill;
+                -webkit-text-stroke: 2.5px #5E4B8B;
+                filter: drop-shadow(0 4px 0px rgba(94,75,139,0.2));
             }
 
             .text-stroke {
-                text-shadow: 
-                    2.5px 2.5px 0 #5E4B8B, -2.5px -2.5px 0 #5E4B8B, 
-                    2.5px -2.5px 0 #5E4B8B, -2.5px 2.5px 0 #5E4B8B,
-                    2.5px 0 0 #5E4B8B, -2.5px 0 0 #5E4B8B, 
-                    0 2.5px 0 #5E4B8B, 0 -2.5px 0 #5E4B8B;
+                -webkit-text-stroke: 1.5px #5E4B8B;
+            }
+            /* 强制抹除代码中残留的内联劣质阴影描边，全部替换为真描边 */
+            *[style*="text-shadow:"] {
+                text-shadow: none !important;
+                -webkit-text-stroke: 1.5px currentColor;
+            }
+            *[style*="text-shadow: 2px 2px 0 #fff"] {
+                -webkit-text-stroke: 2px #ffffff !important;
             }
 
             .bar-stroke { box-shadow: 0 0 0 2px #5E4B8B; }
@@ -86,6 +86,9 @@
         .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 8px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .status-scroll::-webkit-scrollbar { width: 24px; }
+        .status-scroll::-webkit-scrollbar-track { background: white; border-left: 2px solid #5E4B8B; }
+        .status-scroll::-webkit-scrollbar-thumb { background: #B0B0B0; border: 2px solid #5E4B8B; }
     </style>
 </head>
 <body class="min-h-screen pb-10" id="appBody" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
@@ -197,6 +200,46 @@
             </div>
         </section>
         </header>
+
+<!-- 【全新新增】最新战况区域 (图1 1:1 像素复刻) -->
+        <section id="latestStatusSection" class="kawaii-card p-3 sm:p-5 mb-6" style="order: 0;">
+            <div class="flex flex-col items-center w-full relative">
+                <!-- 顶部标题：最新战况 -->
+                <div class="bg-[#FEFCE8] border-[2px] sm:border-[3px] border-[#5E4B8B] px-4 py-0.5 mb-2 relative z-10 shadow-sm">
+                    <span class="font-black text-[#5E4B8B] text-sm sm:text-base tracking-widest text-stroke" style="color: #FACC15; text-shadow: 1px 1px 0 #5E4B8B, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B, 0 1.5px 0 #5E4B8B, 0 -1.5px 0 #5E4B8B, 1.5px 0 0 #5E4B8B, -1.5px 0 0 #5E4B8B;">最新战况</span>
+                </div>
+                
+                <!-- 局数选择按钮 (点击弹窗) -->
+                <button id="statusRoundSelectBtn" class="bg-white border-[2px] sm:border-[3px] border-[#5E4B8B] w-full max-w-[280px] py-1.5 mb-4 shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-center">
+                    <span class="font-black text-[#5E4B8B] text-lg sm:text-xl tracking-widest" id="statusCurrentRoundText">第0局</span>
+                </button>
+
+                <!-- 横向滚动容器：存放玩家卡片 -->
+                <div class="w-full overflow-x-auto scrollbar-hide pb-2">
+                    <!-- 【修复】通过 w-max 和 mx-auto 实现了完美居中排列 -->
+                    <div class="flex gap-2 sm:gap-3 items-stretch w-max mx-auto" id="statusPlayersContainer">
+                        <!-- JS 动态填入玩家卡片 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 【全新新增】图2 历史局数选择弹窗 -->
+        <div id="statusRoundDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+            <div class="bg-[#D5E8D4] border-[4px] border-[#5E4B8B] p-4 max-w-[280px] sm:max-w-[320px] w-full mx-4 shadow-2xl relative flex justify-center">
+                <!-- 关闭按钮 (点外部也能关，这里加个小X更安全) -->
+                <button id="closeStatusDialogBtn" class="absolute -top-3 -right-3 w-8 h-8 bg-white border-[3px] border-[#5E4B8B] rounded-full flex items-center justify-center text-[#5E4B8B] font-black shadow-sm z-10 hover:bg-gray-100">X</button>
+                
+                <div class="bg-white border-[3px] border-[#5E4B8B] w-full max-w-[220px] flex shadow-inner">
+                    <!-- 左侧：局数列表容器 -->
+                    <div class="flex-1 flex flex-col max-h-[350px] overflow-y-auto status-scroll" id="statusRoundList">
+                        <!-- JS 动态填入按钮 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
 
 <!-- 【全新新增】1V1-擂台区 -->
         <section id="oneVsOneSection" class="kawaii-card p-3 sm:p-5 mb-6 hidden" style="background-color: #FEFCE8; order: 0;">
@@ -342,12 +385,16 @@
 
             </div>
 
-            <div id="audienceSharePanel" class="hidden flex-col gap-3 transition-all">
+<div id="audienceSharePanel" class="hidden flex-col gap-3 transition-all">
                 <button id="audienceUpdateDataBtn" class="w-full bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-2xl py-3 font-black text-white text-lg sm:text-xl shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
                     <i class="fa-solid fa-rotate mr-2"></i>拉取最新数据
                 </button>
+                <!-- 【新增】同步主机端视图按钮 -->
+                <button id="audienceSyncViewBtn" class="w-full bg-[#93C5FD] border-[4px] border-[#5E4B8B] rounded-2xl py-2 font-black text-white text-base sm:text-lg shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
+                    <i class="fa-solid fa-desktop mr-2"></i>同步主机端视图
+                </button>
                 <div class="text-center text-[10px] sm:text-xs font-bold text-[#5E4B8B] opacity-60 mt-1">
-                    您正在作为观众查看，可自由点击查看数据，但无法修改主机记录。
+                    您正在作为观众查看，拉取数据不会改变您的自定义排版。
                 </div>
             </div>
         </section>
@@ -1006,6 +1053,7 @@
         ];
 
 const modulesConfig =[
+            { id: 'latestStatusSection', name: '最新战况', icon: 'fa-tv' }, // <--- 这是新加的这一行
 { id: 'cloudShareSection', name: '云端同步与分享', icon: 'fa-cloud' },
 { id: 'oneVsOneSection', name: '1V1-擂台区', icon: 'fa-khanda' },
             { id: 'methodManagerSection', name: '淘汰条目管理区', icon: 'fa-clone' }, // 【图1复刻新增】
@@ -1445,8 +1493,8 @@ const payload = {
             }
         }
 
-        // 核心功能4：从云端拉取最新数据，并覆盖到本地
-        async function fetchDataFromCloud() {
+// 核心功能4：从云端拉取最新数据 (加入 syncView 参数，区分纯数据和全覆盖)
+        async function fetchDataFromCloud(syncView = false) {
             if (!cloudBinId) return;
             const statusBadge = document.getElementById('shareStatusBadge');
             const originalText = statusBadge.textContent;
@@ -1458,16 +1506,27 @@ const payload = {
                 });
                 const result = await response.json();
                 
-if (response.ok && result.record.data) {
-                    // 覆盖本地数据
-                    localStorage.setItem('unoInfinityPro', result.record.data);
-                    // 强制同步主机的模块隐藏状态
-                    if (result.record.hidden) {
-                        localStorage.setItem('unoHiddenModules', result.record.hidden);
+                if (response.ok && result.record.data) {
+                    if (!syncView) {
+                        // 【纯数据模式】: 把云端数据拿下来，但强行保留观众自己当前的视图排版
+                        const localData = JSON.parse(localStorage.getItem('unoInfinityPro') || '{}');
+                        const incomingData = JSON.parse(result.record.data);
+                        
+                        // 保留观众的本地排版和预设配置
+                        if (localData.sectionOrder) incomingData.sectionOrder = localData.sectionOrder;
+                        
+                        localStorage.setItem('unoInfinityPro', JSON.stringify(incomingData));
+                        // 隐藏模块设置保留本地的，不覆盖
+                    } else {
+                        // 【同步视图模式】: 完全覆盖为云端（主机）的数据和排版
+                        localStorage.setItem('unoInfinityPro', result.record.data);
+                        if (result.record.hidden) {
+                            localStorage.setItem('unoHiddenModules', result.record.hidden);
+                        }
                     }
-                    // 刷新页面
+                    
                     location.reload(); 
-                }else {
+                } else {
                     throw new Error("数据格式错误");
                 }
             } catch (error) {
@@ -1478,21 +1537,16 @@ if (response.ok && result.record.data) {
         }
 
 // 核心功能5：管理视图配置
-        let viewConfigs = JSON.parse(localStorage.getItem('unoViewConfigs') || '{"default": {"name": "默认视图", "modules": []}}');
+        let viewConfigs = JSON.parse(localStorage.getItem('unoViewConfigs') || '{"default": {"name": "默认视图", "modules":[]}}');
         let currentViewId = 'default';
 
-        // 渲染弹窗里的模块列表
         function renderModuleSettings() {
             const container = document.getElementById('moduleListContainer');
             if(!container) return;
             container.innerHTML = '';
-            
-            // 获取当前主机端所有的模块定义
             modulesConfig.forEach((mod, index) => {
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-3 bg-white border-[2px] border-[#5E4B8B] rounded-xl p-3 shadow-sm";
-                
-                // 默认全部勾选
                 div.innerHTML = `
                     <input type="checkbox" id="check-${mod.id}" checked class="w-5 h-5 accent-[#4ADE80] cursor-pointer">
                     <span class="flex-1 font-bold text-[#5E4B8B] text-sm"><i class="fa-solid ${mod.icon} mr-2 opacity-70"></i>${mod.name}</span>
@@ -1502,34 +1556,22 @@ if (response.ok && result.record.data) {
             });
         }
 
-// 核心功能6：【关键】观众端根据配置自动调整界面
         function applyAudienceView(config) {
             if (!config || !config.modules) return;
-            
-            // 1. 先把所有模块藏起来
             modulesConfig.forEach(mod => {
                 const el = document.getElementById(mod.id);
                 if (el) el.style.display = 'none';
             });
-
-            // 2. 根据配置显示并排序
             config.modules.forEach(item => {
                 const el = document.getElementById(item.id);
-                // --- 【核心修复：强制显示逻辑】 ---
-                // 如果是“云端同步视窗”，无论开关怎么选，都必须强制显示！
                 if (item.id === 'cloudShareSection') {
-                    if (el) {
-                        el.style.display = 'block';
-                        el.style.order = "-999"; // 让它永远排在最上面，方便观众一眼看到
-                    }
+                    if (el) { el.style.display = 'block'; el.style.order = "-999"; }
                 } else if (el && item.visible) {
-                    el.style.display = 'block';
-                    el.style.order = item.order;
+                    el.style.display = 'block'; el.style.order = item.order;
                 }
             });
         }
 
-        // 核心引擎2：初始化云端UI面板（决定显示主机面板还是观众面板，并锁死观众的修改权限）
         function initCloudUI() {
             const hostPanel = document.getElementById('hostSharePanel');
             const audPanel = document.getElementById('audienceSharePanel');
@@ -1538,92 +1580,78 @@ if (response.ok && result.record.data) {
             if (!hostPanel || !audPanel || !statusBadge) return;
 
             if (isAudienceMode) {
-                // 观众模式：隐藏主机面板，显示观众面板
-                hostPanel.classList.add('hidden');
-                hostPanel.classList.remove('flex');
-                audPanel.classList.remove('hidden');
-                audPanel.classList.add('flex');
+                hostPanel.classList.add('hidden'); hostPanel.classList.remove('flex');
+                audPanel.classList.remove('hidden'); audPanel.classList.add('flex');
                 
                 statusBadge.textContent = "观众模式 (只读)";
                 statusBadge.classList.replace('text-gray-400', 'text-[#F43F5E]');
                 statusBadge.classList.add('border-[#F43F5E]');
                 
-                // 暴力锁死：让观众无法点击任何修改分数的按钮
-                const disableBtnIds = ['calculateBtn', 'undoBtn', 'redoBtn', 'resetBtn', 'importBtn', 'v2CalculateBtn', 'v2UndoBtn', 'v2RedoBtn', 'earlyWinBtn', 'addSessionBtn', 'penaltyAddBtn', 'penaltyUndoBtn', 'penaltyRedoBtn'];
+                const disableBtnIds =['calculateBtn', 'undoBtn', 'redoBtn', 'resetBtn', 'importBtn', 'v2CalculateBtn', 'v2UndoBtn', 'v2RedoBtn', 'earlyWinBtn', 'addSessionBtn', 'penaltyAddBtn', 'penaltyUndoBtn', 'penaltyRedoBtn'];
                 disableBtnIds.forEach(id => {
                     const btn = document.getElementById(id);
                     if(btn) {
-                        btn.disabled = true;
-                        btn.classList.add('opacity-50', 'cursor-not-allowed');
-                        // 覆盖原有的点击事件，弹出警告
-                        btn.onclick = (e) => { 
-                            e.preventDefault(); 
-                            e.stopPropagation(); 
-                            alert("您当前处于观众模式，仅供查看，无法修改数据喔！"); 
-                        };
+                        btn.disabled = true; btn.classList.add('opacity-50', 'cursor-not-allowed');
+                        btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); alert("您当前处于观众模式，仅供查看，无法修改数据喔！"); };
                     }
                 });
             } else {
-                // 主机模式：保持默认的主机面板
-                hostPanel.classList.remove('hidden');
-                hostPanel.classList.add('flex');
-                audPanel.classList.add('hidden');
-                audPanel.classList.remove('flex');
-                
+                hostPanel.classList.remove('hidden'); hostPanel.classList.add('flex');
+                audPanel.classList.add('hidden'); audPanel.classList.remove('flex');
                 statusBadge.textContent = "主机模式 (可写)";
                 statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
                 statusBadge.classList.add('border-[#4ADE80]');
             }
         }
-        // ==========================================
 
 function init() {
-initCloudUI(); // 【新增】启动云端身份识别UI
-// 1. 【主机端】点击生成分享链接
+            initCloudUI(); 
             const genBtn = document.getElementById('generateShareLinkBtn');
             if (genBtn) {
                 genBtn.onclick = async () => {
-                    genBtn.disabled = true;
-                    genBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>正在生成...';
-                    
+                    genBtn.disabled = true; genBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>正在生成...';
                     const success = await uploadDataToCloud();
                     if (success) {
                         const shareUrl = `${window.location.origin}${window.location.pathname}?view=${cloudBinId}`;
-                        // 尝试自动复制到剪贴板
                         navigator.clipboard.writeText(shareUrl).then(() => {
                             alert("分享链接已生成并复制到剪贴板！快去微信发给朋友吧：\n" + shareUrl);
-                        }).catch(() => {
-                            prompt("请手动复制下方的分享链接：", shareUrl);
-                        });
+                        }).catch(() => { prompt("请手动复制下方的分享链接：", shareUrl); });
                     }
-                    
-                    genBtn.disabled = false;
-                    genBtn.innerHTML = '<i class="fa-solid fa-link mr-1"></i>生成分享链接';
+                    genBtn.disabled = false; genBtn.innerHTML = '<i class="fa-solid fa-link mr-1"></i>生成分享链接';
                 };
             }
 
-            // 2. 【主机端】点击手动更新数据到云端
             const hostUpBtn = document.getElementById('hostUpdateDataBtn');
-            if (hostUpBtn) {
-                hostUpBtn.onclick = () => uploadDataToCloud();
-            }
+            if (hostUpBtn) { hostUpBtn.onclick = () => uploadDataToCloud(); }
 
-            // 3. 【观众端】点击从云端拉取最新数据
+            // 观众端：拉取数据按钮 (传入false，保留本地排版)
             const audUpBtn = document.getElementById('audienceUpdateDataBtn');
-            if (audUpBtn) {
-                audUpBtn.onclick = () => fetchDataFromCloud();
-            }
-// 【新增】布局预设导出为 Excel 功能
+            if (audUpBtn) { audUpBtn.onclick = () => fetchDataFromCloud(false); }
+            
+            // 观众端：同步视图按钮 (传入true，强制覆盖为主机排版)
+            const audSyncBtn = document.getElementById('audienceSyncViewBtn');
+            if (audSyncBtn) { audSyncBtn.onclick = () => fetchDataFromCloud(true); }
+
+            // 【完全修复】布局预设导出，切片存储防爆表，修改文件名
             document.getElementById('exportPresetsBtn').onclick = () => {
                 if (typeof XLSX === 'undefined') return alert('请等待 Excel 库加载完成！');
                 const wb = XLSX.utils.book_new();
                 const jsonStr = JSON.stringify(gameData.presets ||[]);
-                const ws = XLSX.utils.aoa_to_sheet([[jsonStr]]);
+                const rows =[];
+                // 核心：将超长字符串切片，防止Excel单格字符限制导致破损
+                for (let i = 0; i < jsonStr.length; i += 30000) {
+                    rows.push([jsonStr.substring(i, i + 30000)]);
+                }
+                const ws = XLSX.utils.aoa_to_sheet(rows);
                 XLSX.utils.book_append_sheet(wb, ws, "Presets_Config");
-                XLSX.writeFile(wb, `UNO-布局预设备份-${Date.now()}.xlsx`);
+                
+                // 动态提取年份和数量生成完美文件名
+                const yy = String(new Date().getFullYear()).slice(-2);
+                const count = (gameData.presets ||[]).length;
+                XLSX.writeFile(wb, `UNO-S${yy}-布局预设-${count}.xlsx`);
             };
 
-            // 【新增】布局预设从 Excel 导入功能
+            // 【完全修复】布局预设导入，拼接字符串解解析
             document.getElementById('importPresetsBtn').onclick = () => {
                 document.getElementById('importPresetsFile').click();
             };
@@ -1636,8 +1664,13 @@ initCloudUI(); // 【新增】启动云端身份识别UI
                         const workbook = XLSX.read(evt.target.result, {type:'array'});
                         const sheet = workbook.Sheets["Presets_Config"] || workbook.Sheets[workbook.SheetNames[0]];
                         const json = XLSX.utils.sheet_to_json(sheet, {header:1});
-                        if(json[0] && json[0][0]) {
-                            const parsed = JSON.parse(json[0][0]);
+                        
+                        // 核心：把分散在每一行的切片字符串重新拼凑起来
+                        let jsonStr = '';
+                        json.forEach(row => { if(row[0]) jsonStr += row[0]; });
+                        
+                        if(jsonStr) {
+                            const parsed = JSON.parse(jsonStr);
                             if(Array.isArray(parsed)) {
                                 gameData.presets = parsed;
                                 saveData();
@@ -1798,10 +1831,10 @@ bindV2Events(); // 【V2新增】激活我们的新事件
                     const active = gameData.players.filter(p => p.isActive);
                     const alive = active.filter(p => !v2State.eliminated[p.id]);
                     if (alive.length >= 2 && !v2State.winnerId) {
-                        els.survivingPlayersContainer.innerHTML = alive.map(p => `
-                            <button class="kawaii-btn bg-white text-lg py-2 px-4 hover:bg-gray-50 surv-btn" data-id="${p.id}" style="color:${p.color}; border-color:${p.color}">${p.name}</button>
-                        `).join('');
-                        els.earlyWinPlayerDialog.classList.remove('hidden');
+                        // 呼叫最新的终极版选择赢家弹窗 UI
+                        if (typeof window.openSelectPlayerDialog === 'function') {
+                            window.openSelectPlayerDialog('win_select');
+                        }
                     }
                 }
                 updateTimerUI();
@@ -2439,9 +2472,12 @@ window.renderOneVsOneArena = function() {
             let timeBg = m.time > 0 ? 'bg-white' : 'bg-[#E11D48]';
             let timeText = m.time > 0 ? 'text-[#5E4B8B]' : 'text-white text-stroke';
 
-            let methodUrl = 'https://via.placeholder.com/150?text=?';
-            if (gameData.customMethods && gameData.customMethods.win) {
-                let mItem = gameData.customMethods.win.items.find(i => i.name === m.method);
+let methodUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+            if (gameData.customMethods) {
+                // 两边同时查，只要有一边有就拿出来
+                let mItem = null;
+                if (gameData.customMethods.win) mItem = gameData.customMethods.win.items.find(i => i.name === m.method);
+                if (!mItem && gameData.customMethods.lose) mItem = gameData.customMethods.lose.items.find(i => i.name === m.method);
                 if (mItem && mItem.url) methodUrl = mItem.url;
             }
 
@@ -3396,12 +3432,22 @@ function renderLeaderboard(sortedPlayers) {
             let keys = Object.keys(methodsObj).sort((a,b) => methodsObj[b] - methodsObj[a]);
             if (keys.length === 0) return ''; 
 
-            // 智能抓取对应方式设置的图片 URL
+// 智能抓取对应方式设置的图片 URL（终极防裂开升级版）
             let getMethodUrl = (methodName, t) => {
-                let defaultUrl = 'https://via.placeholder.com/150?text=无图';
+                // 使用纯内置 SVG 代码代替网图，断网也绝对不会裂开！
+                let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
                 if (!gameData.customMethods) return defaultUrl;
+                
+                // 1. 先去自己的库里找
                 let data = t === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
                 let item = data.items.find(i => i.name === methodName);
+                
+                // 2. 【核心修复】如果在自己的库里找不到，立刻去隔壁的库找！(完美解决 1V1 继承图片丢失)
+                if (!item) {
+                    let otherData = t === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+                    item = otherData.items.find(i => i.name === methodName);
+                }
+                
                 return item && item.url ? item.url : defaultUrl;
             };
 
@@ -3724,19 +3770,26 @@ ${elimDetailsHtml}
 
             function recordPenalty(statsObj, method, victimId, killerId, cards, roundNum) {
                 if (!statsObj[method]) {
-                    // 默认值
-                    let imgUrl = 'https://via.placeholder.com/150?text=?';
+// 默认使用内置SVG防裂开
+                    let imgUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
                     let catId = 'cl_def';
                     let catName = '无分类';
                     let catColor = '#E2E8F0';
 
-                    // 尝试从自定义设置里找归属信息
-                    if (gameData.customMethods && gameData.customMethods.lose) {
-                        let item = gameData.customMethods.lose.items.find(i => i.name === method);
+                    // 双向查找归属信息
+                    if (gameData.customMethods) {
+                        let data = gameData.customMethods.lose;
+                        let item = data ? data.items.find(i => i.name === method) : null;
+                        
+                        if (!item && gameData.customMethods.win) {
+                            data = gameData.customMethods.win;
+                            item = data.items.find(i => i.name === method);
+                        }
+                        
                         if (item) {
                             if (item.url) imgUrl = item.url;
                             catId = item.categoryId;
-                            let cat = gameData.customMethods.lose.categories.find(c => c.id === catId);
+                            let cat = data.categories.find(c => c.id === catId);
                             if (cat) { catName = cat.name; catColor = cat.color; }
                         }
                     }
@@ -5033,12 +5086,20 @@ function renderMethodStatsTable() {
         const loseContainer = document.getElementById('newLoseStatsList');
         if(!winContainer || !loseContainer) return;
 
-        // 小工具：获取方式对应分类的颜色
+// 小工具：获取方式对应分类的颜色
         const getCatColor = (methodName, type) => {
-            let defaultColor = '#E2E8F0'; // 如果没找到，给个默认浅灰色
+            let defaultColor = '#E2E8F0'; 
             if (!gameData.customMethods) return defaultColor;
+            
             let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
             let item = data.items.find(i => i.name === methodName);
+            
+            // 找不到就去隔壁找
+            if (!item) {
+                data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+                item = data.items.find(i => i.name === methodName);
+            }
+            
             if (item) {
                 let cat = data.categories.find(c => c.id === item.categoryId);
                 if (cat) return cat.color;
@@ -5553,14 +5614,12 @@ function bindV2Events() {
 
         const active = gameData.players.filter(p => p.isActive);
         let simultaneous =[]; // 【新增】
-        active.forEach(p => { 
-            if(p.id !== v2TargetPlayerId && !v2State.eliminated[p.id]) {
-                // 优先使用特殊设置里的默认淘汰方式，没有则用第一个
-let defMethod = gameData.customMethods.lose.items.find(i => i.id === gameData.customMethods.lose.defaultMethodId);
-v2State.eliminated[p.id] = defMethod ? defMethod.name : (eliminateMethodsList[0] || '默认淘汰');
-                simultaneous.push(p.id);
-            }
-        });
+            active.forEach(p => { 
+                if(p.id !== v2TargetPlayerId && !v2State.eliminated[p.id]) {
+                    v2State.eliminated[p.id] = window.getSpecialMethodName('lose', 1);
+                    simultaneous.push(p.id);
+                }
+            });
         if (simultaneous.length > 0) v2State.eliminationEvents.push(simultaneous); // 【新增】加入顺序
 
         triggerWinSelection(v2TargetPlayerId);
@@ -5703,37 +5762,51 @@ gameData.currentSessionIndex = -1;
        }
         window.onload = init;
 // ==========================================
-// 【终极纠错霸体引擎：全功能修复版 (找回丢失的导入导出)】
+// 【终极纠错霸体引擎：全功能修复版】
 // ==========================================
 (function() {
     function deployUltimateEngine() {
         // --- 1. 全局状态强制统一保护舱 ---
-window.v2App = {
+        window.v2App = {
             currentMethodTab: 'lose',
             mmTargetId: null,
+            isSettingSpecialRule: false,
             collapsedCats: new Set(['cl_def', 'cw_def']),
             tempElim: { players:[], killerId: null, methodName: null, cards: '' },
             tempWin: { playerId: null, methodName: null },
-            tempPenalty: { user: null, victim: null, methodName: null, cards: '' }, // 【新增】罚牌弹窗临时数据
+            tempPenalty: { user: null, victim: null, methodName: null, cards: '' }, 
             confirmCallback: null
         };
 
+        // 获取特殊方式名字的终极工具 (已加固容错处理)
+        window.getSpecialMethodName = function(type, num) {
+            let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+            let strNum = String(num); // 强制转换为字符串，杜绝匹配失败
+            if (data && data.specialRules && data.specialRules[strNum]) {
+                let item = data.items.find(i => i.id === data.specialRules[strNum]);
+                if (item && item.name) return item.name;
+            }
+            return '特殊' + (type === 'win' ? '胜利' : '淘汰') + strNum + '(未设置)';
+        };
+
         // 强力扩展重置函数，确保状态永远不报错
-const oldReset = window.resetV2State;
+        const oldReset = window.resetV2State;
         window.resetV2State = function() {
             if (oldReset) oldReset();
             v2State.eliminationDetails = {};
             v2State.eliminationEvents =[];
-            v2State.manualPenalties =[]; // 【新增】清空手动罚牌
-            v2State.penaltyUndoStack =[]; // 【新增】清空罚牌撤销栈
+            v2State.manualPenalties =[]; 
+            v2State.penaltyUndoStack =[]; 
         };
         window.resetV2State();
 
-        // --- 2. 强力清除旧弹窗并注入新 HTML ---
+        // --- 2. 强力清除旧弹窗并注入新 HTML (已修改核心按钮类名，避开旧事件拦截) ---
         document.getElementById('v2DialogSetElimInfo')?.remove();
         document.getElementById('v2DialogSelectPlayer')?.remove();
         document.getElementById('v2DialogSelectMethod')?.remove();
         document.getElementById('v2DialogSetWinInfo')?.remove();
+        document.getElementById('v2DialogSetPenalty')?.remove();
+        
         const newDialogsHTML = `
         <div id="v2DialogSetElimInfo" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
             <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 max-w-[320px] w-full mx-4 shadow-2xl flex flex-col items-center">
@@ -5769,15 +5842,10 @@ const oldReset = window.resetV2State;
             </div>
         </div>
 
-<div id="v2DialogSelectMethod" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+        <div id="v2DialogSelectMethod" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
             <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-2 sm:p-4 w-[96%] max-w-[800px] mx-auto shadow-2xl flex flex-col items-center max-h-[90vh]">
-                <!-- 顶部的红色胶囊大标题 -->
                 <div id="selectMethodTitle" class="bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full py-1.5 px-8 font-black text-white text-xl sm:text-2xl mb-4 shadow-sm w-auto min-w-[50%] text-center tracking-widest mt-2">选择方式</div>
-                
-                <!-- 中间的动态内容区 -->
                 <div class="w-full overflow-y-auto custom-scroll px-1 flex flex-col gap-4 flex-1 mb-4" id="selectMethodList"></div>
-                
-                <!-- 底部超大取消按钮 -->
                 <button id="selectMethodCancelBtn" class="bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-12 py-1.5 sm:py-2 font-black text-white text-stroke text-xl sm:text-2xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest mb-2 w-[60%] shrink-0">取消</button>
             </div>
         </div>
@@ -5800,31 +5868,25 @@ const oldReset = window.resetV2State;
             </div>
         </div>
 
-<!-- 【新增】设置罚牌信息弹窗 (图2复刻) -->
         <div id="v2DialogSetPenalty" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
             <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 max-w-[320px] w-full mx-4 shadow-2xl flex flex-col items-center">
                 <div class="bg-[#3B4C9B] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-4 shadow-sm w-[95%] text-center tracking-widest text-stroke">设置罚牌信息</div>
-                
                 <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-3 flex flex-col items-center shadow-sm">
                     <div class="bg-[#38BDF8] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest text-stroke">使用者</div>
                     <div class="flex items-center justify-center w-full px-2 min-h-[40px]" id="penaltyInfoUserBtn"></div>
                 </div>
-
                 <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-3 flex flex-col items-center shadow-sm">
                     <div class="bg-[#38BDF8] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest text-stroke">被罚者</div>
                     <div class="flex items-center justify-center w-full px-2 min-h-[40px]" id="penaltyInfoVictimBtn"></div>
                 </div>
-
                 <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-3 flex flex-col items-center shadow-sm">
                     <div class="bg-[#38BDF8] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest text-stroke">终结技</div>
                     <button id="penaltyInfoMethodBtn" class="bg-[#9BA4C5] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-6 font-black text-white text-stroke text-lg w-[85%] shadow-sm hover:brightness-110 truncate">点击选择</button>
                 </div>
-
                 <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-5 flex flex-col items-center shadow-sm">
                     <div class="bg-[#38BDF8] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest text-stroke">输入罚牌张数</div>
                     <input type="number" id="penaltyInfoCardsInput" class="w-[85%] h-10 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-black text-center text-[#5E4B8B] text-xl focus:outline-none focus:bg-gray-50 shadow-inner">
                 </div>
-
                 <div class="flex justify-center gap-4 w-full px-2 mb-2">
                     <button id="penaltyInfoConfirmBtn" class="flex-1 bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-2xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest">确定</button>
                     <button id="penaltyInfoCancelBtn" class="flex-1 bg-[#E11D48] border-[4px] border-[#5E4B8B] rounded-2xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest">取消</button>
@@ -5895,12 +5957,12 @@ const oldReset = window.resetV2State;
             const titleEl = document.getElementById('methodManagerTitle');
             if(titleEl) titleEl.innerHTML = isLose ? '淘汰方式条目管理区' : '胜利方式条目管理区';
             const specBtn = document.getElementById('mmSpecialSettingBtn');
-            if(specBtn) specBtn.style.display = isLose ? 'block' : 'none';
+            if(specBtn) specBtn.style.display = 'block';
 
             let html = '';
             const normalCats = data.categories.filter(c => !c.id.endsWith('_def'));
             const defaultCat = data.categories.filter(c => c.id.endsWith('_def'));
-            const sortedCats =[...normalCats, ...defaultCat];
+            const sortedCats = [...normalCats, ...defaultCat];
 
             sortedCats.forEach(cat => {
                 const catItems = data.items.filter(item => item.categoryId === cat.id);
@@ -5922,6 +5984,18 @@ const oldReset = window.resetV2State;
                         <div class="grid grid-cols-6 gap-2 sm:gap-4 mm-cat-grid min-h-[140px]" data-cat-id="${cat.id}">
                             ${catItems.map(item => {
                                 const isDefaultMethod = (isLose && item.id === data.defaultMethodId);
+                                let specialLabel = '';
+                                if (data.specialRules) {
+                                    for (let sNum in data.specialRules) {
+                                        if (data.specialRules[sNum] === item.id) {
+                                            specialLabel = `<div class="absolute top-0 right-0 bg-[#FDE047] border-b-[2px] border-l-[2px] border-[#5E4B8B] px-1.5 py-0.5 text-[10px] font-black text-[#5E4B8B] leading-none z-10 shadow-sm">特殊 `+sNum+`</div>`;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (!specialLabel && isDefaultMethod) {
+                                    specialLabel = `<div class="absolute top-0 right-0 bg-[#FDE047] border-b-[2px] border-l-[2px] border-[#5E4B8B] px-1.5 py-0.5 text-[10px] font-black text-[#5E4B8B] leading-none z-10 shadow-sm">默认</div>`;
+                                }
                                 return `
                                 <div class="flex flex-col items-center w-full mm-item-cap cursor-move" data-id="${item.id}">
                                     <div class="h-8 flex items-end justify-center w-full mb-1.5">
@@ -5930,8 +6004,8 @@ const oldReset = window.resetV2State;
                                         </div>
                                     </div>
                                     <div class="w-full aspect-[2/3] border-[3px] border-[#5E4B8B] rounded-none overflow-hidden relative shadow-sm bg-white hover:brightness-95 transition-all flex justify-center items-center">
-                                        ${isDefaultMethod ? `<div class="absolute top-0 right-0 bg-[#FDE047] border-b-[2px] border-l-[2px] border-[#5E4B8B] px-1.5 py-0.5 text-[10px] font-black text-[#5E4B8B] leading-none z-10 shadow-sm">特殊</div>` : ''}
-                                        <img src="${item.url || 'https://via.placeholder.com/150?text=?'}" class="w-full h-full object-contain" onerror="this.src='https://via.placeholder.com/150?text=?'">
+                                        ${specialLabel}
+                                        <img src="${item.url || 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%23f3f4f6\'/><text x=\'50%\' y=\'50%\' fill=\'%239ca3af\' font-size=\'20\' font-family=\'sans-serif\' text-anchor=\'middle\' dy=\'.3em\'>无图</text></svg>'}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%23f3f4f6\'/><text x=\'50%\' y=\'50%\' fill=\'%239ca3af\' font-size=\'20\' font-family=\'sans-serif\' text-anchor=\'middle\' dy=\'.3em\'>无图</text></svg>';">
                                     </div>
                                     <div class="h-8 flex items-start justify-center w-full mt-1.5">
                                         <button class="bg-[#F43F5E] text-white rounded-full px-5 py-0.5 flex items-center justify-center hover:scale-110 transition-transform mm-del-item-btn shadow-sm cursor-pointer" data-id="${item.id}">
@@ -6015,27 +6089,45 @@ const oldReset = window.resetV2State;
 
         safeBind('mmSpecialSettingBtn', () => {
             isEditingCategory = false;
-            document.getElementById('mmCatSelectList').innerHTML = gameData.customMethods.lose.items.map(item => {
-                const cat = gameData.customMethods.lose.categories.find(c => c.id === item.categoryId) || {color: '#fff'};
+            window.v2App.isSettingSpecialRule = true;
+            const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
+            document.getElementById('mmCatSelectList').innerHTML = data.items.map(item => {
+                const cat = data.categories.find(c => c.id === item.categoryId) || {color: '#fff'};
                 return `<button class="w-full border-[3px] border-[#5E4B8B] rounded-full py-1.5 font-black text-[#5E4B8B] text-sm mm-select-opt-btn" data-id="${item.id}" style="background-color: ${cat.color};">${item.name}</button>`;
             }).join('');
-            document.getElementById('mmCatSelectDialog').querySelector('.bg-\\[\\#D8B4E2\\]').textContent = '选择特殊设置(未淘汰但胜出时)';
+            document.getElementById('mmCatSelectDialog').querySelector('.bg-\\[\\#D8B4E2\\]').textContent = '点击要设为【特殊】的条目';
             document.getElementById('mmCatSelectDialog').classList.remove('hidden');
         });
 
-        safeBind('mmCatSelectCancelBtn', () => document.getElementById('mmCatSelectDialog').classList.add('hidden'));
-        
         document.getElementById('mmCatSelectList').onclick = (e) => {
             const btn = e.target.closest('.mm-select-opt-btn');
             if (!btn) return;
             if (isEditingCategory) {
                 const selectBtn = document.getElementById('mmItemCatSelectBtn');
                 selectBtn.dataset.cid = btn.dataset.id; selectBtn.textContent = btn.textContent;
+                document.getElementById('mmCatSelectDialog').classList.add('hidden');
+            } else if (window.v2App.isSettingSpecialRule) {
+                let num = prompt("请输入要分配的特殊编号\n(例如填 1 代表特殊方式1，填 2 代表特殊方式2。填 0 可取消该条目的特殊身份)：", "1");
+                if (num !== null) {
+                    num = num.trim();
+                    const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
+                    if (!data.specialRules) data.specialRules = {};
+                    
+                    if (num === "0" || num === "") {
+                        for (let k in data.specialRules) {
+                            if (data.specialRules[k] === btn.dataset.id) delete data.specialRules[k];
+                        }
+                    } else {
+                        data.specialRules[num] = btn.dataset.id;
+                    }
+                    saveData(); window.renderMethodManager();
+                    document.getElementById('mmCatSelectDialog').classList.add('hidden');
+                }
             } else {
                 gameData.customMethods.lose.defaultMethodId = btn.dataset.id;
                 saveData(); window.renderMethodManager();
+                document.getElementById('mmCatSelectDialog').classList.add('hidden');
             }
-            document.getElementById('mmCatSelectDialog').classList.add('hidden');
         };
 
         window.showMmConfirm = function(cb) { window.v2App.confirmCallback = cb; document.getElementById('mmConfirmDialog').classList.remove('hidden'); };
@@ -6049,7 +6141,6 @@ const oldReset = window.resetV2State;
             });
         });
 
-        // 【！！！找回的导出导入功能！！！】
         safeBind('mmExportBtn', () => {
             if (typeof XLSX === 'undefined') return alert('请等待 Excel 库加载完成！');
             const wb = XLSX.utils.book_new();
@@ -6149,7 +6240,7 @@ const oldReset = window.resetV2State;
             if (window.v2App.tempElim.killerId) {
                 const p = gameData.players.find(x=>x.id===window.v2App.tempElim.killerId);
                 killerBtn.innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-5 py-1.5 flex items-center gap-3 shadow-sm cursor-pointer hover:brightness-110" style="background-color: ${p.color};" onclick="openSelectPlayerDialog('elim_killer')"><div class="w-8 h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-lg">${p.name}</span></div>`;
-} else { killerBtn.innerHTML = `<button class="bg-[#D8B4E2] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-6 font-black text-[#5E4B8B] text-sm shadow-sm hover:brightness-110 tracking-widest" onclick="openSelectPlayerDialog('elim_killer')">点击选择(必选)</button>`; }
+            } else { killerBtn.innerHTML = `<button class="bg-[#D8B4E2] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-6 font-black text-[#5E4B8B] text-sm shadow-sm hover:brightness-110 tracking-widest" onclick="openSelectPlayerDialog('elim_killer')">点击选择(必选)</button>`; }
 
             const methodBtn = document.getElementById('elimInfoMethodBtn');
             methodBtn.textContent = window.v2App.tempElim.methodName || '点击选择';
@@ -6158,64 +6249,44 @@ const oldReset = window.resetV2State;
         };
         window.removeTempElimPlayer = function(id) { window.v2App.tempElim.players = window.v2App.tempElim.players.filter(pid => pid !== id); window.renderElimInfoDialog(); };
 
-// 【全新复刻】图1和图2同款的紧凑型表格行
         window.createPenaltyRowHtml = function(userP, victimP, method, cardsStr) {
             const getShort = (name) => name ? name.slice(-1) : '?';
-            // 公共单元格样式 (带右边框，垂直居中)
             const cellBase = "flex items-center justify-center border-r-[2px] border-[#5E4B8B] last:border-r-0 h-full py-1";
-            
-            // 头像背景色：将玩家代表色变淡（模拟图中的淡色底）
             let uBg = userP.color + (userP.color.length === 7 ? '4D' : '');
             let vBg = victimP.color + (victimP.color.length === 7 ? '4D' : '');
 
             return `
             <div class="flex items-stretch w-full border-b-[2px] border-[#5E4B8B] last:border-b-0 min-h-[30px] sm:min-h-[36px] bg-white">
-                
-                <!-- 使用者 -->
                 <div class="${cellBase} w-[20%] sm:w-[18%] shrink-0" style="background-color: ${uBg};">
                     <div class="flex items-center gap-1">
                         <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] border-[1.5px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${userP.avatar}" class="w-full h-full object-cover"></div>
                         <span class="font-black text-[#5E4B8B] text-[10px] sm:text-xs whitespace-nowrap">${getShort(userP.name)}</span>
                     </div>
                 </div>
-                
-                <!-- 加号 -->
                 <div class="${cellBase} w-[8%] sm:w-[8%] shrink-0 bg-white">
                     <span class="font-black text-[#E11D48] text-[12px] sm:text-[14px]">+</span>
                 </div>
-                
-                <!-- 方法 -->
                 <div class="${cellBase} flex-1 min-w-0 bg-[#FCE8E6]">
                     <span class="font-black text-[#5E4B8B] text-[10px] sm:text-xs tracking-widest truncate px-1">${method}</span>
                 </div>
-                
-                <!-- 箭头 -->
                 <div class="${cellBase} w-[8%] sm:w-[8%] shrink-0 bg-white">
                     <span class="font-black text-[#E11D48] text-[12px] sm:text-[14px]">→</span>
                 </div>
-                
-                <!-- 被罚者 -->
                 <div class="${cellBase} w-[20%] sm:w-[18%] shrink-0" style="background-color: ${vBg};">
                     <div class="flex items-center gap-1">
                         <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] border-[1.5px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${victimP.avatar}" class="w-full h-full object-cover"></div>
                         <span class="font-black text-[#5E4B8B] text-[10px] sm:text-xs whitespace-nowrap">${getShort(victimP.name)}</span>
                     </div>
                 </div>
-                
-                <!-- 张数 -->
                 <div class="${cellBase} w-[14%] sm:w-[14%] shrink-0 bg-white">
                     <span class="font-black text-[#E11D48] text-[13px] sm:text-[16px]">${cardsStr}</span>
                 </div>
-                
-                <!-- 单位 -->
                 <div class="${cellBase} w-[10%] sm:w-[10%] shrink-0 bg-[#E0E7FF]">
                     <span class="font-black text-[#5E4B8B] text-[10px] sm:text-xs">张</span>
                 </div>
-                
             </div>`;
         };
 
-        // 【新增】更新罚牌显示区
         window.renderPenaltyLists = function() {
             const manList = document.getElementById('penaltyManualList');
             const elimList = document.getElementById('penaltyElimList');
@@ -6224,11 +6295,9 @@ const oldReset = window.resetV2State;
 
             if(roundText) roundText.textContent = gameData.rounds.length + 1;
 
-// 1. 渲染手动录入
             if(v2State.manualPenalties.length === 0) {
                 manList.innerHTML = '<div class="text-center text-gray-400 font-bold text-xs py-2 w-full">暂无记录</div>';
             } else {
-                // 加了一层带边框的圆角盒子，模拟表格外框
                 manList.innerHTML = `<div class="border-[2px] border-[#5E4B8B] rounded-md overflow-hidden flex flex-col w-full">` + 
                     v2State.manualPenalties.map(item => {
                         const uP = gameData.players.find(x=>x.id===item.user);
@@ -6237,34 +6306,29 @@ const oldReset = window.resetV2State;
                     }).join('') + `</div>`;
             }
 
-            // 2. 渲染淘汰自动抓取
             let elimRows =[];
             for (let pid in v2State.eliminated) {
                 const details = v2State.eliminationDetails[pid];
-                // 只有设置了惩罚张数并且大于0的才显示在这里
                 if (details && details.cards && parseInt(details.cards) > 0) {
-                    const uP = details.killerId ? gameData.players.find(x=>x.id===details.killerId) : gameData.players.find(x=>x.id===parseInt(pid)); // 如果没有凶手，使用者就是自己
+                    const uP = details.killerId ? gameData.players.find(x=>x.id===details.killerId) : gameData.players.find(x=>x.id===parseInt(pid));
                     const vP = gameData.players.find(x=>x.id===parseInt(pid));
                     const method = v2State.eliminated[pid];
                     elimRows.push(window.createPenaltyRowHtml(uP, vP, method, details.cards));
                 }
             }
 
-if(elimRows.length === 0) {
+            if(elimRows.length === 0) {
                 elimList.innerHTML = '<div class="text-center text-gray-400 font-bold text-xs py-2 w-full">暂无淘汰罚牌记录</div>';
             } else {
-                // 同样加一层表格外框
                 elimList.innerHTML = `<div class="border-[2px] border-[#5E4B8B] rounded-md overflow-hidden flex flex-col w-full">` + elimRows.join('') + `</div>`;
             }
 
-            // 更新撤销恢复按钮状态
             document.getElementById('penaltyUndoBtn').disabled = v2State.manualPenalties.length === 0;
             document.getElementById('penaltyUndoBtn').classList.toggle('opacity-50', v2State.manualPenalties.length === 0);
             document.getElementById('penaltyRedoBtn').disabled = v2State.penaltyUndoStack.length === 0;
             document.getElementById('penaltyRedoBtn').classList.toggle('opacity-50', v2State.penaltyUndoStack.length === 0);
         };
 
-        // 【新增】渲染弹窗里的内容
         window.renderPenaltyInfoDialog = function() {
             const tUser = window.v2App.tempPenalty.user;
             const tVictim = window.v2App.tempPenalty.victim;
@@ -6287,6 +6351,7 @@ if(elimRows.length === 0) {
             
             document.getElementById('penaltyInfoCardsInput').value = window.v2App.tempPenalty.cards;
         };
+        
         window.renderWinInfoDialog = function() {
             const p = gameData.players.find(x=>x.id===window.v2App.tempWin.playerId);
             document.getElementById('winInfoPlayerBtn').innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-6 py-1.5 flex items-center gap-3 shadow-sm cursor-pointer hover:brightness-110" style="background-color: ${p.color};" onclick="openSelectPlayerDialog('win_select'); document.getElementById('v2DialogSetWinInfo').classList.add('hidden');"><div class="w-9 h-9 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl">${p.name}</span></div>`;
@@ -6295,7 +6360,7 @@ if(elimRows.length === 0) {
             methodBtn.onclick = () => openSelectMethodDialog('win_method');
         };
 
-window.openSelectPlayerDialog = function(context) {
+        window.openSelectPlayerDialog = function(context) {
             let titleEl = document.getElementById('selectPlayerTitle'); let cancelBtn = document.getElementById('selectPlayerCancelBtn');
             if (context.startsWith('elim')) { titleEl.className = "bg-[#F43F5E] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-5 shadow-sm w-[85%] text-center tracking-widest"; cancelBtn.className = "bg-[#84CC16] border-[4px] border-[#5E4B8B] rounded-2xl px-12 py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm mt-2 tracking-widest"; } 
             else if (context.startsWith('penalty')) { titleEl.className = "bg-[#3B4C9B] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-5 shadow-sm w-[85%] text-center tracking-widest"; cancelBtn.className = "bg-[#84CC16] border-[4px] border-[#5E4B8B] rounded-2xl px-12 py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm mt-2 tracking-widest"; }
@@ -6304,17 +6369,14 @@ window.openSelectPlayerDialog = function(context) {
             const active = gameData.players.filter(p => p.isActive);
             let available = active;
             
-            // 核心逻辑：如果是选择凶手 或 选择赢家，过滤掉已经被淘汰的玩家
             if (context === 'elim_add') {
                 available = active.filter(p => !window.v2App.tempElim.players.includes(p.id) && !v2State.eliminated[p.id]);
             } else if (context === 'elim_killer' || context === 'win_select') {
                 available = active.filter(p => !v2State.eliminated[p.id]);
             }
             
-            // 生成按钮代码
-            let html = available.map(p => `<div class="flex justify-center w-full"><div class="border-[3px] border-[#5E4B8B] rounded-full pl-2 pr-8 py-1.5 flex items-center gap-3 cursor-pointer shadow-sm hover:brightness-110 select-player-item w-[85%]" data-id="${p.id}" data-context="${context}" style="background-color: ${p.color};"><div class="w-8 h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0 flex items-center justify-center"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl flex-1 text-center">${p.name}</span></div></div>`).join('');
-            
-            // 把按钮画进框里
+            // 【重点变更】：这里的按钮 className 改成了 'v2-player-selector-btn'，彻底摆脱旧的事件拦截！！
+            let html = available.map(p => `<div class="flex justify-center w-full"><div class="border-[3px] border-[#5E4B8B] rounded-full pl-2 pr-8 py-1.5 flex items-center gap-3 cursor-pointer shadow-sm hover:brightness-110 v2-player-selector-btn w-[85%]" data-id="${p.id}" data-context="${context}" style="background-color: ${p.color};"><div class="w-8 h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0 flex items-center justify-center"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl flex-1 text-center">${p.name}</span></div></div>`).join('');
             document.getElementById('selectPlayerList').innerHTML = html;
             
             if (context.startsWith('elim')) document.getElementById('v2DialogSetElimInfo').classList.add('hidden');
@@ -6324,43 +6386,34 @@ window.openSelectPlayerDialog = function(context) {
             document.getElementById('v2DialogSelectPlayer').dataset.context = context;
         };
 
-window.openSelectMethodDialog = function(context) {
+        window.openSelectMethodDialog = function(context) {
             let titleEl = document.getElementById('selectMethodTitle');
             let data = (context === 'elim_method' || context === 'penalty_method') ? gameData.customMethods.lose : gameData.customMethods.win;
             
-            // 顶层大标题文字设定
             titleEl.textContent = context === 'win_method' ? '选择胜利方式' : (context === 'penalty_method' ? '选择终结技' : '选择淘汰方式');
 
             let html = '';
             data.categories.forEach(cat => {
+             if (cat.id === 'cl_def' || cat.id === 'cw_def') return;
                 const catItems = data.items.filter(item => item.categoryId === cat.id); 
                 if (catItems.length === 0) return;
                 
-                // 完全按照图1 1:1 像素级复刻 HTML排版
+                // 【重点变更】：这里的按钮 className 改成了 'v2-method-selector-btn'
                 html += `
                 <div class="flex flex-col items-center w-full mb-3 px-1">
-                    <!-- 分类标题胶囊：利用z-10压在下面的外框上 -->
                     <div class="border-[2.5px] border-[#5E4B8B] rounded-full px-8 py-0.5 font-black text-[#5E4B8B] shadow-sm text-[12px] sm:text-sm tracking-widest z-10 relative" style="background-color: ${cat.color};">
                         ${cat.name}
                     </div>
-                    
-                    <!-- 方式列表区域大外框：利用 -mt-3 向上移动，实现标题穿插边框的效果 -->
                     <div class="border-[2.5px] border-[#5E4B8B] rounded-[0.5rem] bg-white p-1 sm:p-2 w-full shadow-sm relative -mt-3 pt-4 sm:pt-5">
-                        <!-- 一行强制固定8个： grid-cols-8 -->
                         <div class="grid grid-cols-8 gap-[2px] sm:gap-1 w-full">
                             ${catItems.map(m => {
-                                let imgUrl = m.url || 'https://via.placeholder.com/150?text=?';
+                                let imgUrl = m.url || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
                                 return `
-                                <div class="flex flex-col items-center w-full cursor-pointer hover:scale-105 transition-transform select-method-item" data-name="${m.name}" data-context="${context}">
-                                    <!-- 图片区域：黑底，等比缩放，原图显示，不要边框 -->
+                                <div class="flex flex-col items-center w-full cursor-pointer hover:scale-105 transition-transform v2-method-selector-btn" data-name="${m.name}" data-context="${context}">
                                     <div class="w-full aspect-[2/3] bg-[#111111] flex items-center justify-center overflow-hidden rounded-[2px]">
                                         <img src="${imgUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
                                     </div>
-                                    
-                                    <!-- 图片与文字之间的间隙 -->
                                     <div class="h-[2px] sm:h-1 w-full"></div>
-                                    
-                                    <!-- 文字名称区域：底色与分类一致，带细边框 -->
                                     <div class="w-full border-[1.5px] border-[#5E4B8B] flex items-center justify-center py-[1px] sm:py-0.5 rounded-[1px]" style="background-color: ${cat.color};">
                                         <span class="font-black text-[#5E4B8B] text-[8px] sm:text-[10px] truncate w-full text-center leading-none px-0.5 transform scale-95">${m.name}</span>
                                     </div>
@@ -6373,7 +6426,6 @@ window.openSelectMethodDialog = function(context) {
 
             document.getElementById('selectMethodList').innerHTML = html;
             
-            // 隐藏上一个弹窗，显示当前弹窗
             if (context === 'elim_method') document.getElementById('v2DialogSetElimInfo').classList.add('hidden');
             if (context === 'win_method') document.getElementById('v2DialogSetWinInfo').classList.add('hidden');
             if (context === 'penalty_method') document.getElementById('v2DialogSetPenalty').classList.add('hidden');
@@ -6382,36 +6434,79 @@ window.openSelectMethodDialog = function(context) {
             document.getElementById('v2DialogSelectMethod').dataset.context = context;
         };
 
-        // V2 弹窗事件委派
+        // --- 全新、独立、绝不互相干扰的全局弹窗事件委派 ---
         document.addEventListener('click', e => {
-            const pBtn = e.target.closest('.select-player-item');
+            const pBtn = e.target.closest('.v2-player-selector-btn'); // 换用新类名
             if (pBtn) {
                 const context = pBtn.dataset.context; const pid = pBtn.dataset.id === "null" ? null : parseInt(pBtn.dataset.id);
                 document.getElementById('v2DialogSelectPlayer').classList.add('hidden');
-                if (context === 'elim_add') { if (!window.v2App.tempElim.players.includes(pid)) window.v2App.tempElim.players.push(pid); document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); window.renderElimInfoDialog(); }
-                else if (context === 'elim_killer') { window.v2App.tempElim.killerId = pid; document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); window.renderElimInfoDialog(); }
-                else if (context === 'win_select') { window.v2App.tempWin.playerId = pid; document.getElementById('v2DialogSetWinInfo').classList.remove('hidden'); window.renderWinInfoDialog(); }
-else if (context === 'penalty_user') { window.v2App.tempPenalty.user = pid; document.getElementById('v2DialogSetPenalty').classList.remove('hidden'); window.renderPenaltyInfoDialog(); }
-                else if (context === 'penalty_victim') { window.v2App.tempPenalty.victim = pid; document.getElementById('v2DialogSetPenalty').classList.remove('hidden'); window.renderPenaltyInfoDialog(); }
+                
+                if (context === 'elim_add') { 
+                    if (!window.v2App.tempElim.players.includes(pid)) window.v2App.tempElim.players.push(pid); 
+                    document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); 
+                    window.renderElimInfoDialog(); 
+                }
+                else if (context === 'elim_killer') { 
+                    window.v2App.tempElim.killerId = pid; 
+                    document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); 
+                    window.renderElimInfoDialog(); 
+                }
+                else if (context === 'win_select') { 
+                    let isTimeUp = (typeof timerRemain !== 'undefined' && timerRemain <= 0);
+                    if (isTimeUp && typeof window.handleWinnerConfirmed === 'function') {
+                        // 时间到了，绝不弹窗，直接后台结算
+                        window.handleWinnerConfirmed(pid, true, false);
+                    } else {
+                        // 正常的手动选择胜利方式弹窗
+                        window.v2App.tempWin.playerId = pid; 
+                        document.getElementById('v2DialogSetWinInfo').classList.remove('hidden'); 
+                        window.renderWinInfoDialog(); 
+                    }
+                }
+                else if (context === 'penalty_user') { 
+                    window.v2App.tempPenalty.user = pid; 
+                    document.getElementById('v2DialogSetPenalty').classList.remove('hidden'); 
+                    window.renderPenaltyInfoDialog(); 
+                }
+                else if (context === 'penalty_victim') { 
+                    window.v2App.tempPenalty.victim = pid; 
+                    document.getElementById('v2DialogSetPenalty').classList.remove('hidden'); 
+                    window.renderPenaltyInfoDialog(); 
+                }
             }
-            const mBtn = e.target.closest('.select-method-item');
+
+            const mBtn = e.target.closest('.v2-method-selector-btn'); // 换用新类名
             if (mBtn) {
                 const context = mBtn.dataset.context; const name = mBtn.dataset.name;
                 document.getElementById('v2DialogSelectMethod').classList.add('hidden');
-                if (context === 'elim_method') { window.v2App.tempElim.methodName = name; document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); window.renderElimInfoDialog(); }
-                else if (context === 'win_method') { window.v2App.tempWin.methodName = name; document.getElementById('v2DialogSetWinInfo').classList.remove('hidden'); window.renderWinInfoDialog(); }
-else if (context === 'penalty_method') { window.v2App.tempPenalty.methodName = name; document.getElementById('v2DialogSetPenalty').classList.remove('hidden'); window.renderPenaltyInfoDialog(); }
+                
+                if (context === 'elim_method') { 
+                    window.v2App.tempElim.methodName = name; 
+                    document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); 
+                    window.renderElimInfoDialog(); 
+                }
+                else if (context === 'win_method') { 
+                    window.v2App.tempWin.methodName = name; 
+                    document.getElementById('v2DialogSetWinInfo').classList.remove('hidden'); 
+                    window.renderWinInfoDialog(); 
+                }
+                else if (context === 'penalty_method') { 
+                    window.v2App.tempPenalty.methodName = name; 
+                    document.getElementById('v2DialogSetPenalty').classList.remove('hidden'); 
+                    window.renderPenaltyInfoDialog(); 
+                }
             }
         });
 
         safeBind('selectPlayerCancelBtn', () => {
             const ctx = document.getElementById('v2DialogSelectPlayer').dataset.context; document.getElementById('v2DialogSelectPlayer').classList.add('hidden');
-            if (ctx.startsWith('elim')) document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); else if (ctx === 'win_select' && typeof timerRemain !== 'undefined' && timerRemain > 0 && !isTimerRunning && typeof startTimer === 'function') startTimer();
+            if (ctx.startsWith('elim')) document.getElementById('v2DialogSetElimInfo').classList.remove('hidden'); 
+            else if (ctx === 'win_select' && typeof timerRemain !== 'undefined' && timerRemain > 0 && !isTimerRunning && typeof startTimer === 'function') startTimer();
         });
-safeBind('selectMethodCancelBtn', () => {
+        
+        safeBind('selectMethodCancelBtn', () => {
             const ctx = document.getElementById('v2DialogSelectMethod').dataset.context;
             document.getElementById('v2DialogSelectMethod').classList.add('hidden');
-            // 退回到对应的上一个弹窗
             if (ctx === 'elim_method') document.getElementById('v2DialogSetElimInfo').classList.remove('hidden');
             else if (ctx === 'win_method') document.getElementById('v2DialogSetWinInfo').classList.remove('hidden');
             else if (ctx === 'penalty_method') document.getElementById('v2DialogSetPenalty').classList.remove('hidden');
@@ -6419,14 +6514,12 @@ safeBind('selectMethodCancelBtn', () => {
         
         safeBind('elimInfoCancelBtn', () => document.getElementById('v2DialogSetElimInfo').classList.add('hidden'));
         
-        // 【终极防报错修复：确保各种属性在被调用前绝对已声明！】
-safeBind('elimInfoConfirmBtn', () => {
+        safeBind('elimInfoConfirmBtn', () => {
             window.v2App.tempElim.cards = document.getElementById('elimInfoCardsInput').value;
             if (window.v2App.tempElim.players.length === 0) return alert("请至少选择一名淘汰者！");
-            if (!window.v2App.tempElim.killerId) return alert("请选择被谁淘汰！"); // <--- 新增这行，强制要求选凶手
+            if (!window.v2App.tempElim.killerId) return alert("请选择被谁淘汰！"); 
             if (!window.v2App.tempElim.methodName) return alert("请选择淘汰方式！");
 
-            // 极度安全的保险声明
             v2State.eliminated = v2State.eliminated || {};
             v2State.eliminationDetails = v2State.eliminationDetails || {};
             v2State.eliminationEvents = v2State.eliminationEvents ||[];
@@ -6435,7 +6528,12 @@ safeBind('elimInfoConfirmBtn', () => {
                 v2State.eliminated[pid] = window.v2App.tempElim.methodName;
                 v2State.eliminationDetails[pid] = { killerId: window.v2App.tempElim.killerId, cards: window.v2App.tempElim.cards ? parseInt(window.v2App.tempElim.cards) : 0 };
             });
+            // 【终极修复】必须存ID，不能存对象！！！
             v2State.eliminationEvents.push([...window.v2App.tempElim.players]);
+            
+            v2State.lastElimWasSuicide = (window.v2App.tempElim.killerId === window.v2App.tempElim.players[0]);
+            v2State.lastElimMethodName = window.v2App.tempElim.methodName;
+
             document.getElementById('v2DialogSetElimInfo').classList.add('hidden');
             
             if(typeof startTimer === 'function') startTimer(); 
@@ -6444,11 +6542,98 @@ safeBind('elimInfoConfirmBtn', () => {
         });
 
         safeBind('winInfoCancelBtn', () => { document.getElementById('v2DialogSetWinInfo').classList.add('hidden'); if (typeof timerRemain !== 'undefined' && timerRemain > 0 && !isTimerRunning && typeof startTimer === 'function') startTimer(); });
-        
+
+        window.handleWinnerConfirmed = function(winnerId, isTimeUp, isAutoOneLeft) {
+            let active = gameData.players.filter(p => p.isActive);
+            let simultaneous = active.filter(p => p.id !== winnerId && !v2State.eliminated[p.id]);
+            let survivorsCount = simultaneous.length + 1; 
+
+            let finalWinMethod = null;
+            let finalLoseMethodForOthers = null;
+
+            if (survivorsCount >= 3) {
+                if (!isTimeUp) {
+                    finalWinMethod = 'MANUAL'; 
+                    finalLoseMethodForOthers = window.getSpecialMethodName('lose', 1); 
+                } else {
+                    finalWinMethod = window.getSpecialMethodName('win', 1);
+                    finalLoseMethodForOthers = window.getSpecialMethodName('lose', 2);
+                }
+            } else if (survivorsCount === 2) {
+                if (isTimeUp) {
+                    finalWinMethod = window.getSpecialMethodName('win', 1);
+                    finalLoseMethodForOthers = window.getSpecialMethodName('lose', 2);
+                } else {
+                    finalWinMethod = 'MANUAL';
+                    finalLoseMethodForOthers = window.getSpecialMethodName('lose', 1);
+                }
+            } else if (survivorsCount === 1) {
+                if (!isTimeUp && isAutoOneLeft) {
+                    if (v2State.lastElimWasSuicide) {
+                        finalWinMethod = window.getSpecialMethodName('win', 2);
+                    } else {
+                        finalWinMethod = v2State.lastElimMethodName || window.getSpecialMethodName('win', 1);
+                    }
+                } else {
+                    finalWinMethod = window.getSpecialMethodName('win', 1);
+                }
+            }
+
+            if (finalWinMethod === 'MANUAL') {
+                window.v2App.tempWin = { playerId: winnerId, methodName: null };
+                window.v2App.tempForcedLoseMethod = finalLoseMethodForOthers; 
+                let p = gameData.players.find(x=>x.id===winnerId);
+                document.getElementById('winInfoPlayerBtn').innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-6 py-1.5 flex items-center gap-3 shadow-sm cursor-pointer hover:brightness-110" style="background-color: ${p.color};" onclick="openSelectPlayerDialog('win_select'); document.getElementById('v2DialogSetWinInfo').classList.add('hidden');"><div class="w-9 h-9 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl">${p.name}</span></div>`;
+                document.getElementById('winInfoMethodBtn').textContent = '点击选择';
+                document.getElementById('v2DialogSetWinInfo').classList.remove('hidden');
+            } else {
+                v2State.winnerId = winnerId;
+                v2State.winMethod = finalWinMethod;
+                if (finalLoseMethodForOthers) {
+                    let ids =[];
+                    // 【终极修复】不要存对象！要存纯纯的数字ID！
+                    simultaneous.forEach(p => {
+                        v2State.eliminated[p.id] = finalLoseMethodForOthers;
+                        // 因为是时间耗尽或者系统托管的自动淘汰，凶手就是那个幸存的赢家
+                        v2State.eliminationDetails[p.id] = { killerId: winnerId, cards: 0 };
+                        ids.push(p.id);
+                    });
+                    if (ids.length > 0) v2State.eliminationEvents.push(ids);
+                }
+                document.getElementById('v2DialogSetWinInfo').classList.add('hidden');
+                let calcBtn = document.getElementById('v2CalculateBtn');
+                if (calcBtn) { calcBtn.disabled = false; calcBtn.classList.replace('bg-gray-400', 'bg-primary'); calcBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(typeof stopTimer === 'function') stopTimer(); 
+                if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+            }
+        };
+
+        window.checkWinCondition = function() {
+            const active = gameData.players.filter(p => p.isActive); 
+            const alive = active.filter(p => !v2State.eliminated[p.id]);
+            if(alive.length === 1 && !v2State.winnerId) { 
+                let isTimeUp = (typeof timerRemain !== 'undefined' && timerRemain <= 0);
+                window.handleWinnerConfirmed(alive[0].id, isTimeUp, true); 
+            }
+        };
+
+        const survElem = document.getElementById('survivingPlayersContainer');
+        if(survElem) {
+            let newSurvElem = survElem.cloneNode(true);
+            survElem.parentNode.replaceChild(newSurvElem, survElem);
+            newSurvElem.addEventListener('click', e => {
+                const btn = e.target.closest('.surv-btn');
+                if(!btn) return;
+                v2TargetPlayerId = parseInt(btn.dataset.id);
+                document.getElementById('earlyWinPlayerDialog').classList.add('hidden');
+                let isTimeUp = (typeof timerRemain !== 'undefined' && timerRemain <= 0);
+                window.handleWinnerConfirmed(v2TargetPlayerId, isTimeUp, false);
+            });
+            if (typeof els !== 'undefined') els.survivingPlayersContainer = newSurvElem;
+        }
+
         safeBind('winInfoConfirmBtn', () => {
             if (!window.v2App.tempWin.methodName) return alert("请选择胜利方式！");
-            
-            // 极度安全的保险声明
             v2State.eliminated = v2State.eliminated || {};
             v2State.eliminationDetails = v2State.eliminationDetails || {};
             v2State.eliminationEvents = v2State.eliminationEvents ||[];
@@ -6457,57 +6642,25 @@ safeBind('elimInfoConfirmBtn', () => {
             v2State.winMethod = window.v2App.tempWin.methodName;
 
             const active = gameData.players.filter(p => p.isActive);
-            let simultaneous =[]; let defMethodName = '默认淘汰';
-            if (gameData.customMethods && gameData.customMethods.lose) {
-                let defMethod = gameData.customMethods.lose.items.find(i => i.id === gameData.customMethods.lose.defaultMethodId);
-                if (defMethod) defMethodName = defMethod.name;
-            }
-            
+            let simultaneous =[]; 
             active.forEach(p => {
                 if (p.id !== v2State.winnerId && !v2State.eliminated[p.id]) {
-                    v2State.eliminated[p.id] = defMethodName; 
-                    v2State.eliminationDetails[p.id] = { killerId: null, cards: 0 };
+                    // 彻底解决默认为特殊1的遗留死角：优先读取大脑赋给的死法
+                    v2State.eliminated[p.id] = window.v2App.tempForcedLoseMethod || window.getSpecialMethodName('lose', 1); 
+                    // 【修复】把最后这批人的凶手强行绑定给最终赢家
+                    v2State.eliminationDetails[p.id] = { killerId: v2State.winnerId, cards: 0 };
                     simultaneous.push(p.id);
                 }
             });
-            
-            if (simultaneous.length > 0) { 
-                v2State.eliminationEvents.push(simultaneous);
-            }
+            if (simultaneous.length > 0) v2State.eliminationEvents.push(simultaneous);
 
             document.getElementById('v2DialogSetWinInfo').classList.add('hidden');
-            if (typeof els !== 'undefined' && els.v2CalculateBtn) {
-                els.v2CalculateBtn.disabled = false;
-                els.v2CalculateBtn.classList.replace('bg-gray-400', 'bg-primary');
-                els.v2CalculateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
+            let calcBtn = document.getElementById('v2CalculateBtn');
+            if (calcBtn) { calcBtn.disabled = false; calcBtn.classList.replace('bg-gray-400', 'bg-primary'); calcBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
             if(typeof stopTimer === 'function') stopTimer(); 
             if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
         });
 
-        // --- 7. 暴力接管所有旧事件，安全重写按钮 ---
-        window.checkWinCondition = function() {
-            const active = gameData.players.filter(p => p.isActive); const alive = active.filter(p => !v2State.eliminated[p.id]);
-            if(alive.length === 1 && !v2State.winnerId) { window.v2App.tempWin = { playerId: alive[0].id, methodName: null }; document.getElementById('v2DialogSetWinInfo').classList.remove('hidden'); window.renderWinInfoDialog(); }
-        };
-
-        window.startTimer = function() {
-            if (isTimerRunning || timerRemain <= 0) return; isTimerRunning = true;
-            const toggleBtn = document.getElementById('timerToggleBtn'); toggleBtn.innerHTML = '<i class="fa-solid fa-pause"></i>'; toggleBtn.classList.replace('bg-[#4ADE80]', 'bg-[#F59E0B]'); 
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            timerInterval = setInterval(() => {
-                timerRemain--;
-                if (timerRemain <= 0) {
-                    timerRemain = 0; stopTimer(); playBeep(1.0, 1200, 1.5);
-                    const active = gameData.players.filter(p => p.isActive); const alive = active.filter(p => !v2State.eliminated[p.id]);
-                    if (alive.length >= 2 && !v2State.winnerId) window.openSelectPlayerDialog('win_select'); 
-                    else if (alive.length === 1 && !v2State.winnerId) checkWinCondition();
-                }
-                updateTimerUI();
-            }, 1000); loopSound();
-        };
-
-        // 核心物理替换，绝对不写 window.els 以防崩溃
         function nukeAndReplaceBtn(id) {
             const oldBtn = document.getElementById(id); if (!oldBtn) return null;
             const newBtn = oldBtn.cloneNode(true); oldBtn.parentNode.replaceChild(newBtn, oldBtn); return newBtn;
@@ -6523,7 +6676,6 @@ safeBind('elimInfoConfirmBtn', () => {
             nukeAndReplaceBtn('v2CalculateBtn');
         }
 
-        // 重新注入清爽的点击事件
         const scoreAreaElem = document.getElementById('v2ScoreArea');
         if (scoreAreaElem) {
             scoreAreaElem.addEventListener('click', e => {
@@ -6561,19 +6713,18 @@ safeBind('elimInfoConfirmBtn', () => {
                 active.forEach(p => { if (String(p.id) !== winIdStr) { const penalty = Math.max(0, scores[p.id] - winnerScore); changes[p.id] = -penalty; totalPool += penalty; } });
                 changes[winIdStr] = totalPool;
 
-                // 保险机制，确保序列化时绝不报错
                 v2State.eliminated = v2State.eliminated || {};
                 v2State.eliminationEvents = v2State.eliminationEvents ||[];
                 v2State.eliminationDetails = v2State.eliminationDetails || {};
 
                 gameData.rounds.push({
                     round: gameData.rounds.length + 1, changes: changes, winner: parseInt(winIdStr),
-v2Stats: { 
+                    v2Stats: { 
                         winMethod: v2State.winMethod, 
                         eliminated: JSON.parse(JSON.stringify(v2State.eliminated)), 
                         eliminationEvents: JSON.parse(JSON.stringify(v2State.eliminationEvents)), 
                         eliminationDetails: JSON.parse(JSON.stringify(v2State.eliminationDetails)), 
-                        manualPenalties: JSON.parse(JSON.stringify(v2State.manualPenalties)), // 【新增】保存罚牌记录
+                        manualPenalties: JSON.parse(JSON.stringify(v2State.manualPenalties)), 
                         revivedPlayerId: v2State.revivedPlayerId, 
                         timerRemainAtEnd: typeof timerRemain !== 'undefined' ? timerRemain : 0 
                     }
@@ -6592,7 +6743,6 @@ v2Stats: {
             };
         }
 
-// 【新增】罚牌区的按键绑定
         safeBind('penaltyAddBtn', () => {
             window.v2App.tempPenalty = { user: null, victim: null, methodName: null, cards: '' };
             let defMethod = null; 
@@ -6601,34 +6751,27 @@ v2Stats: {
             }
             if (defMethod) window.v2App.tempPenalty.methodName = defMethod.name;
             window.renderPenaltyInfoDialog();
-// === 新增：让罚牌张数输入框能实时更新到 tempPenalty ===
-const cardsInput = document.getElementById('penaltyInfoCardsInput');
-if (cardsInput) {
-    cardsInput.oninput = () => {
-        window.v2App.tempPenalty.cards = cardsInput.value.trim();
-    };
-    // 保险起见，也监听 change 事件
-    cardsInput.onchange = cardsInput.oninput;
-}
+            const cardsInput = document.getElementById('penaltyInfoCardsInput');
+            if (cardsInput) {
+                cardsInput.oninput = () => { window.v2App.tempPenalty.cards = cardsInput.value.trim(); };
+                cardsInput.onchange = cardsInput.oninput;
+            }
             document.getElementById('v2DialogSetPenalty').classList.remove('hidden');
         });
 
         safeBind('penaltyInfoCancelBtn', () => document.getElementById('v2DialogSetPenalty').classList.add('hidden'));
         
-// 确认添加罚牌记录
         safeBind('penaltyInfoConfirmBtn', () => {
-            // 【修复Bug 1】先把输入框里的数字读出来存好，再去检查
             window.v2App.tempPenalty.cards = document.getElementById('penaltyInfoCardsInput').value;
-
             if(!window.v2App.tempPenalty.user) return alert("请选择使用者！");
             if(!window.v2App.tempPenalty.victim) return alert("请选择被罚者！");
             if(!window.v2App.tempPenalty.methodName) return alert("请选择终结技！");
 
-const cardsVal = String(window.v2App.tempPenalty.cards || '').trim();
-const cardsNum = parseInt(cardsVal, 10);
-if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
-    return alert("必须输入有效的罚牌张数（大于0的整数）！");
-}
+            const cardsVal = String(window.v2App.tempPenalty.cards || '').trim();
+            const cardsNum = parseInt(cardsVal, 10);
+            if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
+                return alert("必须输入有效的罚牌张数（大于0的整数）！");
+            }
 
             v2State.manualPenalties.push({
                 id: Date.now(),
@@ -6638,14 +6781,12 @@ if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
                 cards: window.v2App.tempPenalty.cards
             });
             
-            // 避开截断Bug的写法：清空重做栈
             v2State.penaltyUndoStack.length = 0; 
             
             document.getElementById('v2DialogSetPenalty').classList.add('hidden');
             if(typeof window.renderPenaltyLists === 'function') window.renderPenaltyLists();
         });
 
-        // 罚牌撤销按钮
         safeBind('penaltyUndoBtn', () => {
             if (v2State.manualPenalties.length > 0) {
                 const popped = v2State.manualPenalties.pop();
@@ -6654,7 +6795,6 @@ if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
             }
         });
 
-        // 罚牌恢复按钮
         safeBind('penaltyRedoBtn', () => {
             if (v2State.penaltyUndoStack.length > 0) {
                 const restored = v2State.penaltyUndoStack.pop();
@@ -6663,7 +6803,6 @@ if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
             }
         });
 
-// 切换视图按钮逻辑 (图1与图2自由切换)
         safeBind('togglePenaltyViewBtn', () => {
             const container = document.getElementById('penaltyLayoutContainer');
             const titleManContainer = document.getElementById('titleManualContainer');
@@ -6672,32 +6811,26 @@ if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
             const titleElim = document.getElementById('titleElim');
             
             if (container.classList.contains('flex-col')) {
-                // 切换到双列并排 (图2模式)
                 container.classList.remove('flex-col');
                 container.classList.add('grid', 'grid-cols-2', 'items-start');
-                
                 titleManContainer.className = 'flex justify-center';
                 titleMan.textContent = '局间录入';
                 titleMan.className = 'bg-[#93C5FD] border-[3px] border-[#5E4B8B] rounded-full px-5 py-0.5 text-sm font-bold text-[#5E4B8B] shadow-sm tracking-widest';
-                
                 titleElimContainer.className = 'flex justify-center';
                 titleElim.textContent = '淘汰录入';
                 titleElim.className = 'bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-full px-5 py-0.5 text-sm font-bold text-white shadow-sm tracking-widest text-stroke';
             } else {
-                // 切换回上下单列 (图1模式)
                 container.classList.remove('grid', 'grid-cols-2', 'items-start');
                 container.classList.add('flex-col');
-                
                 titleManContainer.className = 'flex justify-start';
                 titleMan.textContent = '手动录入';
                 titleMan.className = 'bg-[#93C5FD] border-[3px] border-[#5E4B8B] rounded-full px-4 py-0.5 text-sm font-bold text-[#5E4B8B] shadow-sm tracking-widest';
-                
                 titleElimContainer.className = 'flex justify-start';
                 titleElim.textContent = '淘汰区';
                 titleElim.className = 'bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-full px-4 py-0.5 text-sm font-bold text-white shadow-sm tracking-widest text-stroke';
             }
         });
-        // 该局信息折叠/展开按钮
+        
         safeBind('penaltyFoldToggle', () => {
             const content = document.getElementById('penaltyFoldContent');
             const icon = document.getElementById('penaltyFoldIcon');
@@ -6710,15 +6843,218 @@ if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
             }
         });
         
-        // --- 确保页面刷新时，也刷新罚牌列表 ---
         if(typeof window.renderPenaltyLists === 'function') window.renderPenaltyLists();
-
-        // 强行立刻刷新一次界面以显示
         if(typeof window.renderMethodManager === 'function') window.renderMethodManager();
+if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
         if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+// ========================================================
+        // 【新增模块】最新战况 核心逻辑与画笔
+        // ========================================================
+        let statusCurrentViewRound = -1; // -1 代表显示最新的一局
+
+        window.renderLatestStatus = function() {
+            const container = document.getElementById('statusPlayersContainer');
+            const roundTextBtn = document.getElementById('statusCurrentRoundText');
+            if(!container || !roundTextBtn) return;
+
+            const active = gameData.players.filter(p => p.isActive);
+            if(gameData.rounds.length === 0) {
+                container.innerHTML = '<div class="text-[#5E4B8B] font-bold w-full text-center py-4">暂无战况数据，请先完成一局游戏！</div>';
+                roundTextBtn.textContent = '暂无对局';
+                return;
+            }
+
+            // 确定要展示哪一局
+            let targetIndex = statusCurrentViewRound === -1 ? gameData.rounds.length - 1 : statusCurrentViewRound;
+            if(targetIndex >= gameData.rounds.length) targetIndex = gameData.rounds.length - 1;
+            const rData = gameData.rounds[targetIndex];
+            
+            roundTextBtn.textContent = `第${rData.round}局`;
+
+            // 1. 计算【截止到这一局】每个人的累计总分
+            let cumScores = {};
+            active.forEach(p => cumScores[p.id] = 0);
+            for(let i = 0; i <= targetIndex; i++) {
+                active.forEach(p => {
+                    cumScores[p.id] += (gameData.rounds[i].changes[p.id] || 0);
+                });
+            }
+
+            // 2. 根据【这一局的得分】从高到低排序玩家
+            let sortedPlayers = [...active].sort((a,b) => {
+                let ca = rData.changes[a.id] || 0;
+                let cb = rData.changes[b.id] || 0;
+                return cb - ca; 
+            });
+
+            // 提取图片的小工具
+            let getMethodUrl = (methodName, type) => {
+                let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23000000'/><text x='50%' y='50%' fill='%23ffffff' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+                if (!gameData.customMethods) return defaultUrl;
+                let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+                let item = data.items.find(i => i.name === methodName);
+                if (!item) {
+                    data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+                    item = data.items.find(i => i.name === methodName);
+                }
+                return item && item.url ? item.url : defaultUrl;
+            };
+
+            const getShort = (name) => name ? name.slice(-1) : '?';
+
+// 3. 画出卡片
+            container.innerHTML = sortedPlayers.map(p => {
+                let isWinner = rData.winner === p.id;
+                let changeScore = rData.changes[p.id] || 0;
+                let changeStr = changeScore > 0 ? `+${changeScore}` : `${changeScore}`;
+                let cumScore = cumScores[p.id];
+                
+                // 【修改：累计分数的颜色】正分绿(#4ADE80)，负分红(#EF4444)，0分默认紫(#5E4B8B)
+                let cumScoreColor = cumScore > 0 ? 'text-[#4ADE80]' : (cumScore < 0 ? 'text-[#EF4444]' : 'text-[#5E4B8B]');
+                
+                // 边框和基础色：赢家绿框，输家红框
+                let outBorder = isWinner ? 'border-[#86EFAC]' : 'border-[#EF4444]';
+                let scoreColor = isWinner ? 'text-[#4ADE80]' : (changeScore < 0 ? 'text-[#EF4444]' : 'text-gray-500');
+                
+                let actionText = '';
+                let actionBg = '';
+                let methodImg = '';
+                let penaltyCards = '/';
+                let v2 = rData.v2Stats;
+
+                if (isWinner) {
+                    actionText = '使用';
+                    actionBg = 'bg-[#4ADE80] text-white'; // 赢家保持白字绿底
+                    let wMethod = v2 && v2.winMethod ? v2.winMethod : '默认胜利';
+                    methodImg = getMethodUrl(wMethod, 'win');
+                } else {
+                    let killerId = null;
+                    if(v2 && v2.eliminationDetails && v2.eliminationDetails[p.id]) {
+                        killerId = v2.eliminationDetails[p.id].killerId;
+                        let cards = parseInt(v2.eliminationDetails[p.id].cards);
+                        if(cards > 0) penaltyCards = `+${cards}张`;
+                    }
+                    
+                    // 【修改：输家第四行文字改成暗红色 text-[#9F1239]】
+                    if (killerId === p.id) {
+                        actionText = '被自己用';
+                        let selfColor = p.color; 
+                        actionBg = `text-[#9F1239]" style="background-color: ${selfColor};`;
+                    } else if (killerId) {
+                        let kP = gameData.players.find(x=>x.id===killerId);
+                        let kName = kP ? getShort(kP.name) : '?';
+                        actionText = `被${kName}用`;
+                        let kColor = kP ? kP.color : '#9CA3AF';
+                        actionBg = `text-[#9F1239]" style="background-color: ${kColor};`;
+                    } else {
+                        actionText = '被系统用';
+                        actionBg = 'bg-gray-400 text-[#9F1239]';
+                    }
+
+                    let lMethod = (v2 && v2.eliminated && v2.eliminated[p.id]) ? v2.eliminated[p.id] : '默认淘汰';
+                    methodImg = getMethodUrl(lMethod, 'lose');
+                }
+
+                let cellBase = "flex items-center justify-center border-b-[2px] border-[#5E4B8B] w-full text-center tracking-widest font-black leading-none";
+
+                let bottomHtml = '';
+                if(isWinner) {
+                    bottomHtml = `
+                    <!-- 赢家合并最后两行 -->
+                    <div class="h-[46px] sm:h-[54px] bg-[#4ADE80] flex items-center justify-center w-full">
+                        <span class="font-black text-white text-base sm:text-lg tracking-widest text-stroke">获胜</span>
+                    </div>`;
+                } else {
+                    bottomHtml = `
+                    <div class="h-[22px] sm:h-[26px] bg-[#9F1239] flex items-center justify-center w-full border-b-[2px] border-[#5E4B8B]">
+                        <span class="font-black text-white text-[11px] sm:text-xs tracking-widest">淘汰</span>
+                    </div>
+                    <div class="h-[22px] sm:h-[26px] bg-[#E2E8F0] flex items-center justify-center w-full">
+                        <span class="font-black text-[#E11D48] text-[11px] sm:text-xs">${penaltyCards}</span>
+                    </div>`;
+                }
+
+                return `
+                <!-- 玩家外框 -->
+                <div class="flex flex-col w-[65px] sm:w-[80px] bg-white border-[2px] ${outBorder} shrink-0">
+                    <!-- 第1行：玩家名 -->
+                    <div class="${cellBase} h-[24px] sm:h-[28px] text-white text-[12px] sm:text-[14px] text-stroke" style="background-color: ${p.color};">
+                        ${getShort(p.name)}
+                    </div>
+                    <!-- 第2行：累计分数 (已应用动态颜色) -->
+                    <div class="${cellBase} h-[26px] sm:h-[30px] ${cumScoreColor} text-[14px] sm:text-[16px]">
+                        ${cumScore}
+                    </div>
+                    <!-- 第3行：单局加减 -->
+                    <div class="${cellBase} h-[22px] sm:h-[26px] ${scoreColor} text-[12px] sm:text-[14px]">
+                        ${changeStr}
+                    </div>
+                    <!-- 第4行：行为 (输家已应用暗红字) -->
+                    <div class="${cellBase} h-[22px] sm:h-[26px] text-[9px] sm:text-[10px] ${actionBg}">
+                        ${actionText}
+                    </div>
+                    <!-- 第5行：图片 -->
+                    <div class="${cellBase} aspect-[2/3] bg-black p-0.5">
+                        <img src="${methodImg}" class="w-full h-full object-contain" crossorigin="anonymous">
+                    </div>
+                    <!-- 底部两行 -->
+                    <div class="flex flex-col w-full">
+                        ${bottomHtml}
+                    </div>
+                </div>`;
+            }).join('');
+        };
+
+        // 弹窗控制逻辑
+        const btnOpenStatus = document.getElementById('statusRoundSelectBtn');
+        const dialogStatus = document.getElementById('statusRoundDialog');
+        const listStatus = document.getElementById('statusRoundList');
+        const btnCloseStatus = document.getElementById('closeStatusDialogBtn');
+
+        if(btnOpenStatus) {
+            btnOpenStatus.onclick = () => {
+                if(gameData.rounds.length === 0) return;
+                
+                let html = '';
+                // 倒序生成列表，符合图2
+                for(let i = gameData.rounds.length - 1; i >= 0; i--) {
+                    let rNum = gameData.rounds[i].round;
+                    // 如果是当前选中的局，给点灰色高亮暗示
+                    let bgClass = (i === statusCurrentViewRound || (statusCurrentViewRound === -1 && i === gameData.rounds.length -1)) ? 'bg-[#E2E8F0]' : 'bg-white';
+                    html += `
+                    <button class="w-full text-center py-2 sm:py-2.5 border-b-[2px] border-[#5E4B8B] last:border-b-0 ${bgClass} hover:bg-gray-100 active:scale-95 transition-all font-black text-[#5E4B8B] text-base sm:text-lg tracking-widest status-round-opt-btn" data-idx="${i}">
+                        第${rNum}局
+                    </button>`;
+                }
+                listStatus.innerHTML = html;
+                dialogStatus.classList.remove('hidden');
+            };
+        }
+
+        if(btnCloseStatus) {
+            btnCloseStatus.onclick = () => dialogStatus.classList.add('hidden');
+        }
+
+        if(listStatus) {
+            listStatus.addEventListener('click', e => {
+                const btn = e.target.closest('.status-round-opt-btn');
+                if(!btn) return;
+                statusCurrentViewRound = parseInt(btn.dataset.idx);
+                dialogStatus.classList.add('hidden');
+                window.renderLatestStatus();
+            });
+        }
+        
+        // 绑定原本每次结算游戏后，自动把视角切回最新一局并重绘
+        const originalStatusUpdate = window.updateAllUI;
+        window.updateAllUI = function() {
+            if(originalUpdateAllUI) originalUpdateAllUI();
+            statusCurrentViewRound = -1; // 只要有新操作，自动跳回追踪最新一局
+            if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
+        };
+        // ========================================================
     }
 
-    // 【最高防线】确保在系统的 init 彻底跑完，旧事件已经绑定完毕之后，再进行清洗和覆盖！
     if (document.readyState === 'complete') {
         setTimeout(deployUltimateEngine, 50);
     } else {
@@ -6729,6 +7065,6 @@ if (!cardsVal || isNaN(cardsNum) || cardsNum <= 0) {
         };
     }
 })();
-    </script>
+</script>
 </body>
 </html>
