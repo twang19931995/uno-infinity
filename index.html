@@ -54,22 +54,22 @@
             .kawaii-btn { @apply border-4 border-[#5E4B8B] rounded-full font-bold transition-all active:translate-y-1 shadow-[0_4px_0_#5E4B8B]; }
             .kawaii-input { @apply bg-[#F1F5F9] border-4 border-[#5E4B8B] rounded-2xl focus:outline-none; }
             
-.smooth-outline {
+/* 【全新优化】真正的平滑外描边：利用 paint-order 先向外画描边再填色 */
+            .smooth-outline {
                 color: white;
-                -webkit-text-stroke: 2.5px #5E4B8B;
-                filter: drop-shadow(0 4px 0px rgba(94,75,139,0.2));
+                -webkit-text-stroke: 4.5px #5E4B8B; /* ★修改这里的 4.5px 可以改变主标题紫色描边宽度★ */
+                paint-order: stroke fill;
             }
 
             .text-stroke {
-                -webkit-text-stroke: 1.5px #5E4B8B;
-            }
-            /* 强制抹除代码中残留的内联劣质阴影描边，全部替换为真描边 */
-            *[style*="text-shadow:"] {
-                text-shadow: none !important;
-                -webkit-text-stroke: 1.5px currentColor;
-            }
-            *[style*="text-shadow: 2px 2px 0 #fff"] {
-                -webkit-text-stroke: 2px #ffffff !important;
+                -webkit-text-stroke: 4px #5E4B8B; /* ★修改这里的 3px 可以改变普通文字紫色描边宽度★ */
+                paint-order: stroke fill;
+   14:08 2026/3/16         }
+
+            /* 专用于名字的白色外描边 */
+            .true-stroke-white {
+                -webkit-text-stroke: 10px #FFFFFF; /* ★修改这里的 3.5px 可以改变玩家名字的白色描边宽度★ */
+                paint-order: stroke fill;
             }
 
             .bar-stroke { box-shadow: 0 0 0 2px #5E4B8B; }
@@ -241,24 +241,16 @@
 
 
 
-<!-- 【全新新增】1V1-擂台区 -->
-        <section id="oneVsOneSection" class="kawaii-card p-3 sm:p-5 mb-6 hidden" style="background-color: #FEFCE8; order: 0;">
-            <!-- 头部标题与切换按钮 -->
-            <div class="flex justify-between items-center mb-3 relative">
-                <div class="flex-1"></div> <!-- 占位撑开空间 -->
-                
-                <!-- 居中标题 -->
-                <div class="bg-[#FFD93D] border-[4px] border-[#5E4B8B] rounded-[2rem] px-8 py-1 shadow-[0_3px_0_#5E4B8B] z-10 absolute left-1/2 transform -translate-x-1/2 flex justify-center items-center">
-                    <span class="font-black text-[#E11D48] text-xl sm:text-2xl tracking-widest text-stroke" style="text-shadow: 2px 2px 0 #5E4B8B, -2px -2px 0 #5E4B8B, 2px -2px 0 #5E4B8B, -2px 2px 0 #5E4B8B, 0 2px 0 #5E4B8B, 0 -2px 0 #5E4B8B, 2px 0 0 #5E4B8B, -2px 0 0 #5E4B8B;">1V1-擂台区</span>
-                </div>
-                
-                <!-- 右侧切换控制台 -->
-                <div class="flex-1 flex justify-end items-center gap-2 relative z-20">
-                    <button id="ovoPrevBtn" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:translate-y-1 hover:bg-gray-100"><i class="fa-solid fa-chevron-left text-sm"></i></button>
-                    <div id="ovoTabLabel" class="bg-[#06B6D4] border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-6 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-sm min-w-[80px] text-center">主信息</div>
-                    <button id="ovoNextBtn" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:translate-y-1 hover:bg-gray-100"><i class="fa-solid fa-chevron-right text-sm"></i></button>
-                </div>
+<!-- 【全新重建】1V1-擂台区 (图1/2/3 像素复刻版) -->
+        <section id="oneVsOneSection" class="kawaii-card p-2 sm:p-4 mb-6 hidden" style="background-color: #FEFCE8; order: 0;">
+            <!-- 这里原本死板的头部被移除了，我们将通过 JS 动态生成完美的居中标题和切换按钮 -->
+            <div id="ovoHeaderContainer" class="w-full"></div>
+            
+            <!-- 动态内容渲染容器 (已改为居中排列) -->
+            <div id="ovoContent" class="w-full relative transition-all flex flex-col items-center">
+                <!-- JS 会把画好的内容塞进这里 -->
             </div>
+        </section>
 
             <!-- 动态内容渲染容器 -->
             <div id="ovoContent" class="w-full border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl overflow-hidden bg-white shadow-sm mt-3 relative transition-all">
@@ -1406,8 +1398,8 @@ function renderSessionSelectorUI() {
         }
 
 // ==========================================
-        // 【全新新增】云端同步与分享核心逻辑
-        // ==========================================
+// 【全新新增】云端同步与分享核心逻辑
+ // ==========================================
         const CLOUD_API_KEY = "$2a$10$QIpfAXWpKRuC9hRiCVNz1.V4182RJx9SaHuotcsOapPlMy2GYAtdC"; // 【预留】接下来我们会在这里填入 JSONBin 的 API Key
         let cloudBinId = null; 
         let isAudienceMode = false;
@@ -1632,29 +1624,28 @@ function init() {
             const audSyncBtn = document.getElementById('audienceSyncViewBtn');
             if (audSyncBtn) { audSyncBtn.onclick = () => fetchDataFromCloud(true); }
 
-            // 【完全修复】布局预设导出，切片存储防爆表，修改文件名
+// 【完全修复】布局预设导出与导入功能
             document.getElementById('exportPresetsBtn').onclick = () => {
                 if (typeof XLSX === 'undefined') return alert('请等待 Excel 库加载完成！');
                 const wb = XLSX.utils.book_new();
                 const jsonStr = JSON.stringify(gameData.presets ||[]);
                 const rows =[];
-                // 核心：将超长字符串切片，防止Excel单格字符限制导致破损
                 for (let i = 0; i < jsonStr.length; i += 30000) {
                     rows.push([jsonStr.substring(i, i + 30000)]);
                 }
                 const ws = XLSX.utils.aoa_to_sheet(rows);
                 XLSX.utils.book_append_sheet(wb, ws, "Presets_Config");
                 
-                // 动态提取年份和数量生成完美文件名
+                // 动态生成你要求的文件名： UNO-S26-布局预设-数量.xlsx
                 const yy = String(new Date().getFullYear()).slice(-2);
                 const count = (gameData.presets ||[]).length;
                 XLSX.writeFile(wb, `UNO-S${yy}-布局预设-${count}.xlsx`);
             };
 
-            // 【完全修复】布局预设导入，拼接字符串解解析
             document.getElementById('importPresetsBtn').onclick = () => {
                 document.getElementById('importPresetsFile').click();
             };
+            
             document.getElementById('importPresetsFile').onchange = (e) => {
                 const file = e.target.files[0];
                 if(!file) return;
@@ -1662,25 +1653,33 @@ function init() {
                 reader.onload = (evt) => {
                     try {
                         const workbook = XLSX.read(evt.target.result, {type:'array'});
-                        const sheet = workbook.Sheets["Presets_Config"] || workbook.Sheets[workbook.SheetNames[0]];
-                        const json = XLSX.utils.sheet_to_json(sheet, {header:1});
+                        // 强制严格校验：必须存在名为 Presets_Config 的表
+                        const sheet = workbook.Sheets["Presets_Config"];
+                        if (!sheet) {
+                            alert("❌ 导入失败！\\n该文件中找不到 'Presets_Config' 表。\\n请确认你选择的是【布局预设】导出的文件，而不是【数据备份】导出的文件！");
+                            return;
+                        }
                         
-                        // 核心：把分散在每一行的切片字符串重新拼凑起来
+                        const jsonArr = XLSX.utils.sheet_to_json(sheet, {header:1, defval:""});
                         let jsonStr = '';
-                        json.forEach(row => { if(row[0]) jsonStr += row[0]; });
+                        jsonArr.forEach(row => { if (row && row[0]) jsonStr += String(row[0]); });
                         
                         if(jsonStr) {
                             const parsed = JSON.parse(jsonStr);
                             if(Array.isArray(parsed)) {
                                 gameData.presets = parsed;
                                 saveData();
-                                renderPresetList();
-                                alert("布局预设导入成功！");
+                                if(typeof renderPresetList === 'function') renderPresetList();
+                                alert("✅ 布局预设导入成功！");
                             } else {
-                                throw new Error("数据格式不对");
+                                alert("❌ 导入失败！数据内部格式损坏。");
                             }
+                        } else {
+                            alert("❌ 导入失败！文件内没有读取到有效预设。");
                         }
-                    } catch(err) { alert("导入失败，请确保您选择的是之前导出的备份文件！"); }
+                    } catch(err) { 
+                        alert("❌ 导入遇到异常错误：" + err.message); 
+                    }
                 };
                 reader.readAsArrayBuffer(file);
                 e.target.value = '';
@@ -2350,13 +2349,13 @@ if(typeof window.renderOneVsOneArena === 'function') window.renderOneVsOneArena(
     }
 
 // ==========================================
-// 【全新新增】1V1-擂台区 核心渲染画笔 (像素级完美复刻)
+// 【全新重建】1V1-擂台区 核心渲染画笔 (像素级完美复刻)
 // ==========================================
 window.renderOneVsOneArena = function() {
     const section = document.getElementById('oneVsOneSection');
     const content = document.getElementById('ovoContent');
-    const tabLabel = document.getElementById('ovoTabLabel');
-    if (!section || !content) return;
+    const headerContainer = document.getElementById('ovoHeaderContainer');
+    if (!section || !content || !headerContainer) return;
 
     const active = gameData.players.filter(p => p.isActive);
     if (active.length < 2) {
@@ -2364,7 +2363,6 @@ window.renderOneVsOneArena = function() {
         return;
     }
 
-    // --- 1. 获取所有的1V1对局 ---
     let ovoMatches =[];
     viewRounds.forEach(r => {
         if (r.v2Stats && r.v2Stats.eliminationEvents && r.v2Stats.eliminationEvents.length > 0) {
@@ -2374,11 +2372,8 @@ window.renderOneVsOneArena = function() {
                 let winnerId = r.winner;
                 if (active.find(p=>p.id===winnerId) && active.find(p=>p.id===loserId)) {
                     ovoMatches.push({
-                        round: r.round,
-                        winner: winnerId,
-                        loser: loserId,
-                        time: r.v2Stats.timerRemainAtEnd,
-                        method: r.v2Stats.winMethod || '默认胜利'
+                        round: r.round, winner: winnerId, loser: loserId,
+                        time: r.v2Stats.timerRemainAtEnd, method: r.v2Stats.winMethod || '默认胜利'
                     });
                 }
             }
@@ -2392,48 +2387,62 @@ window.renderOneVsOneArena = function() {
         section.classList.remove('hidden');
     }
 
-    // 顶部标签文字和颜色
-    tabLabel.textContent = ovoViewNames[ovoState.viewIndex];
-    tabLabel.className = `${ovoViewColors[ovoState.viewIndex]} border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-6 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-sm min-w-[80px] text-center transition-colors`;
-
     const getShort = (name) => name ? name.slice(-1) : '?';
 
-    // --- 辅助函数：绘制图1和图3中的单个玩家表格列 ---
+    // 1. 动态生成头部 (完美居中标题 + 切换按钮)
+    headerContainer.innerHTML = `
+    <div class="flex flex-col items-center mb-3 sm:mb-4 gap-1.5 sm:gap-2 w-full">
+        <!-- 大标题 (套用 stroke-md 真描边) -->
+        <div class="bg-[#FFD93D] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-sm">
+            <span class="font-black text-white text-xl sm:text-2xl tracking-widest stroke-md">1 V 1</span>
+        </div>
+        <!-- 切换视图按钮组 -->
+        <div class="flex items-center gap-2">
+            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:scale-90 transition-transform" onclick="window.changeOvoView(-1)"><i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i></button>
+            
+            <div class="bg-[#06B6D4] border-[2.5px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-sm min-w-[80px] sm:min-w-[100px] text-center transition-colors stroke-sm">${ovoViewNames[ovoState.viewIndex]}</div>
+            
+            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:scale-90 transition-transform" onclick="window.changeOvoView(1)"><i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i></button>
+        </div>
+    </div>`;
+
+    // 2. 辅助函数：绘制图1和图3中的单个玩家卡牌
     const buildStatsCol = (p, matchesInfo, headerBgColor) => {
         let wins = 0; let loses = 0;
         matchesInfo.forEach(m => {
-            if (m.winner === p.id) wins++;
-            else if (m.loser === p.id) loses++;
+            if (m.winner === p.id) wins++; else if (m.loser === p.id) loses++;
         });
         let total = wins + loses;
         let winPct = total > 0 ? Math.round((wins/total)*100) + '%' : '0%';
         let losePct = total > 0 ? Math.round((loses/total)*100) + '%' : '0%';
 
         return `
-        <div class="flex-1 flex flex-col border-r-[2px] border-[#5E4B8B] last:border-r-0 min-w-0 bg-white">
-            <!-- 1. 颜色表头：头像+名字 -->
-            <div class="h-8 sm:h-9 flex items-center justify-center gap-1 border-b-[2px] border-[#5E4B8B]" style="background-color: ${headerBgColor};">
-                <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-md border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
+        <!-- 图1: 每人独立外框，带圆角，带阴影 -->
+        <div class="flex flex-col bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[6px] overflow-hidden min-w-[55px] sm:min-w-[75px] flex-1 shadow-sm">
+            <!-- 颜色表头：头像+名字 -->
+            <div class="h-7 sm:h-9 flex items-center justify-center gap-1 border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B]" style="background-color: ${headerBgColor};">
+                <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-[4px] border-[1.5px] sm:border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
                     <img src="${p.avatar}" class="w-full h-full object-cover">
                 </div>
-                <span class="font-black text-white text-stroke text-xs sm:text-sm truncate tracking-widest leading-none">${getShort(p.name)}</span>
+                <!-- 名字套用 stroke-xs 真极小描边 -->
+                <span class="font-black text-white stroke-xs text-[10px] sm:text-sm truncate tracking-widest leading-none">${getShort(p.name)}</span>
             </div>
-            <!-- 2. 总次数 (蓝字白底) -->
-            <div class="h-7 sm:h-8 flex items-center justify-center text-[#3B82F6] font-black text-[15px] sm:text-[17px] border-b-[2px] border-[#5E4B8B] bg-white">${total}</div>
-            <!-- 3. WIN / LOSE -->
-            <div class="h-6 sm:h-7 flex border-b-[2px] border-[#5E4B8B] text-[10px] sm:text-[11px] font-black tracking-widest leading-none">
-                <div class="flex-1 bg-[#FACC15] text-white flex items-center justify-center border-r-[2px] border-[#5E4B8B] text-stroke">WIN</div>
-                <div class="flex-1 bg-[#E11D48] text-white flex items-center justify-center text-stroke">LOSE</div>
+            <!-- 总次数 (蓝字白底) -->
+            <div class="h-6 sm:h-8 flex items-center justify-center text-[#3B82F6] font-black text-[13px] sm:text-[16px] border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B] bg-white">${total}</div>
+            <!-- WIN / LOSE -->
+            <div class="flex border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B] text-white text-[9px] sm:text-[11px] font-black tracking-widest leading-none">
+                <div class="flex-1 bg-[#84CC16] flex items-center justify-center py-1 border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">胜</div>
+                <div class="flex-1 bg-[#E11D48] flex items-center justify-center py-1">负</div>
             </div>
-            <!-- 4. 具体次数 -->
-            <div class="h-7 sm:h-8 flex border-b-[2px] border-[#5E4B8B] text-sm sm:text-[15px] font-black bg-white leading-none">
-                <div class="flex-1 text-[#10B981] flex items-center justify-center border-r-[2px] border-[#5E4B8B]">${wins}</div>
-                <div class="flex-1 text-[#EF4444] flex items-center justify-center">${loses}</div>
+            <!-- 具体次数 -->
+            <div class="flex border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B] text-[11px] sm:text-[15px] font-black bg-white leading-none">
+                <div class="flex-1 text-[#84CC16] flex items-center justify-center py-1 border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">${wins}</div>
+                <div class="flex-1 text-[#E11D48] flex items-center justify-center py-1">${loses}</div>
             </div>
-            <!-- 5. 百分比 -->
-            <div class="h-6 sm:h-7 flex text-[10px] sm:text-[11px] font-black leading-none">
-                <div class="flex-1 text-[#5E4B8B] flex items-center justify-center border-r-[2px] border-[#5E4B8B] bg-[#FEF08A]">${winPct}</div>
-                <div class="flex-1 text-[#5E4B8B] flex items-center justify-center bg-[#FECDD3]">${losePct}</div>
+            <!-- 百分比 -->
+            <div class="flex text-[8px] sm:text-[10px] font-black leading-none">
+                <div class="flex-1 text-[#5E4B8B] flex items-center justify-center py-1 border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] bg-[#D9F99D]">${winPct}</div>
+                <div class="flex-1 text-[#5E4B8B] flex items-center justify-center py-1 bg-[#FECDD3]">${losePct}</div>
             </div>
         </div>`;
     };
@@ -2441,102 +2450,87 @@ window.renderOneVsOneArena = function() {
     let html = '';
 
     // ==========================================
-    // 视图 0：主信息 (图1 像素级复刻)
+    // 视图 0：主信息 (图1：独立标签，有间距，动态排版)
     // ==========================================
     if (ovoState.viewIndex === 0) {
-        // 图1特点：外围有个白色的留白（padding），里面是紧凑的网格，没有任何额外描边
         let colsHtml = active.map(p => buildStatsCol(p, ovoMatches, p.color)).join('');
         html = `
-        <div class="p-2 sm:p-3 w-full">
-            <div class="flex w-full border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md overflow-hidden shadow-sm">
+        <div class="p-1 sm:p-2 w-full flex justify-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-sm">
+            <!-- 内部使用 gap 隔开各个玩家标签，使用 overflow-x-auto 确保不撑破 -->
+            <div class="flex gap-1.5 sm:gap-2.5 w-full max-w-full justify-around items-stretch overflow-x-auto scrollbar-hide py-1">
                 ${colsHtml}
             </div>
         </div>`;
     } 
     
     // ==========================================
-    // 视图 1：轮次信息 (图2 像素级复刻 - 修复图片撑爆)
+    // 视图 1：轮次信息 (图2：限制5局，有间距，带垂直滑块)
     // ==========================================
     else if (ovoState.viewIndex === 1) {
         let reversedMatches = [...ovoMatches].reverse();
         
-        // 图2特点：外围有个留白，里面是一条一条单独的卡片
-        html = `<div class="p-2 sm:p-3 flex flex-col gap-2 max-h-[400px] overflow-y-auto custom-scroll">`;
+        // 外围容器，固定高度出现滚动条 (图2右侧的蓝灰色滚动条已通过 custom-scroll 控制)
+        html = `<div class="p-1.5 sm:p-2.5 flex flex-col gap-2 sm:gap-3 max-h-[260px] sm:max-h-[320px] overflow-y-auto custom-scroll w-full bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-sm">`;
         
         reversedMatches.forEach(m => {
-            let wp = active.find(p=>p.id===m.winner);
-            let lp = active.find(p=>p.id===m.loser);
+            let wp = active.find(p=>p.id===m.winner); let lp = active.find(p=>p.id===m.loser);
             if(!wp || !lp) return;
 
             let timeStr = m.time > 0 ? `${Math.floor(m.time/60)}:${String(m.time%60).padStart(2,'0')}` : '耗尽';
             let timeBg = m.time > 0 ? 'bg-white' : 'bg-[#E11D48]';
-            let timeText = m.time > 0 ? 'text-[#5E4B8B]' : 'text-white text-stroke';
+            let timeText = m.time > 0 ? 'text-[#5E4B8B]' : 'text-white stroke-xs'; // 耗尽时带白描边
 
-let methodUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+            let methodUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
             if (gameData.customMethods) {
-                // 两边同时查，只要有一边有就拿出来
                 let mItem = null;
                 if (gameData.customMethods.win) mItem = gameData.customMethods.win.items.find(i => i.name === m.method);
                 if (!mItem && gameData.customMethods.lose) mItem = gameData.customMethods.lose.items.find(i => i.name === m.method);
                 if (mItem && mItem.url) methodUrl = mItem.url;
             }
 
-            // 【重磅修复】：强制锁死整个行的高度 `h-[52px]`，图片区为 `w-[52px]` 的正方形！它绝对不可能再撑破屏幕了！
+            // 每个对局是一条独立的横幅，带阴影和间距
             html += `
-            <div class="flex w-full border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] bg-white h-[52px] sm:h-[60px] overflow-hidden">
-                
+            <div class="flex w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md bg-white h-[42px] sm:h-[50px] overflow-hidden shrink-0 shadow-sm">
                 <!-- 第X局 -->
-                <div class="w-12 sm:w-16 flex items-center justify-center border-r-[2px] sm:border-[3px] border-[#5E4B8B] shrink-0">
-                    <span class="font-bold text-[#5E4B8B] text-[10px] sm:text-xs">第${m.round}局</span>
+                <div class="w-11 sm:w-14 flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] bg-[#E2E8F0] shrink-0">
+                    <span class="font-bold text-[#5E4B8B] text-[9px] sm:text-xs">第${m.round}局</span>
                 </div>
-                
-                <!-- 中间对战详情区 -->
-                <div class="flex-1 flex border-r-[2px] sm:border-[3px] border-[#5E4B8B] min-w-0">
-                    <!-- WIN栏 -->
-                    <div class="flex-1 flex flex-col border-r-[2px] sm:border-[3px] border-[#5E4B8B]">
-                        <div class="h-1/2 bg-[#FACC15] flex items-center justify-center border-b-[2px] sm:border-b-[3px] border-[#5E4B8B]">
-                            <span class="text-white font-black text-[9px] sm:text-[11px] text-stroke">WIN</span>
+                <!-- 详情区 -->
+                <div class="flex-1 flex min-w-0">
+                    <!-- WIN -->
+                    <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                        <div class="w-[30%] bg-[#84CC16] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                            <span class="text-white font-black text-[9px] sm:text-[11px] stroke-xs">胜</span>
                         </div>
-                        <div class="h-1/2 flex items-center justify-center gap-1" style="background-color: ${wp.color};">
-                            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0"><img src="${wp.avatar}" class="w-full h-full object-cover"></div>
-                            <span class="text-white font-black text-[10px] sm:text-xs text-stroke leading-none">${getShort(wp.name)}</span>
+                        <div class="flex-1 flex items-center justify-center" style="background-color: ${wp.color};">
+                            <span class="text-white font-black text-[10px] sm:text-xs stroke-xs">${getShort(wp.name)}</span>
                         </div>
                     </div>
-                    
-                    <!-- 红字 PK -->
-                    <div class="w-8 sm:w-10 flex items-center justify-center bg-white border-r-[2px] sm:border-[3px] border-[#5E4B8B] shrink-0">
-                        <span class="text-[#E11D48] font-black text-lg sm:text-xl">PK</span>
+                    <!-- PK -->
+                    <div class="w-7 sm:w-9 flex items-center justify-center bg-white border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] shrink-0">
+                        <span class="text-[#E11D48] font-black text-[13px] sm:text-[16px] stroke-xs" style="color:#E11D48; -webkit-text-stroke-color: #5E4B8B;">PK</span>
                     </div>
-                    
-                    <!-- LOSE栏 -->
-                    <div class="flex-1 flex flex-col border-r-[2px] sm:border-[3px] border-[#5E4B8B]">
-                        <div class="h-1/2 bg-[#E11D48] flex items-center justify-center border-b-[2px] sm:border-b-[3px] border-[#5E4B8B]">
-                            <span class="text-white font-black text-[9px] sm:text-[11px] text-stroke">LOSE</span>
+                    <!-- LOSE -->
+                    <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                        <div class="w-[30%] bg-[#E11D48] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                            <span class="text-white font-black text-[9px] sm:text-[11px] stroke-xs">负</span>
                         </div>
-                        <div class="h-1/2 flex items-center justify-center gap-1" style="background-color: ${lp.color};">
-                            <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0"><img src="${lp.avatar}" class="w-full h-full object-cover"></div>
-                            <span class="text-white font-black text-[10px] sm:text-xs text-stroke leading-none">${getShort(lp.name)}</span>
+                        <div class="flex-1 flex items-center justify-center" style="background-color: ${lp.color};">
+                            <span class="text-white font-black text-[10px] sm:text-xs stroke-xs">${getShort(lp.name)}</span>
                         </div>
                     </div>
-                    
-                    <!-- 剩余时间 -->
-                    <div class="w-[50px] sm:w-[60px] flex flex-col shrink-0">
-                        <div class="h-1/2 bg-[#84CC16] flex items-center justify-center border-b-[2px] sm:border-b-[3px] border-[#5E4B8B]">
-                            <span class="text-white font-bold text-[9px] sm:text-[10px]">剩余时间</span>
+                    <!-- 时间 -->
+                    <div class="w-[50px] sm:w-[65px] flex flex-col shrink-0 border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                        <div class="h-1/2 bg-[#FDE047] flex items-center justify-center border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B]">
+                            <span class="text-[#5E4B8B] font-bold text-[8px] sm:text-[9px] leading-none transform scale-90 sm:scale-100">剩余时间</span>
                         </div>
                         <div class="h-1/2 ${timeBg} flex items-center justify-center">
-                            <span class="${timeText} font-bold text-[10px] sm:text-xs">${timeStr}</span>
+                            <span class="${timeText} font-bold text-[10px] sm:text-xs leading-none">${timeStr}</span>
                         </div>
                     </div>
                 </div>
-                
-                <!-- 终结技文字 -->
-                <div class="w-10 sm:w-14 bg-[#06B6D4] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] shrink-0">
-                    <span class="text-white font-bold text-[10px] sm:text-xs">终结技</span>
-                </div>
-                
-                <!-- 终结技图片区：严格正方形，绝对不会撑大 -->
-                <div class="w-[52px] sm:w-[60px] h-full bg-white flex items-center justify-center p-0.5 shrink-0">
+                <!-- 终结技图片区 -->
+                <div class="w-[42px] sm:w-[50px] h-full bg-[#111111] flex items-center justify-center p-[1px] shrink-0">
                     <img src="${methodUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
                 </div>
             </div>`;
@@ -2545,78 +2539,78 @@ let methodUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'
     }
 
     // ==========================================
-    // 视图 2：对局信息 (图3 像素级复刻 - 玩家依次向下排列)
+    // 视图 2：对局信息 (图3：主视角玩家置于上方，下方为对手卡片)
     // ==========================================
     else if (ovoState.viewIndex === 2) {
-        html = `<div class="p-2 sm:p-3 flex flex-col gap-3 max-h-[500px] overflow-y-auto custom-scroll">`;
+        if(ovoState.subjectIndex === undefined || ovoState.subjectIndex >= active.length) ovoState.subjectIndex = 0;
         
-        // 遍历每一个活跃玩家，画出一整行
-        active.forEach(subject => {
-            let opponents = active.filter(p => p.id !== subject.id);
-            let subjectMatches = ovoMatches.filter(m => m.winner === subject.id || m.loser === subject.id);
-            
-            // 对手小表格的拼装
-            let oppColsHtml = opponents.map(opp => {
-                let mockMatches =[];
-                subjectMatches.forEach(m => {
-                    if (m.winner === subject.id && m.loser === opp.id) {
-                        mockMatches.push({ winner: opp.id, loser: null }); // 主角赢
-                    } else if (m.loser === subject.id && m.winner === opp.id) {
-                        mockMatches.push({ winner: null, loser: opp.id }); // 主角输
-                    }
-                });
-                // 对手头像是浅蓝色背景 (采用图3的复刻细节，提取透明度为0.5)
-                let headerBg = hexToRgba(opp.color, 0.5); 
-                return buildStatsCol(opp, mockMatches, headerBg);
-            }).join('');
+        let subject = active[ovoState.subjectIndex];
+        let opponents = active.filter(p => p.id !== subject.id);
+        let subjectMatches = ovoMatches.filter(m => m.winner === subject.id || m.loser === subject.id);
+        
+        let oppColsHtml = opponents.map(opp => {
+            let mockMatches =[];
+            subjectMatches.forEach(m => {
+                if (m.winner === subject.id && m.loser === opp.id) mockMatches.push({ winner: opp.id, loser: null }); 
+                else if (m.loser === subject.id && m.winner === opp.id) mockMatches.push({ winner: null, loser: opp.id }); 
+            });
+            // 浅色半透明表头，突出对手
+            let headerBg = hexToRgba(opp.color, 0.5); 
+            return buildStatsCol(opp, mockMatches, headerBg);
+        }).join('');
 
-            html += `
-            <div class="flex items-center gap-2">
-                <!-- 1. 左侧玩家头像区 (单纯的颜色底块) -->
-                <div class="w-16 sm:w-20 h-[72px] sm:h-[86px] rounded-md border-[2px] sm:border-[3px] border-[#5E4B8B] flex flex-col items-center justify-center shrink-0 shadow-sm" style="background-color: ${subject.color};">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-[6px] border-[2px] sm:border-[3px] border-[#5E4B8B] bg-black overflow-hidden mb-0.5">
+        html = `
+        <div class="p-2 sm:p-3 w-full flex flex-col items-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-sm relative">
+            <!-- 玩家切换控制器 -->
+            <div class="flex items-center justify-center gap-3 mb-1 w-full relative z-10">
+                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-sm shrink-0 transition-transform" onclick="window.changeOvoSubject(-1)">
+                    <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i>
+                </button>
+                
+                <!-- 主视角玩家标签 -->
+                <div class="border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-4 sm:pr-6 py-0.5 sm:py-1 flex items-center gap-2 shadow-sm shrink-0" style="background-color: ${subject.color};">
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-[6px] sm:rounded-md border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
                         <img src="${subject.avatar}" class="w-full h-full object-cover">
                     </div>
-                    <span class="text-white font-black text-[11px] sm:text-sm text-stroke leading-none">${getShort(subject.name)}</span>
+                    <span class="font-black text-white stroke-sm tracking-widest text-sm sm:text-base">${getShort(subject.name)}</span>
                 </div>
-                
-                <!-- 2. 中间大红字 PK -->
-                <div class="flex items-center justify-center shrink-0 w-8 sm:w-10">
-                    <span class="text-[#E11D48] font-black text-[22px] sm:text-[28px] tracking-tighter">PK</span>
-                </div>
-                
-                <!-- 3. 右侧包含所有对手的小表格 (带外框) -->
-                <div class="flex-1 flex border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md overflow-hidden bg-white shadow-sm min-w-0">
-                    ${oppColsHtml}
-                </div>
-            </div>`;
-        });
-        
-        html += `</div>`;
+
+                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-sm shrink-0 transition-transform" onclick="window.changeOvoSubject(1)">
+                    <i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i>
+                </button>
+            </div>
+            
+            <!-- PK 字样 (超大字，白底紫描边，外层红色填充) -->
+            <div class="flex justify-center w-full mb-1 sm:mb-2 relative z-0 -mt-1 sm:-mt-2">
+                <span class="font-black text-[28px] sm:text-[36px] tracking-tighter stroke-md" style="color: #E11D48; -webkit-text-stroke-color: #5E4B8B; text-shadow: none;">PK</span>
+            </div>
+            
+            <!-- 对手列表容器 (图3同款，含间距独立卡片) -->
+            <div class="flex gap-1.5 sm:gap-2.5 w-full justify-around items-stretch overflow-x-auto scrollbar-hide py-1">
+                ${oppColsHtml}
+            </div>
+        </div>`;
     }
 
     content.innerHTML = html;
 };
 
-// 绑定顶部左右切换按键事件
-document.addEventListener('DOMContentLoaded', () => {
-    // 因为这块代码可能比按钮早执行，我们用事件委托绑在 document 上最安全
-    document.addEventListener('click', (e) => {
-        const prevBtn = e.target.closest('#ovoPrevBtn');
-        const nextBtn = e.target.closest('#ovoNextBtn');
-        
-        if (prevBtn) {
-            ovoState.viewIndex--;
-            if (ovoState.viewIndex < 0) ovoState.viewIndex = 2;
-            window.renderOneVsOneArena();
-        }
-        if (nextBtn) {
-            ovoState.viewIndex++;
-            if (ovoState.viewIndex > 2) ovoState.viewIndex = 0;
-            window.renderOneVsOneArena();
-        }
-    });
-});
+// 绑定左右切换全局函数 (供 HTML 内联 onClick 调用)
+window.changeOvoView = function(dir) {
+    ovoState.viewIndex += dir;
+    if (ovoState.viewIndex < 0) ovoState.viewIndex = 2;
+    if (ovoState.viewIndex > 2) ovoState.viewIndex = 0;
+    window.renderOneVsOneArena();
+};
+
+window.changeOvoSubject = function(dir) {
+    const active = gameData.players.filter(p => p.isActive);
+    if(ovoState.subjectIndex === undefined) ovoState.subjectIndex = 0;
+    ovoState.subjectIndex += dir;
+    if(ovoState.subjectIndex < 0) ovoState.subjectIndex = active.length - 1;
+    if(ovoState.subjectIndex >= active.length) ovoState.subjectIndex = 0;
+    window.renderOneVsOneArena();
+};
 // ==========================================
 
 function renderSessionSection() {
