@@ -196,10 +196,8 @@
                 <div class="flex items-center justify-end pr-1 sm:pr-2 pt-1 flex-1 min-w-0 overflow-hidden">
                     <span id="sfRange" class="font-black text-white smooth-outline tracking-wider leading-none text-right w-full">1~130</span>
                 </div>
-
             </div>
         </section>
-        </header>
 
 <!-- 【全新新增】最新战况区域 (图1 1:1 像素复刻) -->
         <section id="latestStatusSection" class="kawaii-card p-3 sm:p-5 mb-6" style="order: 0;">
@@ -242,7 +240,7 @@
 
 
 <!-- 【全新重建】1V1-擂台区 (图1/2/3 像素复刻版) -->
-        <section id="oneVsOneSection" class="kawaii-card p-2 sm:p-4 mb-6 hidden" style="background-color: #FEFCE8; order: 0;">
+        <section id="oneVsOneSection" class="kawaii-card p-2 sm:p-4 mb-6" style="order: 0;">
             <!-- 这里原本死板的头部被移除了，我们将通过 JS 动态生成完美的居中标题和切换按钮 -->
             <div id="ovoHeaderContainer" class="w-full"></div>
             
@@ -252,14 +250,8 @@
             </div>
         </section>
 
-            <!-- 动态内容渲染容器 -->
-            <div id="ovoContent" class="w-full border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl overflow-hidden bg-white shadow-sm mt-3 relative transition-all">
-                <!-- JS 会把画好的内容塞进这里 -->
-            </div>
-        </section>
-
 <!-- 【新增】罚牌张数输入区 (图1复刻) -->
-        <section id="penaltySection" class="kawaii-card p-4 sm:p-5 mb-6" style="background-color: #FEFCE8;">
+        <section id="penaltySection" class="kawaii-card p-4 sm:p-5 mb-6" style="order: 0">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg sm:text-xl font-bold text-[#5E4B8B] flex items-center tracking-widest">
                     罚牌张数输入区
@@ -321,7 +313,7 @@
         </section>
 
 <!-- 【全新复刻版】罚牌详细统计区 (完美还原图1) -->
-        <section id="penaltyStatsSection" class="kawaii-card p-3 sm:p-5 mb-6" style="background-color: #FEFCE8;">
+        <section id="penaltyStatsSection" class="kawaii-card p-3 sm:p-5 mb-6" style="order: 0;">
             
             <!-- 1. 顶部红底圆角标题 -->
             <div class="flex justify-center mb-4 mt-2">
@@ -354,7 +346,7 @@
             
         </section>
 
-<section id="cloudShareSection" class="kawaii-card p-4 sm:p-5 mb-6" style="background-color: #F0FDF4; order: 0;">
+<section id="cloudShareSection" class="kawaii-card p-4 sm:p-5 mb-6" style="order: 0;">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg sm:text-xl font-bold text-[#5E4B8B] flex items-center tracking-widest">
                     <i class="fa-solid fa-cloud-arrow-up text-[#3B82F6] mr-2"></i>云端同步与分享
@@ -391,7 +383,7 @@
             </div>
         </section>
 
-        <div id="playerSection" class="kawaii-card mb-6">
+        <div id="playerSection" class="kawaii-card mb-6 overflow-hidden">
             <div id="playerMgrHeader" class="p-4 rounded-t-[1.8rem] bg-[#E0F2FE]/50 cursor-pointer flex justify-between items-center select-none border-b-4 border-transparent hover:border-[#5E4B8B] transition-colors">
                 <h2 class="text-lg font-bold flex items-center text-[#5E4B8B]">
                     <i class="fa-solid fa-users mr-2"></i>玩家管理 (点击展开/收起)
@@ -422,82 +414,137 @@
         </section>
 
         <!-- 【全新新增】倒计时模块 -->
- <section id="timerSection" class="kawaii-card p-4 sm:p-5 mb-6">
-<div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-[#5E4B8B] flex items-center"><i class="fa-solid fa-stopwatch text-accent mr-2"></i>生存倒计时</h2>
-            <div class="text-sm font-black bg-white border-[3px] border-[#5E4B8B] px-4 py-1.5 rounded-2xl text-[#5E4B8B] shadow-sm">第 <span id="v2CurrentRoundDisplay">1</span> 局</div>
-            
-            <!-- 隐藏旧的设定功能（保留是为了不让JS报错跑不起来） -->
+<!-- 【全新新增】倒计时与结算模块 (图1 完美复刻) -->
+        <style>
+            /* 魔法样式：不改JS的情况下，强制让“确认结算”按钮符合红色UI设定 */
+            #v2CalculateBtn:not(:disabled) {
+                background-color: #E11D48 !important;
+                color: white !important;
+                box-shadow: 0 4px 0 #5E4B8B !important;
+                transform: translateY(0) !important;
+                opacity: 1 !important;
+            }
+            #v2CalculateBtn:disabled {
+                background-color: #9CA3AF !important;
+                box-shadow: none !important;
+                transform: translateY(4px) !important;
+                opacity: 0.5 !important;
+            }
+        </style>
+        <section id="timerSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8]">
+            <!-- 隐藏旧的设定功能（保留防报错） -->
             <div class="hidden">
                 <input type="number" id="timerSetMin">
                 <button id="timerSetBtn"></button>
             </div>
-        </div>
+
+            <!-- 1. 顶部控制区 (黄底标题 + 撤销/轮次/恢复) -->
+            <div class="flex flex-col items-center mb-4 sm:mb-5">
+                <!-- 居中标题 -->
+                <div class="bg-[#FDE047] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-8 py-1.5 mb-4 shadow-[0_4px_0_#5E4B8B] z-10">
+                    <span class="font-black text-[#5E4B8B] text-xl sm:text-2xl tracking-widest stroke-sm">结算区</span>
+                </div>
+                
+                <!-- 撤销、局数、恢复 -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <button id="v2UndoBtn" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] text-[#5E4B8B] flex items-center justify-center font-black shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-y-1" title="撤销上一局">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                    <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-6 sm:px-10 py-1 sm:py-1.5 text-[#5E4B8B] font-black text-sm sm:text-base tracking-widest shadow-[0_4px_0_#5E4B8B]">
+                        第 <span id="v2CurrentRoundDisplay" class="mx-0.5">1</span> 局
+                    </div>
+                    <button id="v2RedoBtn" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] text-[#5E4B8B] flex items-center justify-center font-black shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:shadow-none disabled:translate-y-1" title="恢复上一局">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
             
-            <div class="relative w-full h-16 sm:h-20 rounded-full border-[4px] border-[#5E4B8B] bg-gray-200 overflow-hidden mb-5 shadow-inner">
-                <div id="timerBar" class="absolute left-0 top-0 h-full transition-all duration-1000 ease-linear" style="width: 100%; background-color: hsl(120, 80%, 50%);"></div>
-                <div id="timerText" class="absolute inset-0 flex items-center justify-center text-4xl sm:text-5xl font-black text-stroke tracking-wider text-white">08:00</div>
+            <!-- 2. 倒计时大白框 -->
+            <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-5 mb-4 shadow-[0_4px_0_#5E4B8B]">
+                <div class="relative w-full h-14 sm:h-16 rounded-full border-[3px] sm:border-[4px] border-[#5E4B8B] bg-[#E2E8F0] overflow-hidden mb-3">
+                    <div id="timerBar" class="absolute left-0 top-0 h-full transition-all duration-1000 ease-linear" style="width: 100%; background-color: hsl(120, 80%, 50%);"></div>
+                    <div id="timerText" class="absolute inset-0 flex items-center justify-center text-4xl sm:text-5xl font-black tracking-wider text-white stroke-md" style="text-shadow: 2px 0 0 #5E4B8B, -2px 0 0 #5E4B8B, 0 3px 0 #5E4B8B, 0 -2px 0 #5E4B8B;">08:00</div>
+                </div>
+
+                <div class="flex justify-center items-center gap-3 sm:gap-5">
+                    <button id="timerSubBtn" class="px-5 sm:px-6 py-1.5 sm:py-2 rounded-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] text-[#5E4B8B] font-black text-xs sm:text-sm shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">-30s</button>
+                    <button id="timerToggleBtn" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#4ADE80] text-white border-[3px] sm:border-[4px] border-[#5E4B8B] flex items-center justify-center font-black text-lg shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">
+                        <i class="fa-solid fa-play ml-1"></i>
+                    </button>
+                    <button id="timerAddBtn" class="px-5 sm:px-6 py-1.5 sm:py-2 rounded-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] text-[#5E4B8B] font-black text-xs sm:text-sm shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">+30s</button>
+                    <button id="timerResetBtn" class="w-10 h-10 sm:w-12 sm:h-12 rounded-[0.8rem] sm:rounded-xl bg-[#E11D48] text-white border-[3px] sm:border-[4px] border-[#5E4B8B] flex items-center justify-center font-black text-sm shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all" title="复位">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
             </div>
 
-            <div class="flex justify-center items-center gap-4 sm:gap-6">
-                <button id="timerSubBtn" class="w-12 h-12 rounded-full bg-white border-[3px] border-[#5E4B8B] text-[#5E4B8B] font-black text-lg shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:bg-gray-50">-30s</button>
-                <button id="timerToggleBtn" class="w-16 h-16 rounded-full bg-[#4ADE80] text-white border-[4px] border-[#5E4B8B] font-black text-2xl shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center hover:brightness-110">
-                    <i class="fa-solid fa-play ml-1"></i>
-                </button>
-                <button id="timerAddBtn" class="w-12 h-12 rounded-full bg-white border-[3px] border-[#5E4B8B] text-[#5E4B8B] font-black text-lg shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:bg-gray-50">+30s</button>
-                <button id="timerResetBtn" class="w-10 h-10 rounded-full bg-[#F87171] text-white border-[3px] border-[#5E4B8B] font-black text-sm shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110 ml-2" title="复位">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
+            <!-- 3. 分数输入大白框 -->
+            <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-5 mb-4 shadow-[0_4px_0_#5E4B8B]">
+                <!-- 玩家胶囊与分数输入区 (由JS动态生成) -->
+                <div id="v2ScoreArea" class="flex justify-between items-stretch gap-1 sm:gap-2">
+                    <!-- JS 动态填充 -->
+                </div>
             </div>
-<!-- 【V2新增】提前结束按钮 -->
-        <div class="mt-6 flex justify-center border-t-2 border-dashed border-gray-200 pt-4">
-            <button id="earlyWinBtn" class="kawaii-btn bg-accent text-[#5E4B8B] py-2 px-6 text-sm hover:brightness-110 shadow-sm hidden">
-                <i class="fa-solid fa-flag-checkered mr-2"></i>【提前胜出!】
-            </button>
-        </div>
 
-<!-- 【V2新增】玩家胶囊与分数输入区 (由JS动态生成) -->
-        <div id="v2ScoreArea" class="grid grid-cols-5 gap-2 mt-5 px-1">
-            <!-- 动态填充 -->
-        </div>
-
-        <!-- 【V2新增】计算与操作按钮 -->
-        <div class="mt-6 flex justify-center gap-3">
-            <button id="v2CalculateBtn" disabled class="kawaii-btn bg-gray-400 text-white py-2 px-8 text-lg opacity-50 cursor-not-allowed transition-all">确认结算</button>
-            <div class="flex gap-2">
-                <button id="v2UndoBtn" class="kawaii-btn bg-white text-[#5E4B8B] py-2 px-4 hover:bg-gray-50 disabled:opacity-50" title="撤销上一局"><i class="fa-solid fa-rotate-left"></i></button>
-                <button id="v2RedoBtn" class="kawaii-btn bg-white text-[#5E4B8B] py-2 px-4 hover:bg-gray-50 disabled:opacity-50" title="恢复上一局"><i class="fa-solid fa-rotate-right"></i></button>
+            <!-- 4. 最底部按钮区 -->
+            <div class="flex justify-center gap-3 sm:gap-4 mt-2">
+                <button id="earlyWinBtn" class="bg-[#84CC16] text-[#5E4B8B] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full py-2 px-5 sm:px-6 font-black text-xs sm:text-sm shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hidden tracking-widest">提前获胜</button>
+                <button id="v2CalculateBtn" disabled class="border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full py-2 px-6 sm:px-8 font-black text-xs sm:text-sm transition-all tracking-widest">确认结算</button>
             </div>
-        </div>
         </section>
 
 <!-- ======================================= -->
-        <!-- 【全新优化】结算方式统计模块 开始      -->
-        <!-- ======================================= -->
-        <section id="methodStatSection" class="kawaii-card p-3 sm:p-5 mb-6">
-            <div class="flex items-start justify-between gap-2 sm:gap-4 w-full pt-4">
-                
-                <!-- 左半边：胜利侧 -->
-                <div class="w-1/2 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] p-1.5 sm:p-2 relative bg-white flex flex-col shadow-sm">
-                    <!-- 悬浮标题 -->
-                    <div class="absolute -top-[14px] sm:-top-[18px] left-1/2 -translate-x-1/2 bg-[#7ac143] border-[3px] border-[#5E4B8B] rounded-full px-5 sm:px-8 py-0.5 sm:py-1 text-white font-black text-[12px] sm:text-base whitespace-nowrap tracking-widest shadow-sm z-10">胜利方式统计</div>
-                    <!-- 动态列表容器 -->
-                    <div class="flex flex-col gap-1.5 w-full mt-3 sm:mt-4 min-h-[40px]" id="newWinStatsList"></div>
-                </div>
+<!-- 【全新优化】结算方式统计模块 开始      -->
+<!-- ======================================= -->
+<section id="methodStatSection" class="kawaii-card p-3 sm:p-5 mb-6 bg-[#FEFCE8]">
+    <div class="flex flex-col items-center w-full relative">
+        <!-- 顶部主标题 -->
+        <div class="bg-[#ffffff] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-6 py-1 sm:py-1.2 mb-2 shadow-[0_4px_0_#5E4B8B]">
+            <span class="font-black text-[#5E4B8B] text-base sm:text-xl tracking-widest " style="color: [#5E4B8B];">结算方式统计</span>
+        </div>
+        
+        <!-- 切换视图按钮 -->
+        <button onclick="window.toggleMethodStatView()" class="bg-[#8DA4D0] border-[3px] border-[#5E4B8B] rounded-full px-5 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest mb-4 hover:brightness-110 active:translate-y-1 transition-all shadow-[0_4px_0_#5E4B8B]">
+            切换视图
+        </button>
 
-                <!-- 右半边：淘汰侧 -->
-                <div class="w-1/2 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] p-1.5 sm:p-2 relative bg-white flex flex-col shadow-sm">
-                    <!-- 悬浮标题 -->
-                    <div class="absolute -top-[14px] sm:-top-[18px] left-1/2 -translate-x-1/2 bg-[#EF4444] border-[3px] border-[#5E4B8B] rounded-full px-5 sm:px-8 py-0.5 sm:py-1 text-white font-black text-[12px] sm:text-base whitespace-nowrap tracking-widest shadow-sm z-10">淘汰方式统计</div>
-                    <!-- 动态列表容器 -->
-                    <div class="flex flex-col gap-1.5 w-full mt-3 sm:mt-4 min-h-[40px]" id="newLoseStatsList"></div>
+        <!-- 内部白色大画框 (图1像素级复刻) -->
+        <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl w-full p-2 sm:p-4 flex gap-2 sm:gap-4 relative shadow-[0_4px_0_#5E4B8B]
+">
+            
+            <!-- 左半边：胜利侧 -->
+            <div class="flex-1 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl flex flex-col bg-[#D9F99D] shadow-sm overflow-hidden">
+                <div class="bg-[#65A30D] text-white text-center font-black py-1.5 sm:py-2 text-sm sm:text-lg border-b-[3px] sm:border-b-[4px] border-[#5E4B8B] tracking-widest " style="text-shadow: 0, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">
+                    胜利方式统计
                 </div>
-
+                <!-- 列表容器：限制高度，最多显示5个，超出显示特定滚动条 -->
+                <div id="newWinStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 overflow-y-auto max-h-[385px] sm:max-h-[430px] method-scroll relative"></div>
             </div>
-        </section>
-        <!-- ======================================= -->
-        <!-- 【全新优化】结算方式统计模块 结束      -->
-        <!-- ======================================= -->
+
+            <!-- 右半边：淘汰侧 -->
+            <div class="flex-1 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl flex flex-col bg-[#FECDD3] shadow-sm overflow-hidden">
+                <div class="bg-[#E11D48] text-white text-center font-black py-1.5 sm:py-2 text-sm sm:text-lg border-b-[3px] sm:border-b-[4px] border-[#5E4B8B] tracking-widest " style="text-shadow: 0, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">
+                    淘汰方式统计
+                </div>
+                <!-- 列表容器 -->
+                <div id="newLoseStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 overflow-y-auto max-h-[385px] sm:max-h-[430px] method-scroll relative"></div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 注入专属滚动条样式 (匹配图1右侧的粗宽可爱滚动条) -->
+<style>
+    .method-scroll::-webkit-scrollbar { width: 12px; }
+    @media (min-width: 640px) { .method-scroll::-webkit-scrollbar { width: 16px; } }
+    .method-scroll::-webkit-scrollbar-track { background: #8DA4D0; border-left: 3px solid #5E4B8B; }
+    .method-scroll::-webkit-scrollbar-thumb { background: #F8FAFC; border: 3px solid #5E4B8B; border-radius: 8px; }
+</style>
+<!-- ======================================= -->
+<!-- 【全新优化】结算方式统计模块 结束      -->
+<!-- ======================================= -->
+
 <!-- ======================================= -->
         <!-- 【新增】淘汰顺序统计模块 开始          -->
         <!-- ======================================= -->
@@ -538,8 +585,8 @@
         <!-- 【新增】淘汰顺序统计模块 结束          -->
         <!-- ======================================= -->
 
- <div id="championSectionWrapper" class="mb-6">
-            <section id="championSection" class="kawaii-card p-1 mb-6 hidden flex-col">
+<div id="championSectionWrapper" class="mb-6">
+            <section id="championSection" class="kawaii-card p-1 flex flex-col">
                 <div class="text-center py-2 font-bold text-accent text-xl tracking-widest"><i class="fa-solid fa-trophy mr-2"></i>冠军<i class="fa-solid fa-trophy ml-2"></i></div>
                 <div class="bg-[#F0F9FF] border-4 border-[#5E4B8B] rounded-3xl m-2 p-3 relative overflow-hidden">
                     <div class="flex items-center justify-between relative z-10 px-2 mb-2">
@@ -547,7 +594,7 @@
                             <img id="champAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
                         </div>
                         <div class="flex flex-col items-center mx-2 flex-1">
-                            <span id="champName" class="font-bold text-3xl drop-shadow-sm truncate max-w-[150px]">Name</span>
+                            <span id="champName" class="font-bold text-3xl drop-shadow-sm truncate max-w-[150px]">-</span>
                         </div>
                         <div class="flex flex-col text-right text-sm font-bold gap-1 shrink-0">
                             <div><span class="opacity-40 text-xs mr-1">获胜局数</span><span id="champWins" class="text-xl text-[#86EFAC]">0</span></div>
@@ -559,7 +606,6 @@
                     </div>
                 </div>
             </section>
-            <div id="dateDisplay" class="text-center font-bold text-[#5E4B8B]/60 text-sm -mt-2"></div>
         </div>
 
         <section id="leaderboardSection" class="kawaii-card p-5 mb-6">
@@ -625,7 +671,7 @@
         </section>
 
 <!-- 【优化】场次记录模块 -->
-        <section id="sessionSection" class="kawaii-card p-4 sm:p-6 mb-6" style="background-color: #FEFCE8;">
+        <section id="sessionSection" class="kawaii-card p-4 sm:p-6 mb-6" style="order: 0">
             <div id="sessionListView">
                 <!-- 头部标题与添加按钮 -->
                 <div class="flex justify-between items-center mb-5 px-1">
@@ -2311,42 +2357,36 @@ if (p.maxLoseStreak > gameData.achievements.maxLoseStreak.s) { gameData.achievem
 function renderScoreInputs() {
         renderV2ScoreArea(); // 【V2新增】旧的不用了，直接呼叫新版的胶囊画笔
     }
-        function updateAllUI() {
+function updateAllUI() {
             const active = gameData.players.filter(p => p.isActive).sort((a,b) => b.total - a.total);
             const champ = active[0];
             
-            if (champ && champ.total !== 0) {
-                els.championSection.classList.remove('hidden');
-                els.championSection.classList.add('flex');
-                els.cAvatar.src = champ.avatar;
-                els.cName.textContent = champ.name; els.cName.style.color = champ.color;
-                els.cWins.textContent = champ.wins;
-                els.cGames.textContent = champ.gamesPlayed;
-                els.cScore.textContent = champ.total;
-            } else {
-                els.championSection.classList.add('hidden');
-                els.championSection.classList.remove('flex');
+            // 只要有活跃玩家，就把他的信息填进去（绝不再用 JS 隐藏整个面板，显示与否交给右上角集成菜单控制）
+            if (champ) {
+                if(els.cAvatar) els.cAvatar.src = champ.avatar;
+                if(els.cName) { els.cName.textContent = champ.name; els.cName.style.color = champ.color; }
+                if(els.cWins) els.cWins.textContent = champ.wins;
+                if(els.cGames) els.cGames.textContent = champ.gamesPlayed;
+                if(els.cScore) els.cScore.textContent = champ.total;
             }
             
-            const now = new Date();
-            const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-            els.dateDisplay.textContent = `（截止至 ${dateStr}）`;
-
-              renderBadgeWall();           
-renderLeaderboard(active);
-            renderDetailedRecords();
-window.renderPenaltyStats();
-            renderAchievements();
-            renderChart();
-            renderPieCharts(); 
-renderRadarChart(); 
-        renderSessionSection(); 
-        renderBarRanking();
-renderMethodStatsTable(); // 【V2新增】同步更新统计表格
-        renderEliminationOrder(); // 【新增】画出淘汰顺序表
-if(typeof window.renderOneVsOneArena === 'function') window.renderOneVsOneArena();
-        renderV2ScoreArea(); // 【修复1】每次算完分，强制让胶囊和输入框洗牌重置
-    }
+            // 以下使用极其安全的调用方式，任何一个模块哪怕没数据也绝不会卡死整个页面
+            if(typeof renderBadgeWall === 'function') renderBadgeWall();           
+            if(typeof renderLeaderboard === 'function') renderLeaderboard(active);
+            if(typeof renderDetailedRecords === 'function') renderDetailedRecords();
+            if(typeof window.renderPenaltyStats === 'function') window.renderPenaltyStats();
+            if(typeof renderAchievements === 'function') renderAchievements();
+            if(typeof renderChart === 'function') renderChart();
+            if(typeof renderPieCharts === 'function') renderPieCharts(); 
+            if(typeof renderRadarChart === 'function') renderRadarChart(); 
+            if(typeof renderSessionSection === 'function') renderSessionSection(); 
+            if(typeof renderBarRanking === 'function') renderBarRanking();
+            if(typeof renderMethodStatsTable === 'function') renderMethodStatsTable(); 
+            if(typeof renderEliminationOrder === 'function') renderEliminationOrder(); 
+            if(typeof window.renderOneVsOneArena === 'function') window.renderOneVsOneArena();
+            if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea(); 
+            if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
+        }
 
 // ==========================================
 // 【全新重建】1V1-擂台区 核心渲染画笔 (像素级完美复刻)
@@ -2380,12 +2420,8 @@ window.renderOneVsOneArena = function() {
         }
     });
 
-    if (ovoMatches.length === 0) {
-        section.classList.add('hidden');
-        return;
-    } else {
-        section.classList.remove('hidden');
-    }
+// 不管有没有分数，都强制显示擂台区，绝不隐藏！
+    section.classList.remove('hidden');
 
     const getShort = (name) => name ? name.slice(-1) : '?';
 
@@ -2393,16 +2429,16 @@ window.renderOneVsOneArena = function() {
     headerContainer.innerHTML = `
     <div class="flex flex-col items-center mb-3 sm:mb-4 gap-1.5 sm:gap-2 w-full">
         <!-- 大标题 (套用 stroke-md 真描边) -->
-        <div class="bg-[#FFD93D] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-sm">
-            <span class="font-black text-white text-xl sm:text-2xl tracking-widest stroke-md">1 V 1</span>
+        <div class="bg-[#FFD93D] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-[0_4px_0_#5E4B8B]">
+            <span class="font-black text-[#5E4B8B] text-xl sm:text-2xl tracking-widest stroke-md">终极一对一PK！</span>
         </div>
         <!-- 切换视图按钮组 -->
         <div class="flex items-center gap-2">
-            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:scale-90 transition-transform" onclick="window.changeOvoView(-1)"><i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i></button>
+            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-[0_4px_0_#5E4B8B] active:scale-90 transition-transform" onclick="window.changeOvoView(-1)"><i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i></button>
             
-            <div class="bg-[#06B6D4] border-[2.5px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-sm min-w-[80px] sm:min-w-[100px] text-center transition-colors stroke-sm">${ovoViewNames[ovoState.viewIndex]}</div>
+            <div class="bg-[#06B6D4] border-[2.5px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-[0_4px_0_#5E4B8B] min-w-[80px] sm:min-w-[100px] text-center transition-colors stroke-sm">${ovoViewNames[ovoState.viewIndex]}</div>
             
-            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-sm active:scale-90 transition-transform" onclick="window.changeOvoView(1)"><i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i></button>
+            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-[0_4px_0_#5E4B8B] active:scale-90 transition-transform" onclick="window.changeOvoView(1)"><i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i></button>
         </div>
     </div>`;
 
@@ -2418,7 +2454,7 @@ window.renderOneVsOneArena = function() {
 
         return `
         <!-- 图1: 每人独立外框，带圆角，带阴影 -->
-        <div class="flex flex-col bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[6px] overflow-hidden min-w-[55px] sm:min-w-[75px] flex-1 shadow-sm">
+        <div class="flex flex-col bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[6px] overflow-hidden min-w-[55px] sm:min-w-[75px] flex-1 shadow-[0_4px_0_#5E4B8B]">
             <!-- 颜色表头：头像+名字 -->
             <div class="h-7 sm:h-9 flex items-center justify-center gap-1 border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B]" style="background-color: ${headerBgColor};">
                 <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-[4px] border-[1.5px] sm:border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
@@ -2428,7 +2464,7 @@ window.renderOneVsOneArena = function() {
                 <span class="font-black text-white stroke-xs text-[10px] sm:text-sm truncate tracking-widest leading-none">${getShort(p.name)}</span>
             </div>
             <!-- 总次数 (蓝字白底) -->
-            <div class="h-6 sm:h-8 flex items-center justify-center text-[#3B82F6] font-black text-[13px] sm:text-[16px] border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B] bg-white">${total}</div>
+            <div class="h-6 sm:h-8 flex items-center justify-center text-[#5E4B8B] font-black text-[13px] sm:text-[16px] border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B] bg-white">${total}</div>
             <!-- WIN / LOSE -->
             <div class="flex border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B] text-white text-[9px] sm:text-[11px] font-black tracking-widest leading-none">
                 <div class="flex-1 bg-[#84CC16] flex items-center justify-center py-1 border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">胜</div>
@@ -2455,7 +2491,7 @@ window.renderOneVsOneArena = function() {
     if (ovoState.viewIndex === 0) {
         let colsHtml = active.map(p => buildStatsCol(p, ovoMatches, p.color)).join('');
         html = `
-        <div class="p-1 sm:p-2 w-full flex justify-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-sm">
+        <div class="p-1 sm:p-2 w-full flex justify-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B]">
             <!-- 内部使用 gap 隔开各个玩家标签，使用 overflow-x-auto 确保不撑破 -->
             <div class="flex gap-1.5 sm:gap-2.5 w-full max-w-full justify-around items-stretch overflow-x-auto scrollbar-hide py-1">
                 ${colsHtml}
@@ -2470,7 +2506,7 @@ window.renderOneVsOneArena = function() {
         let reversedMatches = [...ovoMatches].reverse();
         
         // 外围容器，固定高度出现滚动条 (图2右侧的蓝灰色滚动条已通过 custom-scroll 控制)
-        html = `<div class="p-1.5 sm:p-2.5 flex flex-col gap-2 sm:gap-3 max-h-[260px] sm:max-h-[320px] overflow-y-auto custom-scroll w-full bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-sm">`;
+        html = `<div class="p-1.5 sm:p-2.5 flex flex-col gap-2 sm:gap-3 max-h-[260px] sm:max-h-[320px] overflow-y-auto custom-scroll w-full bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B]">`;
         
         reversedMatches.forEach(m => {
             let wp = active.find(p=>p.id===m.winner); let lp = active.find(p=>p.id===m.loser);
@@ -2490,20 +2526,20 @@ window.renderOneVsOneArena = function() {
 
             // 每个对局是一条独立的横幅，带阴影和间距
             html += `
-            <div class="flex w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md bg-white h-[42px] sm:h-[50px] overflow-hidden shrink-0 shadow-sm">
+            <div class="flex w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md bg-white h-[42px] sm:h-[40px] overflow-hidden shrink-0 shadow-[0_4px_0_#5E4B8B]">
                 <!-- 第X局 -->
                 <div class="w-11 sm:w-14 flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] bg-[#E2E8F0] shrink-0">
-                    <span class="font-bold text-[#5E4B8B] text-[9px] sm:text-xs">第${m.round}局</span>
+                    <span class="font-bold text-[#5E4B8B] text-[20px] sm:text-xs">${m.round}</span>
                 </div>
                 <!-- 详情区 -->
                 <div class="flex-1 flex min-w-0">
                     <!-- WIN -->
                     <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
                         <div class="w-[30%] bg-[#84CC16] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
-                            <span class="text-white font-black text-[9px] sm:text-[11px] stroke-xs">胜</span>
+                            <span class="text-white font-black text-[20px] sm:text-[20px] stroke-xs">胜</span>
                         </div>
                         <div class="flex-1 flex items-center justify-center" style="background-color: ${wp.color};">
-                            <span class="text-white font-black text-[10px] sm:text-xs stroke-xs">${getShort(wp.name)}</span>
+                            <span class="text-white font-black text-[25px] sm:text-stroke stroke-xs">${getShort(wp.name)}</span>
                         </div>
                     </div>
                     <!-- PK -->
@@ -2513,10 +2549,10 @@ window.renderOneVsOneArena = function() {
                     <!-- LOSE -->
                     <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
                         <div class="w-[30%] bg-[#E11D48] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
-                            <span class="text-white font-black text-[9px] sm:text-[11px] stroke-xs">负</span>
+                            <span class="text-white font-black text-[20px] sm:text-[20px] stroke-xs">负</span>
                         </div>
                         <div class="flex-1 flex items-center justify-center" style="background-color: ${lp.color};">
-                            <span class="text-white font-black text-[10px] sm:text-xs stroke-xs">${getShort(lp.name)}</span>
+                            <span class="text-white font-black text-[25px] sm:text-stroke stroke-xs">${getShort(lp.name)}</span>
                         </div>
                     </div>
                     <!-- 时间 -->
@@ -2560,22 +2596,22 @@ window.renderOneVsOneArena = function() {
         }).join('');
 
         html = `
-        <div class="p-2 sm:p-3 w-full flex flex-col items-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-sm relative">
+        <div class="p-2 sm:p-3 w-full flex flex-col items-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B] relative">
             <!-- 玩家切换控制器 -->
             <div class="flex items-center justify-center gap-3 mb-1 w-full relative z-10">
-                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-sm shrink-0 transition-transform" onclick="window.changeOvoSubject(-1)">
+                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-[0_4px_0_#5E4B8B] shrink-0 transition-transform" onclick="window.changeOvoSubject(-1)">
                     <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i>
                 </button>
                 
                 <!-- 主视角玩家标签 -->
-                <div class="border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-4 sm:pr-6 py-0.5 sm:py-1 flex items-center gap-2 shadow-sm shrink-0" style="background-color: ${subject.color};">
+                <div class="border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-4 sm:pr-6 py-0.5 sm:py-1 flex items-center gap-2 shadow-[0_4px_0_#5E4B8B] shrink-0" style="background-color: ${subject.color};">
                     <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-[6px] sm:rounded-md border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
                         <img src="${subject.avatar}" class="w-full h-full object-cover">
                     </div>
                     <span class="font-black text-white stroke-sm tracking-widest text-sm sm:text-base">${getShort(subject.name)}</span>
                 </div>
 
-                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-sm shrink-0 transition-transform" onclick="window.changeOvoSubject(1)">
+                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-[0_4px_0_#5E4B8B] shrink-0 transition-transform" onclick="window.changeOvoSubject(1)">
                     <i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i>
                 </button>
             </div>
@@ -4983,7 +5019,7 @@ function resetV2State() {
     resetTimer(); // 自动复原倒计时
 }
 
-// 2. 画出新版的胶囊按钮和分数输入框
+// 2. 画出新版的胶囊按钮和分数输入框 (图1像素级复刻厚重投影)
 function renderV2ScoreArea() {
     const roundDisp = document.getElementById('v2CurrentRoundDisplay');
     if (roundDisp) roundDisp.textContent = gameData.rounds.length + 1;
@@ -5002,45 +5038,48 @@ function renderV2ScoreArea() {
         if (!isElim) aliveCount++;
 
         let capBg = p.color; 
+        let shadowColor = "#5E4B8B";
         let capBorder = "#5E4B8B";
-        let textColor = "text-white";
+        let textColor = "text-white stroke-xs"; // 应用极小文字外描边
         let opacityClass = "opacity-100";
-        let textShadow = "text-shadow: 1px 1px 0px rgba(0,0,0,0.5);";
-        let nameContent = p.name;
-        let cursor = "cursor-pointer hover:brightness-110";
+        let nameContent = p.name ? p.name.slice(-1) : '?'; // 图1要求：提取单字
+        let cursor = "cursor-pointer hover:brightness-110 active:translate-y-1 active:shadow-none";
 
         if (isWinner) {
-            capBg = "#FFD93D"; 
+            capBg = "#FDE047"; 
             textColor = "text-[#5E4B8B]";
-            textShadow = "";
             cursor = "cursor-default";
-            nameContent = `<i class="fa-solid fa-crown mr-0.5"></i>${p.name}`;
+            nameContent = `<i class="fa-solid fa-crown mr-0.5"></i>${nameContent}`;
         } else if (isElim) {
-            capBg = "#E5E7EB"; 
+            capBg = "#E2E8F0"; 
             capBorder = "#9CA3AF";
+            shadowColor = "#9CA3AF";
             textColor = "text-gray-500";
-            textShadow = "";
             opacityClass = "opacity-60";
-            nameContent = `<i class="fa-solid fa-skull mr-0.5 text-danger"></i><span class="line-through">${p.name}</span>`;
+            nameContent = `<span class="line-through">${nameContent}</span>`;
+            cursor = "cursor-default";
         }
 
         return `
-        <div class="flex flex-col items-center w-full">
-            <button class="v2-player-cap w-full py-1 px-1 border-[3px] rounded-full font-bold text-[11px] sm:text-sm transition-all flex items-center shadow-sm active:translate-y-1 ${cursor} ${opacityClass} ${textColor}" style="background-color: ${capBg}; border-color: ${capBorder}; ${textShadow}" data-id="${p.id}">
-                <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-[#5E4B8B] overflow-hidden bg-white shrink-0 flex items-center justify-center">
+        <div class="flex-1 flex flex-col items-center min-w-0">
+            <!-- 图1同款：带头像的玩家胶囊，带底部厚重投影 -->
+            <button class="v2-player-cap w-full flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-1 sm:px-1.5 border-[2.5px] sm:border-[3px] rounded-full transition-all ${cursor} ${opacityClass} ${textColor}" style="background-color: ${capBg}; border-color: ${capBorder}; box-shadow: 0 3px 0 ${shadowColor};" data-id="${p.id}">
+                <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[1.5px] sm:border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center">
                     <img src="${p.avatar}" class="w-full h-full object-cover">
                 </div>
-                <span class="flex-1 text-center truncate pr-1">${nameContent}</span>
+                <span class="font-black text-[12px] sm:text-[15px] truncate max-w-full">${nameContent}</span>
             </button>
-            <input type="number" class="v2-score-input w-full h-7 sm:h-9 mt-1.5 bg-white border-[3px] border-[#5E4B8B] rounded-full text-center font-bold text-xs sm:text-base focus:outline-none focus:border-primary shadow-sm transition-colors ${isElim ? 'opacity-50' : ''}" data-id="${p.id}" value="0" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'">
-            ${isElim ? `<span class="text-[9px] text-danger font-bold mt-0.5 scale-90 whitespace-nowrap">${v2State.eliminated[p.id]}</span>` : ''}
+            
+            <!-- 图1同款：分数输入框，圆角胶囊状，带底部厚重投影 -->
+            <input type="number" class="v2-score-input w-[95%] sm:w-[90%] h-6 sm:h-8 mt-2.5 sm:mt-3 bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full text-center font-black text-[#5E4B8B] text-xs sm:text-sm focus:outline-none focus:border-[#4ADE80] transition-colors shadow-[0_3px_0_#5E4B8B] ${isElim ? 'opacity-50 shadow-[0_3px_0_#9CA3AF] border-[#9CA3AF]' : ''}" data-id="${p.id}" value="0" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'">
+            
+            ${isElim ? `<span class="text-[9px] text-[#E11D48] font-bold mt-1.5 scale-90 whitespace-nowrap truncate w-full text-center">${v2State.eliminated[p.id]}</span>` : ''}
         </div>`;
     }).join('');
 
-if (aliveCount > 1 && !v2State.winnerId) els.earlyWinBtn.classList.remove('hidden');
+    if (aliveCount > 1 && !v2State.winnerId) els.earlyWinBtn.classList.remove('hidden');
     else els.earlyWinBtn.classList.add('hidden');
 
-    // 【修复Bug 2】每次刷新玩家状态，顺便把罚牌显示区也刷新一下，让淘汰罚牌显示出来
     if(typeof window.renderPenaltyLists === 'function') window.renderPenaltyLists();
 }
 
@@ -5070,75 +5109,143 @@ function checkResetTimer() {
     if(Object.keys(v2State.eliminated).length === 0) resetTimer();
 }
 
-// 6. 渲染统计表格
+// ==========================================
+// 6. 渲染统计表格 (双视图完美整合版)
+// ==========================================
+// 控制视图的全局变量 (1 = 新版卡片视图, 0 = 旧版简约视图)
+window.methodStatViewMode = 1;
+
+// 绑定给 HTML 按钮的切换视图函数
+window.toggleMethodStatView = function() {
+    window.methodStatViewMode = window.methodStatViewMode === 1 ? 0 : 1;
+    if(typeof renderMethodStatsTable === 'function') renderMethodStatsTable();
+};
+
 function renderMethodStatsTable() {
-        if(!gameData.methodStats) gameData.methodStats = { win: {}, lose: {} };
-        let totalWins = Object.values(gameData.methodStats.win).reduce((a,b)=>a+b, 0);
-        let totalLoses = Object.values(gameData.methodStats.lose).reduce((a,b)=>a+b, 0);
+    if(!gameData.methodStats) gameData.methodStats = { win: {}, lose: {} };
+    let totalWins = Object.values(gameData.methodStats.win).reduce((a,b)=>a+b, 0);
+    let totalLoses = Object.values(gameData.methodStats.lose).reduce((a,b)=>a+b, 0);
 
-        const winContainer = document.getElementById('newWinStatsList');
-        const loseContainer = document.getElementById('newLoseStatsList');
-        if(!winContainer || !loseContainer) return;
+    const winContainer = document.getElementById('newWinStatsList');
+    const loseContainer = document.getElementById('newLoseStatsList');
+    if(!winContainer || !loseContainer) return;
 
-// 小工具：获取方式对应分类的颜色
-        const getCatColor = (methodName, type) => {
-            let defaultColor = '#E2E8F0'; 
-            if (!gameData.customMethods) return defaultColor;
-            
-            let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
-            let item = data.items.find(i => i.name === methodName);
-            
-            // 找不到就去隔壁找
-            if (!item) {
-                data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
-                item = data.items.find(i => i.name === methodName);
-            }
-            
-            if (item) {
-                let cat = data.categories.find(c => c.id === item.categoryId);
-                if (cat) return cat.color;
-            }
-            return defaultColor;
-        };
+    // 小工具 1：获取方式对应分类的颜色
+    const getCatColor = (methodName, type) => {
+        let defaultColor = '#A1A1AA'; 
+        if (!gameData.customMethods) return defaultColor;
+        let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+        let item = data.items.find(i => i.name === methodName);
+        if (!item) {
+            data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+            item = data.items.find(i => i.name === methodName);
+        }
+        if (item) {
+            let cat = data.categories.find(c => c.id === item.categoryId);
+            if (cat) return cat.color;
+        }
+        return defaultColor;
+    };
 
-        // 核心画笔：渲染每一行条目
-        const buildRows = (statsObj, total, type) => {
-            // 按照出现次数由高到低排序！
-            let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
+    // 小工具 2：获取方式对应的图片
+    const getMethodUrl = (methodName, type) => {
+        let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23ffffff'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+        if (!gameData.customMethods) return defaultUrl;
+        let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+        let item = data.items.find(i => i.name === methodName);
+        if (!item) {
+            data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+            item = data.items.find(i => i.name === methodName);
+        }
+        return item && item.url ? item.url : defaultUrl;
+    };
+
+    // 小工具 3：寻找经历过该方式最多次的玩家（找"受害者"或"熟练者"）
+    const getTopPlayer = (methodName, type) => {
+        let maxVal = 0;
+        let topP = null;
+        const active = gameData.players.filter(p => p.isActive);
+        active.forEach(p => {
+            let val = type === 'win' ? (p.winMethods[methodName] || 0) : (p.loseMethods[methodName] || 0);
+            if (val > maxVal) { maxVal = val; topP = p; }
+        });
+        return topP;
+    };
+
+    // 旧版视图画笔
+    const buildOldRows = (statsObj, total, type) => {
+        let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
+        if (keys.length === 0) return '<div class="text-center text-gray-400 font-bold text-[10px] sm:text-xs py-2">暂无数据</div>';
+        let numColor = type === 'win' ? '#16a34a' : '#dc2626'; 
+        return keys.map(m => {
+            let count = statsObj[m];
+            let pct = total > 0 ? Math.round((count / total) * 100) + '%' : '0%';
+            let bgColor = getCatColor(m, type);
+            return `
+            <div class="flex items-stretch border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] overflow-hidden bg-white shadow-sm h-7 sm:h-9 method-stat-row cursor-pointer hover:scale-[1.02] transition-transform shrink-0" data-method="${m}" data-type="${type}">
+                <div class="w-[45%] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] font-black text-[#5E4B8B] text-[10px] sm:text-[13px] tracking-widest px-1 truncate" style="background-color: ${bgColor};">${m}</div>
+                <div class="w-[30%] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] font-black text-[16px] sm:text-[20px]" style="color: ${numColor}; line-height: 1;">${count}</div>
+                <div class="w-[25%] flex items-center justify-center font-black text-[#5E4B8B] text-[9px] sm:text-[12px]">${pct}</div>
+            </div>`;
+        }).join('');
+    };
+
+    // 新版视图画笔 (像素级复刻图1卡片)
+    const buildNewCardRows = (statsObj, total, type) => {
+        let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
+        if (keys.length === 0) return '<div class="text-center text-gray-400 font-bold text-[10px] sm:text-xs py-2">暂无数据</div>';
+        let numColor = type === 'win' ? '#16a34a' : '#dc2626'; 
+        
+        return keys.map(m => {
+            let count = statsObj[m];
+            let pct = total > 0 ? Math.round((count / total) * 100) + '%' : '0%';
+            let bgColor = getCatColor(m, type);
+            let imgUrl = getMethodUrl(m, type);
+            let topPlayer = getTopPlayer(m, type);
             
-            if (keys.length === 0) return '<div class="text-center text-gray-400 font-bold text-[10px] sm:text-xs py-2">暂无数据</div>';
-            
-            let numColor = type === 'win' ? '#16a34a' : '#dc2626'; // 数字颜色：胜利深绿，淘汰深红
-            
-            return keys.map(m => {
-                let count = statsObj[m];
-                let pct = total > 0 ? Math.round((count / total) * 100) + '%' : '0%';
-                let bgColor = getCatColor(m, type);
+            let pName = topPlayer && topPlayer.name ? topPlayer.name.slice(-1) : '?';
+            let pColor = topPlayer ? topPlayer.color : '#9CA3AF';
+
+            return `
+            <div class="flex border-[3px] border-[#5E4B8B] bg-white rounded-[0.5rem] p-1 gap-1.5 method-stat-row cursor-pointer hover:scale-[1.02] transition-transform shadow-[0_2px_0_#5E4B8B] h-[65px] sm:h-[80px] shrink-0" data-method="${m}" data-type="${type}">
                 
-                // 像素级复刻图1：外框、颜色分类背景、数字居中、百分比
-                // 保留 method-stat-row 让他依然支持点击弹出详细数据！
-                return `
-                <div class="flex items-stretch border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] overflow-hidden bg-white shadow-sm h-7 sm:h-9 method-stat-row cursor-pointer hover:scale-[1.02] transition-transform" data-method="${m}" data-type="${type}">
-                    <!-- 左侧：文字分类底色区 -->
-                    <div class="w-[45%] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] font-black text-[#5E4B8B] text-[10px] sm:text-[13px] tracking-widest px-1 truncate" style="background-color: ${bgColor};">
-                        ${m}
+                <!-- 左侧图片区 (等比例缩放) -->
+                <div class="w-[48px] sm:w-[60px] h-full border-[2px] border-[#5E4B8B] rounded-sm overflow-hidden bg-white shrink-0 flex items-center justify-center relative p-[1px]">
+                    <img src="${imgUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
+                </div>
+                
+                <!-- 右侧信息区 -->
+                <div class="flex-1 flex flex-col justify-between gap-0.5 min-w-0 h-full">
+                    
+                    <!-- 上方：分类颜色底色 + 方式名称 -->
+                    <div class="border-[2px] border-[#5E4B8B] rounded-[4px] flex items-center justify-center py-[2px] sm:py-0.5 px-1 w-full shadow-[0_1px_0_#5E4B8B]" style="background-color: ${bgColor};">
+                        <span class="font-black text-[#5E4B8B] text-[10px] sm:text-xs truncate tracking-widest leading-none drop-shadow-sm">${m}</span>
                     </div>
-                    <!-- 中间：次数大数字 -->
-                    <div class="w-[30%] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] font-black text-[16px] sm:text-[20px]" style="color: ${numColor}; line-height: 1;">
-                        ${count}
+                    
+                    <!-- 下方：次数 | 百分比 | 玩家 -->
+                    <div class="flex border-[2px] border-[#5E4B8B] rounded-[4px] overflow-hidden bg-white w-full h-6 sm:h-7 shadow-[0_1px_0_#5E4B8B]">
+                        <!-- 次数 -->
+                        <div class="w-[35%] flex items-center justify-center font-black text-[12px] sm:text-[14px] border-r-[2px] border-[#5E4B8B] leading-none" style="color: ${numColor};">${count}</div>
+                        <!-- 百分比 -->
+                        <div class="flex-1 flex items-center justify-center font-black text-[9px] sm:text-[11px] text-[#9BA4C5] border-r-[2px] border-[#5E4B8B] leading-none">${pct}</div>
+                        <!-- 最多玩家 -->
+                        <div class="w-6 sm:w-8 flex items-center justify-center font-black text-[10px] sm:text-[12px] text-white text-stroke leading-none" style="background-color: ${pColor};">${pName}</div>
                     </div>
-                    <!-- 右侧：百分比 -->
-                    <div class="w-[25%] flex items-center justify-center font-black text-[#5E4B8B] text-[9px] sm:text-[12px]">
-                        ${pct}
-                    </div>
-                </div>`;
-            }).join('');
-        };
 
-        // 注入渲染
-        winContainer.innerHTML = buildRows(gameData.methodStats.win, totalWins, 'win');
-        loseContainer.innerHTML = buildRows(gameData.methodStats.lose, totalLoses, 'lose');
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    // 根据当前的视图状态渲染
+    if (window.methodStatViewMode === 1) {
+        winContainer.innerHTML = buildNewCardRows(gameData.methodStats.win, totalWins, 'win');
+        loseContainer.innerHTML = buildNewCardRows(gameData.methodStats.lose, totalLoses, 'lose');
+    } else {
+        winContainer.innerHTML = buildOldRows(gameData.methodStats.win, totalWins, 'win');
+        loseContainer.innerHTML = buildOldRows(gameData.methodStats.lose, totalLoses, 'lose');
     }
+}
 
 // 【新增核心功能】画出淘汰顺序表
 function renderEliminationOrder() {
