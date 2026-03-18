@@ -66,6 +66,39 @@
                 paint-order: stroke fill;
    14:08 2026/3/16         }
 
+/* ==================================================================== */
+/* ★★★ 奖杯弹窗专属特效与样式区 (修复裁剪问题版) ★★★ */
+/* ==================================================================== */
+
+/* 1. 悬浮呼吸特效 (完美替代扫光，自带发光，绝不裁剪) */
+.float-anim {
+    display: inline-block;
+    /* ★ 动画修改指南：2.5s 是浮动一次的时间，可以改快或改慢 */
+    animation: floatTrophy 3s ease-in-out infinite;
+}
+@keyframes floatTrophy {
+    0% { transform: translateY(0px) rotate(-12deg); filter: drop-shadow(0 0 4px rgba(255,255,255,0.3)); }
+    50% { transform: translateY(-8px) rotate(-15deg); filter: drop-shadow(0 0 15px rgba(255,255,255,0.9)); }
+    100% { transform: translateY(0px) rotate(-12deg); filter: drop-shadow(0 0 4px rgba(255,255,255,0.3)); }
+}
+
+/* 备用特效1：心跳放大缩小 (你可以把HTML里的 sweep-light 换成 pulse-effect 试试看) */
+.pulse-effect { animation: pulseAnim 1.5s infinite; }
+@keyframes pulseAnim { 0% { transform: scale(1) rotate(-12deg); } 50% { transform: scale(1.1) rotate(-12deg); } 100% { transform: scale(1) rotate(-12deg); } }
+
+/* 备用特效2：外发光呼吸灯 (你可以把HTML里的 sweep-light 换成 glow-effect 试试看) */
+.glow-effect { animation: glowAnim 2s infinite alternate; }
+@keyframes glowAnim { 0% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); } 100% { filter: drop-shadow(0 0 20px rgba(255,255,255,1)); } }
+
+/* 2. SSS 专属超厚外描边 (彻底解除限制) */
+.super-heavy-stroke {
+    /* ★ 修改指南：这里控制描边粗细 */
+    -webkit-text-stroke: 12px #5E4B8B;
+    paint-order: stroke fill;
+    /* 核心修复：允许描边溢出，绝不裁剪！ */
+    overflow: visible !important; 
+}
+
 /* --- 【全新】奖杯墙原生滑动 + 隐藏滚动条专用 --- */
             .marquee-wrapper {
                 width: 100%;
@@ -995,38 +1028,114 @@
         </div>
     </div>
 
-    <!-- 成就详情弹窗 -->
+<!-- ================================================================ -->
+    <!-- ★★★ 图1 完美像素级复刻：成就详情弹窗 ★★★ -->
+    <!-- ================================================================ -->
     <div id="badgeInfoDialog" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-        <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-6 max-w-[340px] w-full text-center relative mx-4 shadow-2xl">
-            <button id="closeBadgeInfoBtn" class="absolute top-4 right-4 text-gray-400 hover:text-[#5E4B8B] text-3xl transition-colors leading-none"><i class="fa-solid fa-times"></i></button>
+        
+        <!-- 【最外部的大容器】 -->
+        <!-- ★ 修改指南：w-full max-w-[340px] 控制整个卡片的最大宽度；bg-[#FEFCE8] 是淡黄色背景；border-[6px] 控制紫色边框粗细 -->
+        <div class="relative bg-[#FEFCE8] border-[5px] sm:border-[6px] border-[#5E4B8B] rounded-[2rem] w-full max-w-[320px] sm:max-w-[340px] mx-4 mt-12 p-4 pt-10 pb-6 shadow-[0_8px_0_#5E4B8B]">
             
-            <div class="flex items-center justify-center gap-4 mb-5 mt-2">
-                <i id="badgeInfoIcon" class="fa-solid text-5xl"></i>
-                <div class="text-left">
-                    <h3 id="badgeInfoName" class="text-2xl font-black text-[#5E4B8B] leading-none mb-1"></h3>
-                    <p id="badgeInfoDesc" class="text-xs text-gray-500 font-bold"></p>
+            <!-- 关闭按钮 (右上角的 X) -->
+            <!-- ★ 修改指南：-top-4 -right-4 可以把叉叉挪到框外去，text-3xl 控制叉叉大小 -->
+            <button id="closeBadgeInfoBtn" class="absolute top-3 right-4 text-gray-400 hover:text-danger text-3xl transition-colors leading-none z-50">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
+<!-- ================================================== -->
+            <!-- ★★★ 终极贴纸控制台 (所有参数都在这，改数字即可) ★★★ -->
+            <!-- ================================================== -->
+            <!-- 整体位置控制：改 top(上下) 和 left(左右) -->
+            <div class="absolute z-[100] pointer-events-none" style="top: -50px; left: -15px; overflow: visible;">
+                <div class="relative w-[150px] h-[150px]">
+                    
+                    <!-- 【背后的大 Logo (陨石/火焰)】 -->
+                    <!-- ★ 控制台 1：直接在这里改数字，没有任何上限！ -->
+                    <!-- font-size: 控制大小（数值越大图案越大，比如 120px） -->
+                    <!-- opacity: 控制透明度（1是完全不透，0.5是半透，0.2是超透） -->
+                    <!-- top 和 left: 控制它在这个区域内的上下左右位置 -->
+                    <i id="badgeInfoRarityIcon" 
+                       class="absolute z-0 " 
+                       style="font-size: 90px; opacity: 1; top: -10px; left: 123px; color: #FF8C00;"></i>
+                    
+                    <!-- 【前面的文字 (SSS/A/B)】 -->
+                    <!-- ★ 控制台 2：直接在这里改数字！ -->
+                    <!-- top 和 left: 控制文字相对背后 Logo 的位置 (把 top 变大就往下走，left 变大就往右走) -->
+                    <div class="absolute z-10 float-anim" style="top: -60px; left: -20px; padding: 15px; overflow: visible;">
+                        <!-- ★ 控制台 3：文字的大小 -->
+                        <!-- font-size: 控制文字大小（填 80px、100px 随便你，绝无上限！） -->
+                        <span id="badgeInfoRarityText" 
+                              class="font-black super-heavy-stroke italic text-white drop-shadow-[0_6px_0_rgba(94,75,139,0.5)]"
+                              style="font-size: 120px;">SSS</span>
+                    </div>
+
                 </div>
             </div>
-            
-            <div class="flex items-center justify-center gap-3 mb-6">
-                <div class="w-14 h-14 rounded-2xl border-[3px] border-[#5E4B8B] bg-black overflow-hidden shadow-sm">
-                    <img id="badgeInfoAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
-                </div>
-                <span id="badgeInfoPlayer" class="font-black text-3xl drop-shadow-sm"></span>
-            </div>
-            
-            <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl overflow-hidden shadow-inner flex flex-col">
-                <div class="flex items-center bg-gray-50 border-b-2 border-gray-100">
-                    <div class="px-3 py-2 text-sm font-bold text-gray-400 w-1/3 text-left">达成时机</div>
-                    <div id="badgeInfoRound" class="px-3 py-2 text-sm font-black text-[#4ADE80] w-2/3 text-right break-words leading-tight"></div>
-                </div>
-                <div class="flex flex-col bg-gray-50">
-                    <div class="px-3 py-2 text-sm font-bold text-gray-400 text-left border-b-2 border-gray-100">详细事件记录</div>
-                    <div id="badgeInfoDetail" class="px-4 py-5 text-sm sm:text-base font-black text-[#5E4B8B] text-center bg-white leading-snug"></div>
+            <!-- ================================================== -->
+
+            <!-- 【容器 1：奖杯标题】 -->
+            <div class="flex justify-center mb-4 relative z-20">
+                <!-- ★ 修改指南：px-8 py-2 控制胶囊的长短胖瘦，border-[4px] 是描边，shadow-[0_4px_0_#5E4B8B] 是底部厚重阴影 -->
+                <!-- 注意：背景颜色将在 JS 里动态填入 50% 透明度的稀有度颜色 -->
+                <div id="badgeInfoTitleBg" class="border-[4px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-1.5 sm:py-2 shadow-[0_4px_0_#5E4B8B] w-[85%] flex justify-center items-center">
+                    <!-- ★ 修改指南：text-2xl 控制奖杯名字的大小，text-stroke 给它加上白底紫字的描边特效 -->
+                    <span id="badgeInfoName" class="font-black text-white text-2xl sm:text-3xl tracking-widest leading-none drop-shadow-sm">奖杯名称</span>
                 </div>
             </div>
+
+            <!-- 【容器 2：奖杯描述】 -->
+            <div class="flex justify-center mb-6 relative z-10 -mt-1">
+                <!-- ★ 修改指南：bg-[#C0C0C0] 是灰色底板，shadow-[0_3px_0_#5E4B8B] 是小阴影 -->
+                <div class="bg-[#C0C0C0] border-[3px] border-[#5E4B8B] rounded-full px-5 py-1 shadow-[0_3px_0_#5E4B8B]">
+                    <span id="badgeInfoDesc" class="font-black text-[#5E4B8B] text-xs sm:text-sm tracking-widest">奖杯的描述文字</span>
+                </div>
+            </div>
+
+            <!-- 【容器 3：玩家头像与名字】 -->
+            <div class="flex justify-center mb-8">
+                <!-- ★ 修改指南：bg-[#64C8C8] 是你图里的青色背景。如果你想用玩家专属色，我们会在 JS 里替换它 -->
+                <div id="badgeInfoPlayerBg" class="bg-[#64C8C8] border-[4px] border-[#5E4B8B] rounded-full px-4 sm:px-5 py-1 sm:py-1.5 flex items-center justify-center gap-2 sm:gap-3 shadow-[0_4px_0_#5E4B8B] min-w-[50%]">
+                    <!-- 头像框 -->
+<div class="w-10 h-10 sm:w-12 sm:h-12 bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-2xl overflow-hidden shrink-0 shadow-sm">
+                        <img id="badgeInfoAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <!-- 玩家名字 -->
+                    <!-- ★ 修改指南：text-2xl 控制玩家名字的大小 -->
+                    <span id="badgeInfoPlayer" class="font-black text-white text-stroke text-xl sm:text-2xl tracking-widest drop-shadow-sm">婷</span>
+                </div>
+            </div>
+
+            <!-- 【容器 4：达成时机】 -->
+            <div class="relative w-full mb-8">
+                <!-- 左上角压边的独立小容器标签 -->
+                <!-- ★ 修改指南：-top-4 让他往上凸出，left-4 让他距左边一点距离。bg-[#6A96E5] 是天蓝色背景 -->
+                <div class="absolute -top-3.5 sm:-top-4 left-4 sm:left-6 bg-[#6A96E5] border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-5 py-0.5 z-10 shadow-[0_2px_0_#5E4B8B]">
+                    <span class="font-black text-white text-xs sm:text-sm tracking-widest">达成时机</span>
+                </div>
+                <!-- 下方的信息大白框 -->
+                <!-- ★ 修改指南：pt-6 pb-3 控制上下留白。shadow-[0_4px_0_#5E4B8B] 是底部大阴影 -->
+                <div class="bg-white border-[4px] border-[#5E4B8B] rounded-[1.5rem] px-4 pt-5 sm:pt-6 pb-2.5 sm:pb-3 shadow-[0_4px_0_#5E4B8B] flex justify-center items-center">
+                    <span id="badgeInfoRound" class="font-black text-[#2E7D32] text-sm sm:text-base text-center leading-tight tracking-wide">截止当前 第130局</span>
+                </div>
+            </div>
+
+            <!-- 【容器 5：详细事件记录】 -->
+            <div class="relative w-full mb-2">
+                <!-- 左上角压边的独立小容器标签 -->
+                <!-- ★ 修改指南：bg-[#E11D48] 是玫红色背景 -->
+                <div class="absolute -top-3.5 sm:-top-4 left-4 sm:left-6 bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-5 py-0.5 z-10 shadow-[0_2px_0_#5E4B8B]">
+                    <span class="font-black text-white text-xs sm:text-sm tracking-widest">详细事件记录</span>
+                </div>
+                <!-- 下方的信息大白框 -->
+                <div class="bg-white border-[4px] border-[#5E4B8B] rounded-[1.5rem] px-4 pt-6 sm:pt-7 pb-4 sm:pb-5 shadow-[0_4px_0_#5E4B8B] flex justify-center items-center min-h-[70px] sm:min-h-[80px]">
+                    <span id="badgeInfoDetail" class="font-black text-[#5E4B8B] text-xs sm:text-sm text-center leading-snug tracking-wider">累计由61局成为全场扣分最多的玩家</span>
+                </div>
+            </div>
+
         </div>
     </div>
+    <!-- ================================================================ -->
 
 <!-- 【新增】结算方式详细信息弹窗 (图1复刻版) -->
 <div id="methodDetailDialog" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
@@ -1328,6 +1437,10 @@ const rarityColors = {
             badgeInfoPlayer: document.getElementById('badgeInfoPlayer'),
 badgeInfoRound: document.getElementById('badgeInfoRound'),
             badgeInfoDetail: document.getElementById('badgeInfoDetail'), // 注意这里加了逗号
+badgeInfoRarityText: document.getElementById('badgeInfoRarityText'),
+            badgeInfoRarityIcon: document.getElementById('badgeInfoRarityIcon'),
+            badgeInfoTitleBg: document.getElementById('badgeInfoTitleBg'),
+            badgeInfoPlayerBg: document.getElementById('badgeInfoPlayerBg'),
 
             // 【V2新增】给新按钮和弹窗登记造册，方便代码控制
             v2ScoreArea: document.getElementById('v2ScoreArea'),
@@ -2249,41 +2362,54 @@ initAchievements();
             let roundScores =[];
                 const activeInRound = Object.keys(r.changes).map(id => parseInt(id));
 
-                activeInRound.forEach(id => {
+activeInRound.forEach(id => {
                     const p = gameData.players.find(x => x.id === id);
                     if (!p) return;
 
-                    const change = r.changes[id] || 0;
+                    // 【修复逻辑】如果是 0，就取 0；如果没有记录，才当成 0
+                    const change = r.changes[id] !== undefined ? r.changes[id] : 0;
                     p.total += change;
                     p.totalHistory.push(p.total);
 
-                    if (change !== 0) {
-                        p.gamesPlayed++;
+                    // 【核心修复】不要再把 change !== 0 作为前提了！
+                    // 只要这个玩家在这局里有数据（哪怕是录入了 0），就算参与了本局！
+                    p.gamesPlayed++;
 
-                        if (change > p.maxSingle) { p.maxSingle = change; p.maxSingleRound = r.round; }
-                        if (change < p.minSingle) { p.minSingle = change; p.minSingleRound = r.round; }
-                        
-                        if (change > 0) {
-                            p.wins++;
-                            p.currentStreak++;
-                            p.currentLoseStreak = 0;
-                            p.loseStreakStart = null;
-                            if (!p.streakStart) p.streakStart = r.round;
-                            if (p.currentStreak > p.maxStreak) {
-                                p.maxStreak = p.currentStreak;
-                                p.maxStreakRange = `${p.streakStart}-${r.round}`;
-                            }
-                        } else if (change < 0) {
-                            p.currentStreak = 0;
-                            p.streakStart = null;
-                            if (p.currentLoseStreak === 0) p.loseStreakStart = r.round;
-                            p.currentLoseStreak++;
-                            if (p.currentLoseStreak > p.maxLoseStreak) {
-                                p.maxLoseStreak = p.currentLoseStreak;
-                                p.maxLoseStreakRange = `${p.loseStreakStart}-${r.round}`;
-                            }
+                    // 0分也是有效的分数，参与最高/最低单局分的判定
+                    if (change > p.maxSingle) { p.maxSingle = change; p.maxSingleRound = r.round; }
+                    if (change < p.minSingle) { p.minSingle = change; p.minSingleRound = r.round; }
+                    
+// 【逻辑升级】0分时不盲目平局，胜负严格由结算前明确标记的状态判定！
+                    let isActualWin = (change > 0) || (change === 0 && r.winner === p.id);
+                    let isActualLose = (change < 0) || (change === 0 && r.v2Stats && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]);
+
+                    // 防旧版Bug机制：如果大家全是0分，且没有用新版标记，才算作真正的平局，不乱加胜负
+                    if (!r.v2Stats && change === 0 && Object.values(r.changes).every(v => v === 0)) {
+                        isActualWin = false; 
+                        isActualLose = false;
+                    }
+
+                    if (isActualWin) {
+                        p.wins++;
+                        p.currentStreak++;
+                        p.currentLoseStreak = 0;
+                        p.loseStreakStart = null;
+                        if (!p.streakStart) p.streakStart = r.round;
+                        if (p.currentStreak > p.maxStreak) {
+                            p.maxStreak = p.currentStreak;
+                            p.maxStreakRange = `${p.streakStart}-${r.round}`;
+                        }
+                    } else if (isActualLose) {
+                        p.currentStreak = 0;
+                        p.streakStart = null;
+                        if (p.currentLoseStreak === 0) p.loseStreakStart = r.round;
+                        p.currentLoseStreak++;
+                        if (p.currentLoseStreak > p.maxLoseStreak) {
+                            p.maxLoseStreak = p.currentLoseStreak;
+                            p.maxLoseStreakRange = `${p.loseStreakStart}-${r.round}`;
                         }
                     } else {
+                        // 真正的平局或未参与（既不是赢家也没被淘汰），才会打断连胜和连败记录
                         p.currentStreak = 0;
                         p.streakStart = null;
                         p.currentLoseStreak = 0;
@@ -2304,20 +2430,26 @@ initAchievements();
                     if (lastP) lastP.last++;
                 }
 
-                activeInRound.forEach(id => {
+activeInRound.forEach(id => {
                     const change = r.changes[id] || 0;
-                    if (change === 0) return; 
+                    // 【核心修复】：删掉之前的 if (change === 0) return; 
+                    // 让0分但保持连胜连败的玩家，也能被全局荣誉墙正确记录进去！
 
                     const p = gameData.players.find(x => x.id === id);
                     if (!p) return;
 
-                    if (change > gameData.achievements.maxSingle.s) { gameData.achievements.maxSingle = { p: id, s: change, r: r.round }; }
-                    if (change < gameData.achievements.minSingle.s) { gameData.achievements.minSingle = { p: id, s: change, r: r.round }; }
+                    // 仅当分数不为0时，才参与"全场单局最高/最低加减分"的比拼
+                    if (change !== 0) {
+                        if (change > gameData.achievements.maxSingle.s) { gameData.achievements.maxSingle = { p: id, s: change, r: r.round }; }
+                        if (change < gameData.achievements.minSingle.s) { gameData.achievements.minSingle = { p: id, s: change, r: r.round }; }
+                    }
+                    
+                    // 但是！任何情况（包括0分）都必须参与"连胜/连败/累计总分"的比拼
                     if (p.total > gameData.achievements.maxTotal.s) { gameData.achievements.maxTotal = { p: id, s: p.total, r: r.round }; }
                     if (p.total < gameData.achievements.minTotal.s) { gameData.achievements.minTotal = { p: id, s: p.total, r: r.round }; }
                     if (p.maxStreak > gameData.achievements.maxStreak.s) { gameData.achievements.maxStreak = { p: id, s: p.maxStreak, r: p.maxStreakRange }; }
-if (p.maxLoseStreak > gameData.achievements.maxLoseStreak.s) { gameData.achievements.maxLoseStreak = { p: id, s: p.maxLoseStreak, r: p.maxLoseStreakRange }; }
-            });
+                    if (p.maxLoseStreak > gameData.achievements.maxLoseStreak.s) { gameData.achievements.maxLoseStreak = { p: id, s: p.maxLoseStreak, r: p.maxLoseStreakRange }; }
+                });
 
             // 【新增】计算每局的 胜/负方式、复活、一血 归属给个人
             if (r.v2Stats) {
@@ -3054,7 +3186,7 @@ function renderSessionSection() {
 
                 // w-[22vw] 和 max-w-[85px] 确保在手机端一行刚好能塞下4列，总共显示3x4=12个
                 return `
-                <div class="badge-item flex flex-col justify-between w-[22.5vw] max-w-[85px] sm:w-[95px] h-[135px] sm:h-[155px] shrink-0 gap-[3px] sm:gap-1 p-[3px] sm:p-1 rounded-[12px] sm:rounded-2xl border-[2.5px] sm:border-[3px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] cursor-pointer bg-white transition-transform hover:scale-[1.03]" data-id="${b.id}">
+                <div class="badge-item flex flex-col justify-between w-[22.5vw] max-w-[85px] sm:w-[95px] h-[135px] sm:h-[155px] shrink-0 gap-[3px] sm:gap-1 p-[3px] sm:p-1 rounded-[12px] sm:rounded-2xl border-[2.5px] sm:border-[3px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] ; cursor-pointer  transition-transform hover:scale-[1.03]" data-id="${b.id}"> 
                     
                     <!-- 1. 上部独立模块：图标 + 标题 -->
                     <div class="relative w-full border-[2px] border-[#5E4B8B] rounded-lg flex flex-col items-center justify-center p-1 bg-white flex-1 shadow-[0_2px_0_#5E4B8B] min-h-0 ${isUnlocked ? '' : 'grayscale opacity-50'}">
@@ -3089,20 +3221,16 @@ function renderSessionSection() {
             if (grid1) grid1.innerHTML = badgeHtml;
             if (grid2) grid2.innerHTML = badgeHtml;
 // ====================================================
-            // 【新增】智能滚动马达：允许手滑 + 自动播放，且不影响点击！
+            // 【修正版】智能滚动马达：修复手指触摸时意外恢复滑动的问题
             // ====================================================
             const wrapper = document.getElementById('badgeGrid');
             if (wrapper && grid1) {
-                // 清除之前的马达（防止多次刷新页面导致速度变快）
+                // 清除之前的马达动画
                 if (window.badgeScrollTimer) cancelAnimationFrame(window.badgeScrollTimer);
                 
-                // 这是马达的运转逻辑
                 const playScroll = () => {
-                    if (!window.isBadgeInteracting) { // 如果手指没按住
-                        wrapper.scrollLeft += 1; // 【调节速度】：1代表每次滚1像素，想快点改2，想慢点改0.5
-                        
-                        // 如果滚到了第一块的尽头，瞬间拉回起点（无缝衔接的障眼法）
-                        // 这里的 6 是 gap 的间距误差值
+                    if (!window.isBadgeInteracting) { 
+                        wrapper.scrollLeft += 1; 
                         if (wrapper.scrollLeft >= grid1.offsetWidth + 6) { 
                             wrapper.scrollLeft = 0;
                         }
@@ -3110,18 +3238,26 @@ function renderSessionSection() {
                     window.badgeScrollTimer = requestAnimationFrame(playScroll);
                 };
                 
-                // 监听你的手部/鼠标动作，随时让马达刹车
-                wrapper.onmouseenter = () => window.isBadgeInteracting = true; // 鼠标移入暂停
-                wrapper.onmouseleave = () => window.isBadgeInteracting = false; // 鼠标移出继续
-                
-                // 【核心】专门给手机端触摸准备的逻辑！
-                wrapper.ontouchstart = () => window.isBadgeInteracting = true;  // 手指一碰，立刻暂停自动滚
-                wrapper.ontouchend = () => {
-                    // 手指松开后，等 1000毫秒（1秒）再重新启动马达，体验更丝滑
-                    setTimeout(() => { window.isBadgeInteracting = false; }, 1000);
+                // 【核心修复】：引入一个专门的定时器，防止手指连续摸的时候互相打架
+                let resumeTimer;
+                const pauseMotor = () => {
+                    clearTimeout(resumeTimer); // 手指一碰到，立刻把之前的“恢复倒计时”撕毁销毁！
+                    window.isBadgeInteracting = true;
+                };
+                const resumeMotor = () => {
+                    clearTimeout(resumeTimer);
+                    // 手指离开后，重新开始 1 秒的倒计时，1秒后才恢复移动
+                    resumeTimer = setTimeout(() => { window.isBadgeInteracting = false; }, 1000);
                 };
 
-                // 启动马达！
+                // 不管是鼠标还是手指，只要碰到或滑动，就锁死马达！
+                wrapper.onmouseenter = pauseMotor;
+                wrapper.onmouseleave = resumeMotor;
+                wrapper.ontouchstart = pauseMotor;
+                wrapper.ontouchmove = pauseMotor; // 【新增】滑动过程中也持续锁死
+                wrapper.ontouchend = resumeMotor;
+                wrapper.ontouchcancel = resumeMotor;
+
                 window.badgeScrollTimer = requestAnimationFrame(playScroll);
             }
         }
@@ -4231,14 +4367,17 @@ ${elimDetailsHtml}
                 tdRound.textContent = r.round;
                 tr.appendChild(tdRound);
 
-                active.forEach(p => {
+active.forEach(p => {
                     const td = document.createElement('td');
                     const val = r.changes[p.id];
                     td.className = 'py-3 px-2 font-bold';
                     
                     if (val > 0) { td.textContent = `+${val}`; td.className += ' text-rec-pos'; }
                     else if (val < 0) { td.textContent = val; td.className += ' text-rec-neg'; }
-                    else { td.textContent = '-'; td.className += ' text-gray-300'; }
+                    // 【UI 修复】：如果明确记录了是 0 分，就显示 0
+                    else if (val === 0) { td.textContent = '0'; td.className += ' text-gray-400'; } 
+                    // 只有当完全没有这个人的记录（undefined）时，才显示 '-' 表示没玩
+                    else { td.textContent = '-'; td.className += ' text-gray-300'; } 
                     
                     tr.appendChild(td);
                 });
@@ -4965,18 +5104,39 @@ function updateUndoRedoButtons() {
                     detailStr = `仿佛一个轮回，最新一局的得分 ${firstVal} 恰好等同于第一局的得分！`;
                 }
 
-                els.badgeInfoIcon.className = `fa-solid ${bDef.icon}`;
-                els.badgeInfoIcon.style.color = bDef.color;
+// ==========================================================
+                // ★★★ 图1 弹窗数据灌入核心引擎 ★★★
+                // ==========================================================
+                // 1. 获取稀有度专属颜色 (SS 是粉色，SSS 是红色，S是橙色等)
+                let rColor = rarityColors[bDef.rarity] || '#10B981';
+
+                // 2. 左上角炫酷稀有度文字与背景 LOGO
+                els.badgeInfoRarityText.textContent = bDef.rarity;
+                els.badgeInfoRarityText.style.color = rColor;
+                els.badgeInfoRarityIcon.className = `fa-solid ${bDef.icon} absolute z-0 super-heavy-stroke`;
+                // 给后面的 LOGO 一点辅助色，如果不喜欢可以固定写 '#FF8C00'
+                els.badgeInfoRarityIcon.style.color = bDef.color; 
+
+                // 3. 奖杯标题，以及那 50% 透明度的底色
                 els.badgeInfoName.textContent = bDef.name;
+                // 魔法：hexToRgba 将颜色转换为半透明，完美还原你的要求！
+                els.badgeInfoTitleBg.style.backgroundColor = hexToRgba(rColor, 0.45); 
+
+                // 4. 描述文字
                 els.badgeInfoDesc.textContent = bDef.desc;
                 
+                // 5. 玩家区域 (头像 + 名字)
                 els.badgeInfoAvatar.src = p.avatar;
-                els.badgeInfoPlayer.textContent = p.name;
-                els.badgeInfoPlayer.style.color = p.color;
+                // 为了极致的图1复刻，名字只提取单字
+                els.badgeInfoPlayer.textContent = p.name ? p.name.slice(-1) : '?'; 
+                // 让玩家胶囊的底色变成玩家的代表色 (透明度90%)
+                els.badgeInfoPlayerBg.style.backgroundColor = hexToRgba(p.color, 0.85);
                 
+                // 6. 填入时机与记录
                 els.badgeInfoRound.textContent = roundStr;
                 els.badgeInfoDetail.textContent = detailStr;
 
+                // 7. 见证奇迹：弹出窗口！
                 els.badgeInfoDialog.classList.remove('hidden');
             });
 
@@ -4990,7 +5150,8 @@ function updateUndoRedoButtons() {
             const wb = XLSX.utils.book_new();
             const dataRaw = [['轮次', ...active.map(p=>p.name), '赢家']];
             gameData.rounds.forEach(r => {
-                const row =[r.round, ...active.map(p => r.changes[p.id]||0), gameData.players.find(x=>x.id===r.winner)?.name||''];
+                // 【导出修复】：如果有分数（包括0）就原样导出，如果是空（undefined未参与）就导出为 "-"
+                const row =[r.round, ...active.map(p => r.changes[p.id] !== undefined ? r.changes[p.id] : '-'), gameData.players.find(x=>x.id===r.winner)?.name||''];
                 dataRaw.push(row);
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataRaw), "原始记录");
@@ -5084,7 +5245,14 @@ function updateUndoRedoButtons() {
                         const row = json[r];
                         if(!row.length) continue;
                         const changes = {};
-                        for(let c in mapColToId) changes[mapColToId[c]] = row[c] || 0;
+                        // 【导入修复】：如果表格里写的是 "-" 或者是空的，就无视他（记为未参与）；写了 0 就正常录入 0。
+                        for(let c in mapColToId) {
+                            let rawVal = row[c];
+                            if (rawVal === '-' || rawVal === '' || rawVal === undefined || rawVal === null) {
+                                continue; 
+                            }
+                            changes[mapColToId[c]] = parseInt(rawVal) || 0;
+                        }
                         let winId = null;
                         let maxS = -Infinity;
                         for(let pid in changes) { if(changes[pid] > maxS) { maxS = changes[pid]; winId = parseInt(pid); } }
