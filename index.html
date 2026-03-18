@@ -66,27 +66,23 @@
                 paint-order: stroke fill;
    14:08 2026/3/16         }
 
-/* --- 奖杯墙无缝滚动动画专用 --- */
+/* --- 【全新】奖杯墙原生滑动 + 隐藏滚动条专用 --- */
             .marquee-wrapper {
                 width: 100%;
+                overflow-x: auto; /* 核心魔法：允许你的手指原生左右滑动！ */
+                overflow-y: hidden;
+                /* 下面三行是为了隐藏那个难看的横向滚动条，但保留滑动功能 */
+                -ms-overflow-style: none;  /* IE 和 Edge */
+                scrollbar-width: none;  /* Firefox */
                 cursor: grab;
+            }
+            .marquee-wrapper::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Opera 隐藏滚动条 */
             }
             .marquee-track {
                 display: flex;
                 width: max-content;
-                /* 45秒循环一次，平滑滚动 */
-                animation: badge-scroll 45s linear infinite; 
-            }
-            /* 检测到交互（hover或长按点击）时，强制暂停滚动，让你看清12个 */
-            .marquee-wrapper:hover .marquee-track,
-            .marquee-wrapper:active .marquee-track,
-            .marquee-wrapper:focus-within .marquee-track {
-                animation-play-state: paused;
-            }
-            @keyframes badge-scroll {
-                0% { transform: translateX(0); }
-                /* 往左滑动刚好一半的距离，实现完美无缝对接 */
-                100% { transform: translateX(calc(-50% - 4px)); } 
+                /* 注意：删除了之前死板的 animation 动画，现在全权交给底层 JS 马达来推！ */
             }
 
             /* 专用于名字的白色外描边 */
@@ -3092,6 +3088,42 @@ function renderSessionSection() {
             const grid2 = document.getElementById('badgeGrid2');
             if (grid1) grid1.innerHTML = badgeHtml;
             if (grid2) grid2.innerHTML = badgeHtml;
+// ====================================================
+            // 【新增】智能滚动马达：允许手滑 + 自动播放，且不影响点击！
+            // ====================================================
+            const wrapper = document.getElementById('badgeGrid');
+            if (wrapper && grid1) {
+                // 清除之前的马达（防止多次刷新页面导致速度变快）
+                if (window.badgeScrollTimer) cancelAnimationFrame(window.badgeScrollTimer);
+                
+                // 这是马达的运转逻辑
+                const playScroll = () => {
+                    if (!window.isBadgeInteracting) { // 如果手指没按住
+                        wrapper.scrollLeft += 1; // 【调节速度】：1代表每次滚1像素，想快点改2，想慢点改0.5
+                        
+                        // 如果滚到了第一块的尽头，瞬间拉回起点（无缝衔接的障眼法）
+                        // 这里的 6 是 gap 的间距误差值
+                        if (wrapper.scrollLeft >= grid1.offsetWidth + 6) { 
+                            wrapper.scrollLeft = 0;
+                        }
+                    }
+                    window.badgeScrollTimer = requestAnimationFrame(playScroll);
+                };
+                
+                // 监听你的手部/鼠标动作，随时让马达刹车
+                wrapper.onmouseenter = () => window.isBadgeInteracting = true; // 鼠标移入暂停
+                wrapper.onmouseleave = () => window.isBadgeInteracting = false; // 鼠标移出继续
+                
+                // 【核心】专门给手机端触摸准备的逻辑！
+                wrapper.ontouchstart = () => window.isBadgeInteracting = true;  // 手指一碰，立刻暂停自动滚
+                wrapper.ontouchend = () => {
+                    // 手指松开后，等 1000毫秒（1秒）再重新启动马达，体验更丝滑
+                    setTimeout(() => { window.isBadgeInteracting = false; }, 1000);
+                };
+
+                // 启动马达！
+                window.badgeScrollTimer = requestAnimationFrame(playScroll);
+            }
         }
 
         function renderPieCharts() {
