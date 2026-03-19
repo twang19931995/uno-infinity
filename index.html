@@ -1019,54 +1019,42 @@
     </div>
 
 
-<!-- ======================================================== -->
-    <!-- 模块显示与自由拖拽排序设置面板 (图1 像素级复刻) -->
+
+    <!-- 模块显示与自由拖拽排序设置面板 (修复高度锁死溢出版) -->
     <!-- ======================================================== -->
-    <div id="moduleToggleDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+    <div id="moduleToggleDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[9999] hidden p-4 sm:p-6">
         
-        <!-- 【外部主容器】
-             max-w-[340px]: 控制整个面板的最大宽度 (控制胖瘦)
-             bg-[#FEFCE8]: 整体背景颜色 (图1的淡黄色)
-             border-[4px]: 最外层紫色边框的粗细
-             rounded-[2rem]: 面板的圆角大小
-             shadow-[0_8px_0_#5E4B8B]: 面板底部厚重的紫色投影
+        <!-- 【外层主容器：高度修复核心】
+             max-h-[90vh]: 最大高度绝对不能超过屏幕的90%，强行把弹窗锁在屏幕内！
+             flex flex-col: 使用弹性列布局，让头部标题固定，下半身列表自适应缩放。
         -->
-        <div class="relative bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] w-full max-w-[340px] flex flex-col items-center mx-4 p-4 pt-6 pb-6 shadow-[0_8px_0_#5E4B8B]">
+        <div class="relative bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] w-full max-w-[340px] max-h-[90vh] flex flex-col items-center mx-auto shadow-[0_8px_0_#5E4B8B] pt-6 pb-4 px-4 sm:px-5">
             
             <!-- 右上角关闭按钮 (打个X) -->
             <button id="closeModuleDialogBtn" class="absolute -top-3 -right-3 w-8 h-8 bg-white border-[3px] border-[#5E4B8B] rounded-full flex items-center justify-center text-[#5E4B8B] font-black shadow-sm z-10 hover:bg-gray-100">
                 <i class="fa-solid fa-times"></i>
             </button>
 
-            <!-- 【容器1：主标题胶囊】
-                 bg-[#C4D984]: 背景颜色 (图1的抹茶绿)
-                 px-8 py-1.5: 左右和上下内边距 (控制标题胶囊的长短胖瘦)
-            -->
-            <div class="bg-[#C4D984] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1.5 mb-4 shadow-[0_4px_0_#5E4B8B] z-10 w-[80%] flex justify-center">
-                <!-- text-lg: 文字大小, tracking-widest: 文字间距拉宽 -->
+            <!-- 【标题胶囊：shrink-0 保证绝对不被压缩】 -->
+            <div class="shrink-0 bg-[#C4D984] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1.5 mb-4 shadow-[0_4px_0_#5E4B8B] z-10 w-[80%] flex justify-center">
                 <span class="font-black text-[#5E4B8B] text-lg tracking-widest">模块显示与排序</span>
             </div>
 
-            <!-- 【容器2：全局控制胶囊】
-                 bg-[#8DA4D0]: 背景颜色 (图1的蓝紫色)
-            -->
-            <div class="flex items-center bg-[#8DA4D0] border-[3px] border-[#5E4B8B] rounded-full px-3 py-1 mb-4 shadow-[0_3px_0_#5E4B8B]">
+            <!-- 【全局控制胶囊：shrink-0 保证绝对不被压缩】 -->
+            <div class="shrink-0 flex items-center bg-[#8DA4D0] border-[3px] border-[#5E4B8B] rounded-full px-3 py-1 mb-4 shadow-[0_3px_0_#5E4B8B]">
                 <span class="font-black text-white text-xs tracking-widest mr-2">全局控制</span>
-                
-                <!-- 全局开关按钮 (小白点在里面滑动) -->
-                <!-- w-9 h-5: 开关的宽度和高度 -->
                 <button id="globalModuleToggleBtn" class="w-9 h-5 rounded-full transition-colors relative border-[2px] border-[#5E4B8B] shrink-0 bg-[#A3D977]">
                     <div class="global-toggle-knob w-3.5 h-3.5 rounded-full border-[2px] border-[#5E4B8B] bg-white absolute top-[1px] transition-all left-[18px]"></div>
                 </button>
             </div>
 
-            <!-- 【容器3：包裹所有模块的大白框容器】
-                 max-h-[50vh]: 控制这个白框的最大高度，超过这个高度就会在内部产生滚动条 (不会撑破屏幕)
+            <!-- 【内部列表容器：滚动修复核心】
+                 flex-1 min-h-0: 这两个词组合在一起是魔法！它告诉白框：占据剩下的所有空间，但绝不撑破父元素！
+                 overflow-y-auto: 当里面内容太多时，自动在白框内部产生上下滚动条。
             -->
-            <div class="w-full bg-white border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-2 shadow-inner">
-                <!-- 内部加了 gap-2 来控制每个模块胶囊之间的上下间距 -->
-                <div id="moduleTogglesContainer" class="overflow-y-auto custom-scroll w-full flex flex-col gap-2 max-h-[50vh] pr-1">
-                    <!-- JS 会在这里动态生成里面的模块胶囊 -->
+            <div class="flex-1 min-h-0 w-full bg-white border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-2 shadow-[0_4px_0_#5E4B8B] flex flex-col">
+                <div id="moduleTogglesContainer" class="flex-1 overflow-y-auto custom-scroll w-full flex flex-col gap-2 pr-1 pb-1">
+                    <!-- JS 动态生成 -->
                 </div>
             </div>
 
@@ -2147,6 +2135,26 @@ bindV2Events(); // 【V2新增】激活我们的新事件
                     const missing = defaultSectionOrder.filter(id => !currentOrder.includes(id));
                     gameData.sectionOrder =[...currentOrder.filter(id => defaultSectionOrder.includes(id)), ...missing];
                 }
+
+// ===== 【新增核心功能：自动置顶分离逻辑】 =====
+                // 把模块分为"显示"和"隐藏"两个篮子
+                let visibleMods = [];
+                let hiddenMods =[];
+                
+                gameData.sectionOrder.forEach(id => {
+                    if (hiddenModules.includes(id)) {
+                        hiddenMods.push(id); // 如果是被隐藏的，扔进隐藏篮子
+                    } else {
+                        visibleMods.push(id); // 如果是显示的，扔进显示篮子
+                    }
+                });
+                
+                // 重新合并数组：显示的篮子放前面，隐藏的篮子放后面！
+                gameData.sectionOrder = [...visibleMods, ...hiddenMods];
+                
+                // 将重新排好的顺序保存到本地
+                saveData(); 
+                // ==============================================
                 
                 container.className = "overflow-y-auto custom-scroll pr-2 flex-1 pb-2";
 
@@ -2162,13 +2170,13 @@ bindV2Events(); // 【V2新增】激活我们的新事件
                              border-[2.5px]: 胶囊的外边框粗细
                              shadow-[0_2px_0_#5E4B8B]: 底部的薄阴影
                         -->
-                        <div class="sortable-item flex items-center justify-between px-2 h-9 bg-white rounded-full border-[2.5px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] select-none relative transition-all shrink-0" data-id="${id}">
+                        <div class="sortable-item flex items-center mb-1 justify-between px-2 h-7 bg-white rounded-full border-[2.5px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] select-none relative transition-all shrink-0" data-id="${id}">
                             
                             <!-- 左侧：六个点的拖拽抓手 + 图标 + 模块名字 -->
                             <div class="drag-handle flex items-center flex-1 cursor-move touch-none">
                                 <i class="fa-solid fa-grip-vertical text-[#D1D5DB] text-sm mr-2 pl-1 py-1"></i>
                                 <!-- -webkit-text-stroke: 控制文字的极细紫色描边 -->
-                                <span class="font-black text-[#8DA4D0] text-xs flex items-center tracking-widest text-stroke" style="-webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">
+                                <span class="font-black text-[#5E4B8B] text-xs flex items-center tracking-widest ; paint-order: stroke fill;">
                                     <i class="fa-solid ${m.icon} text-[#A3D977] w-4 text-center mr-1 text-sm stroke-none" style="-webkit-text-stroke: 0px;"></i>${m.name}
                                 </span>
                             </div>
@@ -2319,6 +2327,12 @@ bindV2Events(); // 【V2新增】激活我们的新事件
                 gameData.sectionOrder = newOrder;
                 saveData();
                 applySectionOrder();
+
+// ===== 【新增：拖拽纠错保险】 =====
+                // 如果用户试图把显示的拖到隐藏下面，这行代码会立刻刷新列表，
+                // 触发刚才第二步的逻辑，把它乖乖"弹"回置顶区域！
+                renderModuleToggles();
+                // ===============================
                 
                 document.removeEventListener('mousemove', listOnDrag);
                 document.removeEventListener('touchmove', listOnDrag);
