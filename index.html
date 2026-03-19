@@ -823,8 +823,13 @@
                 <h2 class="text-xl font-bold"><i class="fa-solid fa-table text-primary mr-2"></i>详细记录</h2>
             </div>
             
-            <div class="overflow-x-auto scrollbar-hide border-4 border-[#5E4B8B] rounded-3xl">
-                <table id="detailedRecords" class="min-w-full bg-white text-center text-sm">
+<!-- 【新增滚动控制】
+     max-h-[440px]: 控制这里的高度大概刚好容纳 10 行数据
+     overflow-y-auto: 允许上下滚动
+     custom-scroll: 调用我们之前写好的好看的滚动条样式
+-->
+<div class="overflow-x-auto overflow-y-auto custom-scroll max-h-[440px] border-[4px] border-[#5E4B8B] rounded-[1.5rem]">
+    <table id="detailedRecords" class="min-w-full bg-white text-center text-sm relative">
                     <thead><tr class="bg-[#F8FAFC] border-b-4 border-[#5E4B8B]"><th class="py-3 px-2 whitespace-nowrap">局</th></tr></thead>
                     <tbody></tbody>
                     <tfoot><tr class="bg-[#F8FAFC] border-t-4 border-[#5E4B8B] font-bold"><td>总</td></tr></tfoot>
@@ -1014,17 +1019,57 @@
     </div>
 
 
-    <!-- 模块显示与自由拖拽排序设置面板 -->
+<!-- ======================================================== -->
+    <!-- 模块显示与自由拖拽排序设置面板 (图1 像素级复刻) -->
+    <!-- ======================================================== -->
     <div id="moduleToggleDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
-        <div class="kawaii-card p-4 max-w-[340px] w-full max-h-[85vh] flex flex-col mx-4 shadow-2xl">
-            <div class="flex justify-between items-center mb-4 border-b-2 border-gray-100 pb-3">
-                <h2 class="text-xl font-bold flex items-center text-[#5E4B8B]"><i class="fa-solid fa-sliders text-primary mr-2"></i>模块显示与排序</h2>
-                <button id="closeModuleDialogBtn" class="text-gray-400 hover:text-danger text-2xl transition-colors"><i class="fa-solid fa-times"></i></button>
+        
+        <!-- 【外部主容器】
+             max-w-[340px]: 控制整个面板的最大宽度 (控制胖瘦)
+             bg-[#FEFCE8]: 整体背景颜色 (图1的淡黄色)
+             border-[4px]: 最外层紫色边框的粗细
+             rounded-[2rem]: 面板的圆角大小
+             shadow-[0_8px_0_#5E4B8B]: 面板底部厚重的紫色投影
+        -->
+        <div class="relative bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] w-full max-w-[340px] flex flex-col items-center mx-4 p-4 pt-6 pb-6 shadow-[0_8px_0_#5E4B8B]">
+            
+            <!-- 右上角关闭按钮 (打个X) -->
+            <button id="closeModuleDialogBtn" class="absolute -top-3 -right-3 w-8 h-8 bg-white border-[3px] border-[#5E4B8B] rounded-full flex items-center justify-center text-[#5E4B8B] font-black shadow-sm z-10 hover:bg-gray-100">
+                <i class="fa-solid fa-times"></i>
+            </button>
+
+            <!-- 【容器1：主标题胶囊】
+                 bg-[#C4D984]: 背景颜色 (图1的抹茶绿)
+                 px-8 py-1.5: 左右和上下内边距 (控制标题胶囊的长短胖瘦)
+            -->
+            <div class="bg-[#C4D984] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1.5 mb-4 shadow-[0_4px_0_#5E4B8B] z-10 w-[80%] flex justify-center">
+                <!-- text-lg: 文字大小, tracking-widest: 文字间距拉宽 -->
+                <span class="font-black text-[#5E4B8B] text-lg tracking-widest">模块显示与排序</span>
             </div>
-            <div class="text-xs text-gray-400 font-bold mb-3 text-center">不仅能开关，还能按住左侧图标上下拖动排序喔~</div>
-            <div id="moduleTogglesContainer" class="overflow-y-auto custom-scroll pr-2 flex-1 pb-2">
-                <!-- 动态生成 Sortable Toggle 按钮 -->
+
+            <!-- 【容器2：全局控制胶囊】
+                 bg-[#8DA4D0]: 背景颜色 (图1的蓝紫色)
+            -->
+            <div class="flex items-center bg-[#8DA4D0] border-[3px] border-[#5E4B8B] rounded-full px-3 py-1 mb-4 shadow-[0_3px_0_#5E4B8B]">
+                <span class="font-black text-white text-xs tracking-widest mr-2">全局控制</span>
+                
+                <!-- 全局开关按钮 (小白点在里面滑动) -->
+                <!-- w-9 h-5: 开关的宽度和高度 -->
+                <button id="globalModuleToggleBtn" class="w-9 h-5 rounded-full transition-colors relative border-[2px] border-[#5E4B8B] shrink-0 bg-[#A3D977]">
+                    <div class="global-toggle-knob w-3.5 h-3.5 rounded-full border-[2px] border-[#5E4B8B] bg-white absolute top-[1px] transition-all left-[18px]"></div>
+                </button>
             </div>
+
+            <!-- 【容器3：包裹所有模块的大白框容器】
+                 max-h-[50vh]: 控制这个白框的最大高度，超过这个高度就会在内部产生滚动条 (不会撑破屏幕)
+            -->
+            <div class="w-full bg-white border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-2 shadow-inner">
+                <!-- 内部加了 gap-2 来控制每个模块胶囊之间的上下间距 -->
+                <div id="moduleTogglesContainer" class="overflow-y-auto custom-scroll w-full flex flex-col gap-2 max-h-[50vh] pr-1">
+                    <!-- JS 会在这里动态生成里面的模块胶囊 -->
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -2105,25 +2150,50 @@ bindV2Events(); // 【V2新增】激活我们的新事件
                 
                 container.className = "overflow-y-auto custom-scroll pr-2 flex-1 pb-2";
 
+// 【核心画笔】：画出图1中那个白底极窄的小胶囊
                 container.innerHTML = gameData.sectionOrder.map((id) => {
                     const m = modulesConfig.find(x => x.id === id);
                     if (!m) return '';
                     const isHidden = hiddenModules.includes(m.id);
                     
                     return `
-                        <div class="sortable-item flex items-center justify-between p-3 mb-3 bg-white rounded-xl border-2 border-[#5E4B8B] shadow-sm select-none relative transition-all" data-id="${id}">
+                        <!-- 【单个模块胶囊】
+                             h-9: 控制胶囊的高度，9非常窄，符合图1
+                             border-[2.5px]: 胶囊的外边框粗细
+                             shadow-[0_2px_0_#5E4B8B]: 底部的薄阴影
+                        -->
+                        <div class="sortable-item flex items-center justify-between px-2 h-9 bg-white rounded-full border-[2.5px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] select-none relative transition-all shrink-0" data-id="${id}">
+                            
+                            <!-- 左侧：六个点的拖拽抓手 + 图标 + 模块名字 -->
                             <div class="drag-handle flex items-center flex-1 cursor-move touch-none">
-                                <i class="fa-solid fa-grip-vertical text-gray-300 hover:text-[#5E4B8B] text-lg mr-3 px-2 py-1"></i>
-                                <span class="font-bold text-[#5E4B8B] text-sm flex items-center">
-                                    <i class="fa-solid ${m.icon} text-primary w-5 text-center mr-2 opacity-80"></i>${m.name}
+                                <i class="fa-solid fa-grip-vertical text-[#D1D5DB] text-sm mr-2 pl-1 py-1"></i>
+                                <!-- -webkit-text-stroke: 控制文字的极细紫色描边 -->
+                                <span class="font-black text-[#8DA4D0] text-xs flex items-center tracking-widest text-stroke" style="-webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">
+                                    <i class="fa-solid ${m.icon} text-[#A3D977] w-4 text-center mr-1 text-sm stroke-none" style="-webkit-text-stroke: 0px;"></i>${m.name}
                                 </span>
                             </div>
-                            <button class="w-10 h-5 rounded-full transition-colors relative toggle-module-btn border-2 border-[#5E4B8B] ml-2 shrink-0 ${isHidden ? 'bg-gray-200' : 'bg-[#4ADE80]'}" data-target="${m.id}">
-                                <div class="w-3 h-3 rounded-full border-2 border-[#5E4B8B] bg-white absolute top-[2px] transition-all ${isHidden ? 'left-[2px]' : 'left-[20px]'}"></div>
+
+                            <!-- 右侧：模块单独的开关按钮 -->
+                            <!-- w-9 h-5: 控制开关的长度和高度 -->
+                            <button class="w-9 h-5 rounded-full transition-colors relative toggle-module-btn border-[2px] border-[#5E4B8B] shrink-0 ${isHidden ? 'bg-white' : 'bg-[#A3D977]'}" data-target="${m.id}">
+                                <div class="w-3 h-3 rounded-full border-[2px] border-[#5E4B8B] bg-white absolute top-[1px] transition-all ${isHidden ? 'left-[2px]' : 'left-[18px]'}"></div>
                             </button>
                         </div>
                     `;
                 }).join('');
+                
+                // 【新增逻辑】：让全局控制按钮的状态和内部列表同步
+                const globalBtn = document.getElementById('globalModuleToggleBtn');
+                const globalKnob = globalBtn.querySelector('.global-toggle-knob');
+                if (hiddenModules.length === 0) {
+                    // 全开状态：变绿，白点在右
+                    globalBtn.classList.add('bg-[#A3D977]'); globalBtn.classList.remove('bg-white');
+                    globalKnob.classList.add('left-[18px]'); globalKnob.classList.remove('left-[2px]');
+                } else {
+                    // 有关闭的模块：变白，白点在左
+                    globalBtn.classList.add('bg-white'); globalBtn.classList.remove('bg-[#A3D977]');
+                    globalKnob.classList.add('left-[2px]'); globalKnob.classList.remove('left-[18px]');
+                }
                 
                 applySectionOrder();
             }
@@ -2132,6 +2202,27 @@ bindV2Events(); // 【V2新增】激活我们的新事件
             renderModuleToggles();
 
             const container = document.getElementById('moduleTogglesContainer');
+
+// ==========================================
+            // 【新增】：全局控制开关的点击事件
+            // ==========================================
+            const globalToggleBtn = document.getElementById('globalModuleToggleBtn');
+            const globalToggleKnob = globalToggleBtn.querySelector('.global-toggle-knob');
+            
+            globalToggleBtn.onclick = () => {
+                const allIds = modulesConfig.map(m => m.id);
+                // 只要有任何一个是隐藏的，点一下就全部显示
+                if (hiddenModules.length > 0) {
+                    hiddenModules =[]; 
+                } else {
+                    // 如果已经是全显状态，点一下就全部隐藏
+                    hiddenModules = [...allIds];
+                }
+                localStorage.setItem('unoHiddenModules', JSON.stringify(hiddenModules));
+                renderModuleToggles();
+                applyHiddenModules();
+            };
+            // ==========================================
             
             container.addEventListener('click', e => {
                 const btn = e.target.closest('.toggle-module-btn');
@@ -4335,25 +4426,30 @@ ${elimDetailsHtml}
             closePenaltyBtn.onclick = () => document.getElementById('penaltyDetailModal').classList.add('hidden');
         }
 
-        function renderDetailedRecords() {
+function renderDetailedRecords() {
             const active = gameData.players.filter(p => p.isActive);
             const thead = els.detailedRecords.querySelector('thead tr');
             const tbody = els.detailedRecords.querySelector('tbody');
             const tfoot = els.detailedRecords.querySelector('tfoot tr');
 
-            thead.innerHTML = '<th class="py-3 px-2 whitespace-nowrap bg-gray-50 sticky left-0 z-10 border-r-2 border-[#5E4B8B]">局</th>';
-            tfoot.innerHTML = '<td class="py-3 px-2 font-black bg-gray-50 sticky left-0 z-10 border-r-2 border-[#5E4B8B]">总</td>';
+            // 【给左上角的"局"加双向图钉】：sticky left-0 top-0，并加底边框
+            thead.innerHTML = '<th class="py-3 px-2 whitespace-nowrap bg-gray-50 sticky left-0 top-0 z-30 border-r-[2px] border-b-[3px] border-[#5E4B8B]">局</th>';
+            
+            // 【给左下角的"总"加双向图钉】：sticky left-0 bottom-0，并加顶边框
+            tfoot.innerHTML = '<td class="py-3 px-2 font-black bg-gray-50 sticky left-0 bottom-0 z-30 border-r-[2px] border-t-[3px] border-[#5E4B8B]">总</td>';
             tbody.innerHTML = '';
 
             active.forEach(p => {
+                // 【给顶部玩家名字加图钉】：sticky top-0 z-20
                 const th = document.createElement('th');
-                th.className = 'py-3 px-2 whitespace-nowrap min-w-[60px]';
+                th.className = 'py-3 px-2 whitespace-nowrap min-w-[60px] sticky top-0 z-20 bg-gray-50 border-b-[3px] border-[#5E4B8B]';
                 th.style.color = p.color;
                 th.textContent = p.name;
                 thead.appendChild(th);
 
+                // 【给底部总分加图钉】：sticky bottom-0 z-20
                 const td = document.createElement('td');
-                td.className = `py-3 px-2 font-bold ${p.total >= 0 ? 'text-rec-pos' : 'text-rec-neg'}`;
+                td.className = `py-3 px-2 font-bold sticky bottom-0 z-20 bg-gray-50 border-t-[3px] border-[#5E4B8B] ${p.total >= 0 ? 'text-rec-pos' : 'text-rec-neg'}`;
                 td.textContent = p.total;
                 tfoot.appendChild(td);
             });
@@ -4362,21 +4458,20 @@ ${elimDetailsHtml}
                 const tr = document.createElement('tr');
                 tr.className = 'border-b hover:bg-gray-50';
                 
+                // 左侧第X局依然固定在最左边 sticky left-0
                 const tdRound = document.createElement('td');
-                tdRound.className = 'py-3 px-2 font-bold text-gray-400 bg-white sticky left-0 border-r-2 border-gray-100';
+                tdRound.className = 'py-3 px-2 font-bold text-gray-400 bg-white sticky left-0 z-10 border-r-[2px] border-gray-100';
                 tdRound.textContent = r.round;
                 tr.appendChild(tdRound);
 
-active.forEach(p => {
+                active.forEach(p => {
                     const td = document.createElement('td');
                     const val = r.changes[p.id];
                     td.className = 'py-3 px-2 font-bold';
                     
                     if (val > 0) { td.textContent = `+${val}`; td.className += ' text-rec-pos'; }
                     else if (val < 0) { td.textContent = val; td.className += ' text-rec-neg'; }
-                    // 【UI 修复】：如果明确记录了是 0 分，就显示 0
                     else if (val === 0) { td.textContent = '0'; td.className += ' text-gray-400'; } 
-                    // 只有当完全没有这个人的记录（undefined）时，才显示 '-' 表示没玩
                     else { td.textContent = '-'; td.className += ' text-gray-300'; } 
                     
                     tr.appendChild(td);
