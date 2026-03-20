@@ -251,28 +251,58 @@
             </div>
         </section>
 
-<!-- 【全新新增】最新战况区域 (图1 1:1 像素复刻) -->
-        <section id="latestStatusSection" class="kawaii-card p-3 sm:p-5 mb-6" style="order: 0;">
+<!-- ======================================================== -->
+<!-- 【优化版】最新战况区域 (图1 1:1 像素复刻) 开始 -->
+<!-- ======================================================== -->
+        <section id="latestStatusSection" class="mb-6" style="order: 0;">
             <div class="flex flex-col items-center w-full relative">
-                <!-- 顶部标题：最新战况 -->
-                <div class="bg-[#FEFCE8] border-[2px] sm:border-[3px] border-[#5E4B8B] px-4 py-0.5 mb-2 relative z-10 shadow-sm">
-                    <span class="font-black text-[#5E4B8B] text-sm sm:text-base tracking-widest text-stroke" style="color: #FACC15; text-shadow: 1px 1px 0 #5E4B8B, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B, 0 1.5px 0 #5E4B8B, 0 -1.5px 0 #5E4B8B, 1.5px 0 0 #5E4B8B, -1.5px 0 0 #5E4B8B;">最新战况</span>
-                </div>
                 
-                <!-- 局数选择按钮 (点击弹窗) -->
-                <button id="statusRoundSelectBtn" class="bg-white border-[2px] sm:border-[3px] border-[#5E4B8B] w-full max-w-[280px] py-1.5 mb-4 shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-center">
-                    <span class="font-black text-[#5E4B8B] text-lg sm:text-xl tracking-widest" id="statusCurrentRoundText">第0局</span>
-                </button>
+                <!-- 【容器1：标题】 -->
+                <!-- 调参备注：bg-[#ffff00]是黄色底色; border-[3px]是描边粗细; px-8 py-1是控制大小; shadow-[0_3px_0_#5E4B8B]是底部投影 -->
+                <div class="bg-[#ffff00] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 mb-3 relative z-10 shadow-[0_3px_0_#5E4B8B]">
+                    <span class="font-black text-[#5E4B8B] text-base sm:text-lg tracking-widest">最新战况</span>
+                </div>
 
-                <!-- 横向滚动容器：存放玩家卡片 -->
-                <div class="w-full overflow-x-auto scrollbar-hide pb-2">
-                    <!-- 【修复】通过 w-max 和 mx-auto 实现了完美居中排列 -->
-                    <div class="flex gap-2 sm:gap-3 items-stretch w-max mx-auto" id="statusPlayersContainer">
-                        <!-- JS 动态填入玩家卡片 -->
+                <!-- 【容器2：带左右切换的局数选择器】 -->
+                <div class="flex items-center justify-center gap-2 mb-3 w-full px-2">
+                    
+                    <!-- 左侧切换按钮 -->
+                    <!-- 调参备注：w-8 h-8是按钮大小; bg-[#99b7db]是蓝色底色 -->
+                    <button onclick="if(window.changeStatusRound) window.changeStatusRound(-1)" class="w-8 h-8 rounded-full bg-[#99b7db] border-[3px] border-[#5E4B8B] text-white flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all shrink-0">
+                        <i class="fa-solid fa-chevron-left text-sm pointer-events-none"></i>
+                    </button>
+
+                    <!-- 中间局数显示 (点击弹窗) -->
+                    <!-- 调参备注：w-[55%]控制宽度; text-lg控制字体大小 -->
+                    <button id="statusRoundSelectBtn" class="bg-[#99b7db] border-[3px] border-[#5E4B8B] rounded-full w-[55%] max-w-[200px] py-1 shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all text-center shrink-0">
+                        <span class="font-black text-white text-lg tracking-widest text-stroke" id="statusCurrentRoundText" style="-webkit-text-stroke-color: #5E4B8B;">第0局</span>
+                    </button>
+
+                    <!-- 右侧切换按钮 -->
+                    <button onclick="if(window.changeStatusRound) window.changeStatusRound(1)" class="w-8 h-8 rounded-full bg-[#99b7db] border-[3px] border-[#5E4B8B] text-white flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all shrink-0">
+                        <i class="fa-solid fa-chevron-right text-sm pointer-events-none"></i>
+                    </button>
+                </div>
+
+                <!-- 【容器3：展示玩家卡片的白色外部大容器】 -->
+                <!-- 调参备注：bg-white是白底; border-[3px]给外框加边; p-1.5是控制内部卡片和外框的边距 -->
+                <div class="w-full border-[3px] border-[#5E4B8B] rounded-xl bg-white p-1.5 sm:p-2 shadow-[0_3px_0_rgba(94,75,139,0.15)] relative">
+                    
+                    <!-- 这是魔法滑动框，scrollbar-hide用来隐藏难看的滚动条 -->
+                    <div class="w-full overflow-x-auto scrollbar-hide pb-1">
+                        
+                        <!-- 【重要调参】：gap-[6px] 控制5个玩家卡片之间的间隔！如果觉得太挤可以改成 gap-2 -->
+                        <div class="flex gap-[6px] sm:gap-2 items-stretch w-max" id="statusPlayersContainer">
+                            <!-- JS 会像画笔一样把内部的小卡片画在这里 -->
+                        </div>
                     </div>
                 </div>
+
             </div>
         </section>
+<!-- ======================================================== -->
+<!-- 【优化版】最新战况区域 结束 -->
+<!-- ======================================================== -->
 
         <!-- 【全新新增】图2 历史局数选择弹窗 -->
         <div id="statusRoundDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
@@ -7633,15 +7663,30 @@ const originalUpdateAllUI = window.updateAllUI;
         if(typeof window.renderMethodManager === 'function') window.renderMethodManager();
 if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
         if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+
 // ========================================================
-        // 【新增模块】最新战况 核心逻辑与画笔
+        // 【像素级复刻】最新战况 核心逻辑与画笔 开始
         // ========================================================
         let statusCurrentViewRound = -1; // -1 代表显示最新的一局
 
-        window.renderLatestStatus = function() {
+        // 给 HTML 左右箭头的点击事件准备的引擎
+        window.changeStatusRound = function(dir) {
+            if (gameData.rounds.length === 0) return;
+            if (statusCurrentViewRound === -1) {
+                statusCurrentViewRound = gameData.rounds.length - 1;
+            }
+            statusCurrentViewRound += dir;
+            if (statusCurrentViewRound < 0) statusCurrentViewRound = 0;
+            if (statusCurrentViewRound >= gameData.rounds.length) statusCurrentViewRound = gameData.rounds.length - 1;
+            window.renderLatestStatus();
+        };
+
+window.renderLatestStatus = function() {
             const container = document.getElementById('statusPlayersContainer');
             const roundTextBtn = document.getElementById('statusCurrentRoundText');
             if(!container || !roundTextBtn) return;
+
+            container.className = "flex gap-[8px] sm:gap-3 items-stretch w-max mx-auto px-1";
 
             const active = gameData.players.filter(p => p.isActive);
             if(gameData.rounds.length === 0) {
@@ -7650,32 +7695,34 @@ if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
                 return;
             }
 
-            // 确定要展示哪一局
             let targetIndex = statusCurrentViewRound === -1 ? gameData.rounds.length - 1 : statusCurrentViewRound;
             if(targetIndex >= gameData.rounds.length) targetIndex = gameData.rounds.length - 1;
             const rData = gameData.rounds[targetIndex];
             
             roundTextBtn.textContent = `第${rData.round}局`;
 
-            // 1. 计算【截止到这一局】每个人的累计总分
-            let cumScores = {};
-            active.forEach(p => cumScores[p.id] = 0);
-            for(let i = 0; i <= targetIndex; i++) {
-                active.forEach(p => {
-                    cumScores[p.id] += (gameData.rounds[i].changes[p.id] || 0);
-                });
+            let sortedPlayers =[];
+            if (rData.winner) {
+                let winP = active.find(p => p.id === rData.winner);
+                if (winP) sortedPlayers.push(winP);
             }
-
-            // 2. 根据【这一局的得分】从高到低排序玩家
-            let sortedPlayers = [...active].sort((a,b) => {
-                let ca = rData.changes[a.id] || 0;
-                let cb = rData.changes[b.id] || 0;
-                return cb - ca; 
+            let elimEvents = (rData.v2Stats && rData.v2Stats.eliminationEvents) ? rData.v2Stats.eliminationEvents :[];
+            let elimDetails = (rData.v2Stats && rData.v2Stats.eliminationDetails) ? rData.v2Stats.eliminationDetails : {};
+            
+            elimEvents.forEach(group => {
+                group.forEach(id => {
+                    let p = active.find(x => x.id === id);
+                    if (p) sortedPlayers.push(p);
+                });
+            });
+            active.forEach(p => {
+                if (!sortedPlayers.find(x => x.id === p.id)) {
+                    sortedPlayers.push(p);
+                }
             });
 
-            // 提取图片的小工具
             let getMethodUrl = (methodName, type) => {
-                let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23000000'/><text x='50%' y='50%' fill='%23ffffff' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+                let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
                 if (!gameData.customMethods) return defaultUrl;
                 let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
                 let item = data.items.find(i => i.name === methodName);
@@ -7686,112 +7733,128 @@ if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
                 return item && item.url ? item.url : defaultUrl;
             };
 
-            const getShort = (name) => name ? name.slice(-1) : '?';
+            const getShort = (name) => name ? name.slice(-1) : '?'; 
+            
+            const bloodBgColors =['#9c0a00', '#ba1b0f', '#d43024', '#eb483a', '#f5695d', '#fa8a82', '#ffaba6', '#ffcfcc'];
+            const bloodNames =['一血', '二血', '三血', '四血', '五血', '六血', '七血', '八血'];
 
-// 3. 画出卡片
             container.innerHTML = sortedPlayers.map(p => {
+                // ★【核心新增：判断是否未参与】★
+                // 如果这局的数据里根本找不到这个玩家的分数记录，说明他未参与
+                let isNotParticipated = rData.changes[p.id] === undefined;
+                
                 let isWinner = rData.winner === p.id;
                 let changeScore = rData.changes[p.id] || 0;
-                let changeStr = changeScore > 0 ? `+${changeScore}` : `${changeScore}`;
-                let cumScore = cumScores[p.id];
                 
-                // 【修改：累计分数的颜色】正分绿(#4ADE80)，负分红(#EF4444)，0分默认紫(#5E4B8B)
-                let cumScoreColor = cumScore > 0 ? 'text-[#4ADE80]' : (cumScore < 0 ? 'text-[#EF4444]' : 'text-[#5E4B8B]');
+                // ★【底色修改】未参与玩家显示淡灰色背景
+                let outerBg = isNotParticipated ? '#f3f4f6' : (isWinner ? '#e2ffd3' : '#ffd1d1');
                 
-                // 边框和基础色：赢家绿框，输家红框
-                let outBorder = isWinner ? 'border-[#86EFAC]' : 'border-[#EF4444]';
-                let scoreColor = isWinner ? 'text-[#4ADE80]' : (changeScore < 0 ? 'text-[#EF4444]' : 'text-gray-500');
-                
-                let actionText = '';
-                let actionBg = '';
-                let methodImg = '';
-                let penaltyCards = '/';
-                let v2 = rData.v2Stats;
+                // ★【得分修改】未参与玩家显示 '-'
+                let scoreStr = isNotParticipated ? '-' : (changeScore > 0 ? `+${changeScore}` : `${changeScore}`);
+                let scoreColor = isNotParticipated ? '#9ca3af' : (changeScore > 0 ? '#1f8316' : (changeScore < 0 ? '#d60029' : '#5c4c8b'));
 
-                if (isWinner) {
-                    actionText = '使用';
-                    actionBg = 'bg-[#4ADE80] text-white'; // 赢家保持白字绿底
-                    let wMethod = v2 && v2.winMethod ? v2.winMethod : '默认胜利';
-                    methodImg = getMethodUrl(wMethod, 'win');
-                } else {
-                    let killerId = null;
-                    if(v2 && v2.eliminationDetails && v2.eliminationDetails[p.id]) {
-                        killerId = v2.eliminationDetails[p.id].killerId;
-                        let cards = parseInt(v2.eliminationDetails[p.id].cards);
-                        if(cards > 0) penaltyCards = `+${cards}张`;
-                    }
-                    
-                    // 【修改：输家第四行文字改成暗红色 text-[#9F1239]】
-                    if (killerId === p.id) {
-                        actionText = '被自己用';
-                        let selfColor = p.color; 
-                        actionBg = `text-[#9F1239]" style="background-color: ${selfColor};`;
-                    } else if (killerId) {
-                        let kP = gameData.players.find(x=>x.id===killerId);
-                        let kName = kP ? getShort(kP.name) : '?';
-                        actionText = `被${kName}用`;
-                        let kColor = kP ? kP.color : '#9CA3AF';
-                        actionBg = `text-[#9F1239]" style="background-color: ${kColor};`;
-                    } else {
-                        actionText = '被系统用';
-                        actionBg = 'bg-gray-400 text-[#9F1239]';
-                    }
-
-                    let lMethod = (v2 && v2.eliminated && v2.eliminated[p.id]) ? v2.eliminated[p.id] : '默认淘汰';
-                    methodImg = getMethodUrl(lMethod, 'lose');
-                }
-
-                let cellBase = "flex items-center justify-center border-b-[2px] border-[#5E4B8B] w-full text-center tracking-widest font-black leading-none";
-
+                let methodImgHtml = '';
                 let bottomHtml = '';
-                if(isWinner) {
-                    bottomHtml = `
-                    <!-- 赢家合并最后两行 -->
-                    <div class="h-[46px] sm:h-[54px] bg-[#4ADE80] flex items-center justify-center w-full">
-                        <span class="font-black text-white text-base sm:text-lg tracking-widest text-stroke">获胜</span>
-                    </div>`;
-                } else {
-                    bottomHtml = `
-                    <div class="h-[22px] sm:h-[26px] bg-[#9F1239] flex items-center justify-center w-full border-b-[2px] border-[#5E4B8B]">
-                        <span class="font-black text-white text-[11px] sm:text-xs tracking-widest">淘汰</span>
-                    </div>
-                    <div class="h-[22px] sm:h-[26px] bg-[#E2E8F0] flex items-center justify-center w-full">
-                        <span class="font-black text-[#E11D48] text-[11px] sm:text-xs">${penaltyCards}</span>
-                    </div>`;
+
+                // 情况 1：未参与
+                if (isNotParticipated) {
+                    // 隐藏容器3,4,5，但保留一个透明占位符维持卡片高度！
+                    methodImgHtml = `<div class="w-full aspect-[3/4] relative flex items-center justify-center p-[3px] my-[4px] sm:my-1.5 opacity-30">
+                                        <i class="fa-solid fa-minus text-2xl text-[#5E4B8B]"></i>
+                                     </div>`;
+                    
+                    // 底部容器6显示“未参与”
+                    bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #bfbfbf;">
+                                    <span class="font-black text-[12px] sm:text-[13px] leading-none" style="color: #5c4c8b;">未参与</span>
+                                  </div>`;
+                } 
+                // 情况 2：赢家
+                else if (isWinner) {
+                    let wMethod = (rData.v2Stats && rData.v2Stats.winMethod) ? rData.v2Stats.winMethod : '默认胜利';
+                    let methodImg = getMethodUrl(wMethod, 'win');
+                    
+                    methodImgHtml = `<div class="w-full aspect-[3/4] bg-white rounded-lg border-[2px] sm:border-[3px] border-[#5E4B8B] relative flex items-center justify-center p-[3px] shadow-[0_2px_0_rgba(94,75,139,0.3)] my-[4px] sm:my-1.5">
+                                        <img src="${methodImg}" class="w-full h-full object-contain drop-shadow-sm" crossorigin="anonymous">
+                                     </div>`;
+
+                    bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #ffd1d1;">
+                                    <span class="font-black text-white text-[12px] sm:text-[14px] leading-none" style="text-shadow: 1px 1px 0 #5E4B8B, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">获胜</span>
+                                  </div>`;
+                } 
+                // 情况 3：淘汰玩家
+                else {
+                    let lMethod = (rData.v2Stats && rData.v2Stats.eliminated && rData.v2Stats.eliminated[p.id]) ? rData.v2Stats.eliminated[p.id] : '默认淘汰';
+                    let methodImg = getMethodUrl(lMethod, 'lose');
+                    
+                    let bloodLevelIndex = elimEvents.findIndex(group => group.includes(p.id));
+                    let bloodName = bloodLevelIndex >= 0 ? bloodNames[bloodLevelIndex] : '淘汰';
+                    let bloodBg = bloodBgColors[Math.min(bloodLevelIndex >= 0 ? bloodLevelIndex : 0, bloodBgColors.length - 1)];
+                    
+                    let bloodHtml = `<div class="absolute -top-2 -left-2 rounded-[5px] px-1 py-0.5 z-10 border-[1.5px] border-[#5E4B8B] shadow-sm" style="background-color: ${bloodBg};">
+                                    <span class="font-black text-[#5E4B8B] text-[9px] sm:text-[10px] tracking-tighter leading-none block" style="color: #5E4B8B; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;">${bloodName}</span>
+                                 </div>`;
+
+                    let killerId = (elimDetails[p.id]) ? elimDetails[p.id].killerId : null;
+                    let kName = '?'; let kColor = '#9CA3AF';
+                    if (killerId === p.id) {
+                        kName = '自'; kColor = p.color; 
+                    } else if (killerId) {
+                        let kP = gameData.players.find(x => x.id === killerId);
+                        if (kP) { kName = getShort(kP.name); kColor = kP.color; }
+                    } else {
+                        kName = '系'; kColor = '#6B7280'; 
+                    }
+
+                    let killerHtml = `<div class="absolute -bottom-2 -right-2 rounded-[5px] px-1 py-0.5 z-10 border-[1.5px] border-[#5E4B8B] shadow-sm" style="background-color: ${kColor};">
+                                    <span class="font-black text-[9px] sm:text-[10px] tracking-tighter leading-none block" style="color: #5E4B8B; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;">${kName}</span>
+                                 </div>`;
+
+                    methodImgHtml = `<div class="w-full aspect-[3/4] bg-white rounded-lg border-[2px] sm:border-[3px] border-[#5E4B8B] relative flex items-center justify-center p-[3px] shadow-[0_2px_0_rgba(94,75,139,0.3)] my-[4px] sm:my-1.5">
+                                        ${bloodHtml}
+                                        <img src="${methodImg}" class="w-full h-full object-contain drop-shadow-sm" crossorigin="anonymous">
+                                        ${killerHtml}
+                                     </div>`;
+
+                    let cards = elimDetails[p.id] ? parseInt(elimDetails[p.id].cards) : 0;
+                    if (cards > 0) {
+                        bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #ff2534;">
+                                        <span class="font-black text-white text-[12px] sm:text-[14px] leading-none" style="text-shadow: 1px 1px 0 #5E4B8B, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">+${cards}</span>
+                                      </div>`;
+                    } else {
+                        bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #bfbfbf;">
+                                        <span class="font-black text-[12px] sm:text-[14px] leading-none" style="color: #5c4c8b;">/</span>
+                                      </div>`;
+                    }
                 }
 
+                // ==================
+                // 组装最终外框
+                // ==================
                 return `
-                <!-- 玩家外框 -->
-                <div class="flex flex-col w-[65px] sm:w-[80px] bg-white border-[2px] ${outBorder} shrink-0">
-                    <!-- 第1行：玩家名 -->
-                    <div class="${cellBase} h-[24px] sm:h-[28px] text-white text-[12px] sm:text-[14px] text-stroke" style="background-color: ${p.color};">
-                        ${getShort(p.name)}
+                <div class="w-[74px] sm:w-[90px] flex flex-col p-1.5 rounded-[16px] border-[3px] border-[#5E4B8B] shrink-0 gap-[7px] shadow-sm" style="background-color: ${outerBg};">
+                    
+                    <div class="w-full h-[28px] sm:h-[32px] rounded-full flex flex-row items-center border-[2px] border-[#5E4B8B] px-[3px] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: ${p.color};">
+                        <div class="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-full border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center">
+                            <img src="${p.avatar}" class="w-full h-full object-cover">
+                        </div>
+                        <span class="flex-1 text-center font-black text-[12px] sm:text-[14px] tracking-widest leading-none block" style="color: #5E4B8B; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 1px 0 #fff, 0 -1px 0 #fff;">${getShort(p.name)}</span>
                     </div>
-                    <!-- 第2行：累计分数 (已应用动态颜色) -->
-                    <div class="${cellBase} h-[26px] sm:h-[30px] ${cumScoreColor} text-[14px] sm:text-[16px]">
-                        ${cumScore}
+
+                    <div class="w-full rounded-full bg-white border-[2px] border-[#5E4B8B] flex items-center justify-center py-[4px] shadow-[0_2px_0_rgba(94,75,139,0.2)]">
+                        <span class="font-black text-[14px] sm:text-[16px] leading-none" style="color: ${scoreColor};">${scoreStr}</span>
                     </div>
-                    <!-- 第3行：单局加减 -->
-                    <div class="${cellBase} h-[22px] sm:h-[26px] ${scoreColor} text-[12px] sm:text-[14px]">
-                        ${changeStr}
-                    </div>
-                    <!-- 第4行：行为 (输家已应用暗红字) -->
-                    <div class="${cellBase} h-[22px] sm:h-[26px] text-[9px] sm:text-[10px] ${actionBg}">
-                        ${actionText}
-                    </div>
-                    <!-- 第5行：图片 -->
-                    <div class="${cellBase} aspect-[2/3] bg-black p-0.5">
-                        <img src="${methodImg}" class="w-full h-full object-contain" crossorigin="anonymous">
-                    </div>
-                    <!-- 底部两行 -->
-                    <div class="flex flex-col w-full">
+
+                    ${methodImgHtml}
+
+                    <div class="w-full mt-auto flex justify-center">
                         ${bottomHtml}
                     </div>
+
                 </div>`;
             }).join('');
         };
 
-        // 弹窗控制逻辑
+        // 弹窗控制与自动更新绑定逻辑
         const btnOpenStatus = document.getElementById('statusRoundSelectBtn');
         const dialogStatus = document.getElementById('statusRoundDialog');
         const listStatus = document.getElementById('statusRoundList');
@@ -7802,10 +7865,8 @@ if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
                 if(gameData.rounds.length === 0) return;
                 
                 let html = '';
-                // 倒序生成列表，符合图2
                 for(let i = gameData.rounds.length - 1; i >= 0; i--) {
                     let rNum = gameData.rounds[i].round;
-                    // 如果是当前选中的局，给点灰色高亮暗示
                     let bgClass = (i === statusCurrentViewRound || (statusCurrentViewRound === -1 && i === gameData.rounds.length -1)) ? 'bg-[#E2E8F0]' : 'bg-white';
                     html += `
                     <button class="w-full text-center py-2 sm:py-2.5 border-b-[2px] border-[#5E4B8B] last:border-b-0 ${bgClass} hover:bg-gray-100 active:scale-95 transition-all font-black text-[#5E4B8B] text-base sm:text-lg tracking-widest status-round-opt-btn" data-idx="${i}">
@@ -7838,6 +7899,8 @@ if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
             statusCurrentViewRound = -1; // 只要有新操作，自动跳回追踪最新一局
             if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
         };
+        // ========================================================
+        // 【像素级复刻】最新战况 核心逻辑与画笔 结束
         // ========================================================
     }
 
