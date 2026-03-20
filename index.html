@@ -254,7 +254,7 @@
 <!-- ======================================================== -->
 <!-- 【优化版】最新战况区域 (图1 1:1 像素复刻) 开始 -->
 <!-- ======================================================== -->
-        <section id="latestStatusSection" class="mb-6" style="order: 0;">
+        <section id="latestStatusSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8]" style="order: 0;">
             <div class="flex flex-col items-center w-full relative">
                 
                 <!-- 【容器1：标题】 -->
@@ -275,7 +275,7 @@
                     <!-- 中间局数显示 (点击弹窗) -->
                     <!-- 调参备注：w-[55%]控制宽度; text-lg控制字体大小 -->
                     <button id="statusRoundSelectBtn" class="bg-[#99b7db] border-[3px] border-[#5E4B8B] rounded-full w-[55%] max-w-[200px] py-1 shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all text-center shrink-0">
-                        <span class="font-black text-white text-lg tracking-widest text-stroke" id="statusCurrentRoundText" style="-webkit-text-stroke-color: #5E4B8B;">第0局</span>
+                        <span class="font-black text-white text-lg tracking-widest " id="statusCurrentRoundText" style="-webkit-text-stroke-color: #5E4B8B;">第0局</span>
                     </button>
 
                     <!-- 右侧切换按钮 -->
@@ -286,7 +286,7 @@
 
                 <!-- 【容器3：展示玩家卡片的白色外部大容器】 -->
                 <!-- 调参备注：bg-white是白底; border-[3px]给外框加边; p-1.5是控制内部卡片和外框的边距 -->
-                <div class="w-full border-[3px] border-[#5E4B8B] rounded-xl bg-white p-1.5 sm:p-2 shadow-[0_3px_0_rgba(94,75,139,0.15)] relative">
+                <div class="w-full border-[3px] border-[#5E4B8B] rounded-xl bg-white p-1.5 sm:p-2 shadow-[0_4px_0_#5E4B8B] relative">
                     
                     <!-- 这是魔法滑动框，scrollbar-hide用来隐藏难看的滚动条 -->
                     <div class="w-full overflow-x-auto scrollbar-hide pb-1">
@@ -7701,6 +7701,7 @@ window.renderLatestStatus = function() {
             
             roundTextBtn.textContent = `第${rData.round}局`;
 
+            // 【核心排序算法】：把赢家排在最前面，然后按淘汰顺序倒序排！
             let sortedPlayers =[];
             if (rData.winner) {
                 let winP = active.find(p => p.id === rData.winner);
@@ -7709,7 +7710,8 @@ window.renderLatestStatus = function() {
             let elimEvents = (rData.v2Stats && rData.v2Stats.eliminationEvents) ? rData.v2Stats.eliminationEvents :[];
             let elimDetails = (rData.v2Stats && rData.v2Stats.eliminationDetails) ? rData.v2Stats.eliminationDetails : {};
             
-            elimEvents.forEach(group => {
+            // ★【排序修改位置】：用 reverse() 让最后死的人排前面，一血排最后
+            [...elimEvents].reverse().forEach(group => {
                 group.forEach(id => {
                     let p = active.find(x => x.id === id);
                     if (p) sortedPlayers.push(p);
@@ -7739,49 +7741,37 @@ window.renderLatestStatus = function() {
             const bloodNames =['一血', '二血', '三血', '四血', '五血', '六血', '七血', '八血'];
 
             container.innerHTML = sortedPlayers.map(p => {
-                // ★【核心新增：判断是否未参与】★
-                // 如果这局的数据里根本找不到这个玩家的分数记录，说明他未参与
                 let isNotParticipated = rData.changes[p.id] === undefined;
-                
                 let isWinner = rData.winner === p.id;
                 let changeScore = rData.changes[p.id] || 0;
                 
-                // ★【底色修改】未参与玩家显示淡灰色背景
                 let outerBg = isNotParticipated ? '#f3f4f6' : (isWinner ? '#e2ffd3' : '#ffd1d1');
-                
-                // ★【得分修改】未参与玩家显示 '-'
                 let scoreStr = isNotParticipated ? '-' : (changeScore > 0 ? `+${changeScore}` : `${changeScore}`);
                 let scoreColor = isNotParticipated ? '#9ca3af' : (changeScore > 0 ? '#1f8316' : (changeScore < 0 ? '#d60029' : '#5c4c8b'));
 
                 let methodImgHtml = '';
                 let bottomHtml = '';
 
-                // 情况 1：未参与
                 if (isNotParticipated) {
-                    // 隐藏容器3,4,5，但保留一个透明占位符维持卡片高度！
                     methodImgHtml = `<div class="w-full aspect-[3/4] relative flex items-center justify-center p-[3px] my-[4px] sm:my-1.5 opacity-30">
                                         <i class="fa-solid fa-minus text-2xl text-[#5E4B8B]"></i>
                                      </div>`;
-                    
-                    // 底部容器6显示“未参与”
-                    bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #bfbfbf;">
+                    bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]" style="background-color: #bfbfbf;">
                                     <span class="font-black text-[12px] sm:text-[13px] leading-none" style="color: #5c4c8b;">未参与</span>
                                   </div>`;
                 } 
-                // 情况 2：赢家
                 else if (isWinner) {
                     let wMethod = (rData.v2Stats && rData.v2Stats.winMethod) ? rData.v2Stats.winMethod : '默认胜利';
                     let methodImg = getMethodUrl(wMethod, 'win');
                     
-                    methodImgHtml = `<div class="w-full aspect-[3/4] bg-white rounded-lg border-[2px] sm:border-[3px] border-[#5E4B8B] relative flex items-center justify-center p-[3px] shadow-[0_2px_0_rgba(94,75,139,0.3)] my-[4px] sm:my-1.5">
+                    methodImgHtml = `<div class="w-full aspect-[3/4] bg-white rounded-lg border-[2px] sm:border-[3px] border-[#5E4B8B] relative flex items-center justify-center p-[3px] shadow-[0_4px_0_#5E4B8B] my-[4px] sm:my-1.5">
                                         <img src="${methodImg}" class="w-full h-full object-contain drop-shadow-sm" crossorigin="anonymous">
                                      </div>`;
 
-                    bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #ffd1d1;">
-                                    <span class="font-black text-white text-[12px] sm:text-[14px] leading-none" style="text-shadow: 1px 1px 0 #5E4B8B, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">获胜</span>
+                    bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]" style="background-color: #70bf30;">
+                                    <span class="font-black text-white text-[12px] sm:text-[14px] leading-none";>获胜</span>
                                   </div>`;
                 } 
-                // 情况 3：淘汰玩家
                 else {
                     let lMethod = (rData.v2Stats && rData.v2Stats.eliminated && rData.v2Stats.eliminated[p.id]) ? rData.v2Stats.eliminated[p.id] : '默认淘汰';
                     let methodImg = getMethodUrl(lMethod, 'lose');
@@ -7789,9 +7779,9 @@ window.renderLatestStatus = function() {
                     let bloodLevelIndex = elimEvents.findIndex(group => group.includes(p.id));
                     let bloodName = bloodLevelIndex >= 0 ? bloodNames[bloodLevelIndex] : '淘汰';
                     let bloodBg = bloodBgColors[Math.min(bloodLevelIndex >= 0 ? bloodLevelIndex : 0, bloodBgColors.length - 1)];
-                    
-                    let bloodHtml = `<div class="absolute -top-2 -left-2 rounded-[5px] px-1 py-0.5 z-10 border-[1.5px] border-[#5E4B8B] shadow-sm" style="background-color: ${bloodBg};">
-                                    <span class="font-black text-[#5E4B8B] text-[9px] sm:text-[10px] tracking-tighter leading-none block" style="color: #5E4B8B; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;">${bloodName}</span>
+//几血窗口↓                 
+                    let bloodHtml = `<div class="absolute -top-2 -left-1 rounded-[5px] px-1 py-0.5 z-10 border-[1.5px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]"  style="background-color: ${bloodBg};">
+                                    <span class="font-black text-white text-[9px] sm:text-[10px] tracking-tighter leading-none block" style="color: white;">${bloodName}</span>
                                  </div>`;
 
                     let killerId = (elimDetails[p.id]) ? elimDetails[p.id].killerId : null;
@@ -7804,43 +7794,43 @@ window.renderLatestStatus = function() {
                     } else {
                         kName = '系'; kColor = '#6B7280'; 
                     }
-
-                    let killerHtml = `<div class="absolute -bottom-2 -right-2 rounded-[5px] px-1 py-0.5 z-10 border-[1.5px] border-[#5E4B8B] shadow-sm" style="background-color: ${kColor};">
-                                    <span class="font-black text-[9px] sm:text-[10px] tracking-tighter leading-none block" style="color: #5E4B8B; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;">${kName}</span>
+//凶手名字↓
+                    let killerHtml = `<div class="absolute -bottom-2 -right-1 rounded-[5px] px-1 py-0.5 z-10 border-[1.5px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]" style="background-color: ${kColor};">
+                                    <span class="font-black text-[12px] sm:text-[12px] tracking-tighter leading-none block" style="color: white; ">${kName}</span>
                                  </div>`;
-
-                    methodImgHtml = `<div class="w-full aspect-[3/4] bg-white rounded-lg border-[2px] sm:border-[3px] border-[#5E4B8B] relative flex items-center justify-center p-[3px] shadow-[0_2px_0_rgba(94,75,139,0.3)] my-[4px] sm:my-1.5">
+//淘汰玩家图片↓
+                    methodImgHtml = `<div class="w-full aspect-[3/4] bg-white rounded-lg border-[2px] sm:border-[3px] border-[#5E4B8B] relative flex items-center justify-center p-[3px] shadow-[0_4px_0_#5E4B8B] my-[4px] sm:my-1.5">
                                         ${bloodHtml}
                                         <img src="${methodImg}" class="w-full h-full object-contain drop-shadow-sm" crossorigin="anonymous">
                                         ${killerHtml}
                                      </div>`;
-
+//淘汰玩家罚牌区↓
                     let cards = elimDetails[p.id] ? parseInt(elimDetails[p.id].cards) : 0;
                     if (cards > 0) {
-                        bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #ff2534;">
-                                        <span class="font-black text-white text-[12px] sm:text-[14px] leading-none" style="text-shadow: 1px 1px 0 #5E4B8B, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">+${cards}</span>
+                        bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]"  style="background-color: #ff2534;">
+                                        <span class="font-black text-white text-[12px] sm:text-[14px] leading-none">+${cards}</span>
                                       </div>`;
                     } else {
-                        bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: #bfbfbf;">
+                        bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]" style="background-color: #bfbfbf;">
                                         <span class="font-black text-[12px] sm:text-[14px] leading-none" style="color: #5c4c8b;">/</span>
                                       </div>`;
                     }
                 }
-
-                // ==================
-                // 组装最终外框
-                // ==================
+//玩家标签大容器2↓
+//玩家名字区2↓  
+//玩家名字颜色
+//分数显示
                 return `
-                <div class="w-[74px] sm:w-[90px] flex flex-col p-1.5 rounded-[16px] border-[3px] border-[#5E4B8B] shrink-0 gap-[7px] shadow-sm" style="background-color: ${outerBg};">
-                    
-                    <div class="w-full h-[28px] sm:h-[32px] rounded-full flex flex-row items-center border-[2px] border-[#5E4B8B] px-[3px] shadow-[0_2px_0_rgba(94,75,139,0.2)]" style="background-color: ${p.color};">
+                <div class="w-[74px] sm:w-[90px] flex flex-col p-1.5 rounded-[16px] border-[3px] border-[#5E4B8B] shrink-0 gap-[7px] shadow-[0_4px_0_#5E4B8B]" style="background-color: ${outerBg};">
+                  
+                    <div class="w-full h-[28px] sm:h-[32px] rounded-full flex flex-row items-center border-[2px] border-[#5E4B8B] px-[3px] shadow-[0_4px_0_#5E4B8B]" style="background-color: ${p.color};">
                         <div class="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-full border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center">
                             <img src="${p.avatar}" class="w-full h-full object-cover">
                         </div>
-                        <span class="flex-1 text-center font-black text-[12px] sm:text-[14px] tracking-widest leading-none block" style="color: #5E4B8B; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 1px 0 #fff, 0 -1px 0 #fff;">${getShort(p.name)}</span>
+                        <span class="flex-1 text-center font-black text-[12px] sm:text-[14px] tracking-widest leading-none block" style="color: white; ">${getShort(p.name)}</span>
                     </div>
 
-                    <div class="w-full rounded-full bg-white border-[2px] border-[#5E4B8B] flex items-center justify-center py-[4px] shadow-[0_2px_0_rgba(94,75,139,0.2)]">
+                    <div class="w-full rounded-full bg-white border-[2px] border-[#5E4B8B] flex items-center justify-center py-[4px] shadow-[0_4px_0_#5E4B8B]">
                         <span class="font-black text-[14px] sm:text-[16px] leading-none" style="color: ${scoreColor};">${scoreStr}</span>
                     </div>
 
