@@ -291,8 +291,8 @@
                     <!-- 这是魔法滑动框，scrollbar-hide用来隐藏难看的滚动条 -->
                     <div class="w-full overflow-x-auto scrollbar-hide pb-1">
                         
-                        <!-- 【重要调参】：gap-[6px] 控制5个玩家卡片之间的间隔！如果觉得太挤可以改成 gap-2 -->
-                        <div class="flex gap-[6px] sm:gap-2 items-stretch w-max" id="statusPlayersContainer">
+                        <!-- 【重要调参】：gap-[2px] 控制5个玩家卡片之间的间隔！如果觉得太挤可以改成 gap-2 -->
+                        <div class="flex gap-[6px] sm:gap-1 items-stretch w-max" id="statusPlayersContainer">
                             <!-- JS 会像画笔一样把内部的小卡片画在这里 -->
                         </div>
                     </div>
@@ -7756,6 +7756,7 @@ window.renderLatestStatus = function() {
                     methodImgHtml = `<div class="w-full aspect-[3/4] relative flex items-center justify-center p-[3px] my-[4px] sm:my-1.5 opacity-30">
                                         <i class="fa-solid fa-minus text-2xl text-[#5E4B8B]"></i>
                                      </div>`;
+//未参与容器↓
                     bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]" style="background-color: #bfbfbf;">
                                     <span class="font-black text-[12px] sm:text-[13px] leading-none" style="color: #5c4c8b;">未参与</span>
                                   </div>`;
@@ -7763,11 +7764,11 @@ window.renderLatestStatus = function() {
                 else if (isWinner) {
                     let wMethod = (rData.v2Stats && rData.v2Stats.winMethod) ? rData.v2Stats.winMethod : '默认胜利';
                     let methodImg = getMethodUrl(wMethod, 'win');
-                    
+ //胜者获胜图片容器↓                   
                     methodImgHtml = `<div class="w-full aspect-[3/4] bg-white rounded-lg border-[2px] sm:border-[3px] border-[#5E4B8B] relative flex items-center justify-center p-[3px] shadow-[0_4px_0_#5E4B8B] my-[4px] sm:my-1.5">
                                         <img src="${methodImg}" class="w-full h-full object-contain drop-shadow-sm" crossorigin="anonymous">
                                      </div>`;
-
+//胜者获胜文字容器↓   
                     bottomHtml = `<div class="w-full rounded-full py-[4px] flex items-center justify-center border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]" style="background-color: #70bf30;">
                                     <span class="font-black text-white text-[12px] sm:text-[14px] leading-none";>获胜</span>
                                   </div>`;
@@ -7821,7 +7822,7 @@ window.renderLatestStatus = function() {
 //玩家名字颜色
 //分数显示
                 return `
-                <div class="w-[74px] sm:w-[90px] flex flex-col p-1.5 rounded-[16px] border-[3px] border-[#5E4B8B] shrink-0 gap-[7px] shadow-[0_4px_0_#5E4B8B]" style="background-color: ${outerBg};">
+                <div class="w-[58px] sm:w-[90px] flex flex-col p-1.5 rounded-[16px] border-[3px] border-[#5E4B8B] shrink-0 gap-[7px] shadow-[0_4px_0_#5E4B8B]" style="background-color: ${outerBg};">
                   
                     <div class="w-full h-[28px] sm:h-[32px] rounded-full flex flex-row items-center border-[2px] border-[#5E4B8B] px-[3px] shadow-[0_4px_0_#5E4B8B]" style="background-color: ${p.color};">
                         <div class="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-full border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center">
