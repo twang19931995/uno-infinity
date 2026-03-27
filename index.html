@@ -4148,29 +4148,73 @@ function renderLeaderboard(sortedPlayers) {
                 return item && item.url ? item.url : defaultUrl;
             };
 
-            // 生成每个小卡牌的 HTML
+// 生成每个小卡牌的 HTML (像素级复刻版)
             let methodsHtml = keys.map(m => {
                 let url = getMethodUrl(m, type);
                 let count = methodsObj[m];
+                
+                // 【核心智能开关】：根据是“胜利”还是“淘汰”，自动赋予不同的胶囊底色
+                // type === 'win' 表示胜利方式，胶囊将使用绿色 #70bf30
+                // 如果不是胜利，那一定是淘汰方式，胶囊将使用红色 #ff2534
+                let capsuleBg = type === 'win' ? '#70bf30' : '#ff2534'; 
+
                 return `
-                <div class="flex flex-col w-full">
-                    <!-- 上半部：图片区域 (2:3比例，黑底，等比缩放不裁剪) -->
-                    <div class="w-full aspect-[2/3] flex items-center justify-center bg-black overflow-hidden border-[1px] border-[#5E4B8B]">
+                <!-- 【外层总包裹器】 -->
+                <!--小白调节区：-->
+                <!-- pb-[6px] sm:pb-[8px]：控制整个卡牌底部的留白距离，这是为了给底下胶囊的厚重投影腾出空间，防止底部的紫色阴影被外层白色大框“残忍切断”！ -->
+                <div class="relative w-full flex flex-col items-center pb-[6px] sm:pb-[8px]">
+                    
+                    <!-- 【容器2：图片展示区】 -->
+                    <!--小白调节区：-->
+                    <!-- aspect-[2/3]：强行控制容器的长宽比为2:3，让它看起来像一张完美修长的塔罗牌 -->
+                    <!-- rounded-[6px] sm:rounded-[8px]：控制外层圆角的弧度大小。数值越大越圆润 -->
+                    <!-- border-[2px] sm:border-[3px]：控制外围紫色的描边粗细 -->
+                    <!-- border-[#5E4B8B]：这决定了描边的颜色，也就是那个深紫色 -->
+                    <!-- shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B]：这是你要的魔法投影！控制往下延伸的深紫色的厚度，数值4px就是投影厚度 -->
+                    <!-- overflow-hidden：极其重要！确保超出去的图片部分被圆角干脆地切掉，不会支棱在框外 -->
+                    <!-- bg-[#111111]：背景色设置为深黑色，当图片没完全填满时，露出来的是黑色，就像图1那样酷炫 -->
+                    <!-- z-0：确保图片在底层，乖乖躺在胶囊下面 -->
+                    <div class="w-full aspect-[2/3] rounded-[6px] sm:rounded-[8px] border-[2px] sm:border-[3px] border-[#5E4B8B] shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] overflow-hidden bg-[#111111] flex justify-center items-center relative z-0">
+                        
+                        <!-- 图片本身控制： -->
+                        <!-- object-contain：魔法属性！确保图片不管原来什么比例，都会“等比缩放”放进去，完整展示，绝不拉伸变形，也不被裁切！ -->
+                        <!-- w-full h-full：让图片去无限撑满刚刚我们定好的边框容器 -->
                         <img src="${url}" class="w-full h-full object-contain" crossorigin="anonymous">
                     </div>
-                    <!-- 下半部：次数区域 (白底，细边框) -->
-                    <div class="w-full bg-white flex items-center justify-center border-[1px] border-t-0 border-[#5E4B8B] py-0.5">
-                        <span class="font-bold text-[10px] sm:text-xs" style="color: ${numColor};">${count}</span>
+                    
+                    <!-- 【容器1：展示次数的胶囊区】 -->
+                    <!--小白调节区：-->
+                    <!-- z-10：图层优先度为10，确保它漂浮在上面图片(z-0)的上方，重叠压住它！ -->
+                    <!-- -mt-[8px] sm:-mt-[10px]：【极其核心】负边距魔法！把胶囊整体往上吸，从而实现一半压在图片里面，一半漏在外面的绝美效果！数值越大往上吸得越深！ -->
+                    <!-- px-2 sm:px-3：胶囊内部左右两边的空间大小，数值越大，胶囊越“长” -->
+                    <!-- py-[2px] sm:py-[3px]：胶囊内部上下两边的空间大小，数值越大，胶囊越“胖” -->
+                    <!-- rounded-full：控制它变成完美对称的半圆形胶囊形状 -->
+                    <!-- border-[2px] sm:border-[3px] border-[#5E4B8B]：控制胶囊自己那一圈深紫色外描边的粗细和颜色 -->
+                    <!-- shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B]：控制胶囊自己的厚重深紫色底部投影 -->
+                    <div class="z-10 -mt-[8px] sm:-mt-[10px] px-2 sm:px-3 py-[2px] sm:py-[3px] rounded-full border-[2px] sm:border-[3px] border-[#5E4B8B] shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] flex items-center justify-center" style="background-color: ${capsuleBg};">
+                        
+                        <!-- 次数数字控制区： -->
+                        <!-- text-white：数字本体的填充颜色固定为纯白色 -->
+                        <!-- text-[12px] sm:text-[14px]：数字的大小。嫌小就把数字改大！ -->
+                        <!-- -webkit-text-stroke: 1.5px #5E4B8B：数字外面的那圈深紫色真描边！1.5px是粗细，#5E4B8B是紫色。 -->
+                        <!-- paint-order: stroke fill：非常高级的平滑魔法，让描边“往外长”，绝不会吃掉数字内部原本的白色，确保字迹清晰！ -->
+                        <span class="font-black text-white text-[12px] sm:text-[14px] leading-none" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${count}</span>
                     </div>
                 </div>`;
             }).join('');
 
-            // 返回带圆角的整体大框
+            // 返回带圆角的整体白色外围大框
             return `
             <div class="flex flex-col border-[3px] border-[#5E4B8B] rounded-[1rem] overflow-hidden shadow-sm w-full bg-white">
                 <div class="${titleBg} text-white text-center py-1 sm:py-1.5 text-[11px] sm:text-xs font-bold border-b-[3px] border-[#5E4B8B] tracking-widest shrink-0">${title}</div>
-                <div class="p-1 sm:p-1.5 flex flex-col bg-white w-full">
-                    <div class="grid grid-cols-8 gap-1 w-full">
+                
+                <!-- 【整体卡牌列表布局网格调整】 -->
+                <!-- p-1.5 sm:p-2：这行8个卡牌的最外围留白距离，确保边缘看起来不会太挤 -->
+                <div class="p-1.5 sm:p-2 flex flex-col bg-white w-full">
+                    
+                    <!-- grid-cols-8：保证手机端横排严格划分8个格子，每个格子塞一个小卡牌 -->
+                    <!-- gap-1.5 sm:gap-2：控制每个小卡牌之间（左右/上下）的“安全间距”！如果觉得太挤，可以把间距改大 -->
+                    <div class="grid grid-cols-8 gap-1.5 sm:gap-2 w-full">
                         ${methodsHtml}
                     </div>
                 </div>
@@ -4189,18 +4233,18 @@ function renderLeaderboard(sortedPlayers) {
             let trophiesHtml = '';
             if (playerTrophies.length > 0) {
 let trophiesItems = playerTrophies.map(b => {
-                    let rColor = rarityColors[b.rarity] || '#10B981'; // 直接调用第2步做好的全局颜色库
+                    let rColor = rarityColors[b.rarity] || '#10B981'; // 直接调用第2步做好的全局颜色库super-heavy-stroke   text-stroke
 
                     return `
                     <div class="flex flex-col h-full w-full cursor-pointer leaderboard-trophy hover:scale-105 transition-transform" data-id="${b.id}">
                         <!-- 上半部分：图标 + 标题 -->
-                        <div class="relative w-full bg-white border-[3px] border-[#5E4B8B] rounded-t-[0.8rem] sm:rounded-t-[1rem] rounded-b-sm flex flex-col items-center justify-center p-1 sm:p-2 z-10">
-                            <div class="absolute -top-2 -left-2 px-1.5 py-0.5 rounded-md font-black text-[8px] sm:text-[10px] text-white border-[2px] border-[#5E4B8B] leading-none tracking-tighter" style="background-color: ${rColor};">${b.rarity}</div>
-                            <i class="fa-solid ${b.icon} text-2xl sm:text-4xl drop-shadow-sm mb-1 mt-1 sm:mt-2" style="color: ${b.color};"></i>
-                            <div class="font-black text-[9px] sm:text-xs text-[#5E4B8B] truncate w-full text-center leading-none">${b.name}</div>
+                        <div class="relative w-full bg-[#ffe788] border-[4px] border-[#5E4B8B] rounded-t-[0.8rem] sm:rounded-t-[1rem] rounded-b-sm flex flex-col items-center justify-center p-1 sm:p-2 z-10">
+                            <div class="absolute -top-2 -left-2 px-1.5 py-0.5 rounded-md font-black text-[15px] sm:text-[10px] text-white border-[3px] border-[#5E4B8B] leading-none shadow-[0_2px_0_#aa6c00] tracking-tighter" style="background-color: ${rColor};">${b.rarity}</div>
+                            <i class="fa-solid ${b.icon} text-2xl sm:text-4xl  mb-2 mt-2  text-stroke sm:mt-2" style="color: ${b.color};"></i>
+                            <div class="font-black text-[14px] sm:text-xs text-white text-stroke truncate w-full text-center leading-none">${b.name}</div>
                         </div>
                         <!-- 下半部分：动态等高描述 -->
-                        <div class="w-full bg-[#E2E8F0] border-[3px] border-[#5E4B8B] border-t-0 rounded-b-[0.8rem] sm:rounded-b-[1rem] p-1 sm:p-1.5 flex-grow flex items-center justify-center -mt-1 pt-1.5 sm:pt-2">
+                        <div class="w-full bg-[#E2E8F0] border-[3px] border-[#5E4B8B] shadow-[0_4px_0_#aa6c00] border-t-0 rounded-b-[0.8rem] sm:rounded-b-[1rem] p-1 sm:p-1.5 flex-grow flex items-center justify-center -mt-1 pt-1.5 sm:pt-2">
                             <div class="font-bold text-[8px] sm:text-[10px] text-[#5E4B8B] text-center leading-tight break-words">${b.desc}</div>
                         </div>
                     </div>`;
@@ -4208,10 +4252,10 @@ let trophiesItems = playerTrophies.map(b => {
 
                 // 外框，并设置为 grid-cols-5 (一行5个)，mt-1.5修复图2间距
                 trophiesHtml = `
-                <div class="mt-1.5 bg-[#FEFCE8] border-[3px] border-[#5E4B8B] rounded-[1rem] overflow-hidden flex flex-col shadow-sm relative">
+                <div class="mt-4 bg-[#FEFCE8] border-[3px] border-[#5E4B8B] rounded-[1rem] overflow-hidden flex flex-col shadow-sm relative">
                     <div class="bg-[#FFD93D] text-white text-center py-1 text-sm sm:text-base font-black border-b-[3px] border-[#5E4B8B] tracking-widest text-stroke">获得奖杯</div>
                     <div class="p-1.5 sm:p-2">
-                        <div class="grid grid-cols-5 gap-1.5 sm:gap-2 items-stretch">
+                        <div class="grid grid-cols-5 gap-2.5 sm:gap-2 items-stretch">
                             ${trophiesItems}
                         </div>
                     </div>
