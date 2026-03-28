@@ -1147,107 +1147,105 @@
     </div>
 
 <!-- ================================================================ -->
-    <!-- ★★★ 图1 完美像素级复刻：成就详情弹窗 ★★★ -->
+    <!-- ★★★ 图1 完美像素级复刻：成就详情弹窗 (自带说明书) ★★★ -->
     <!-- ================================================================ -->
     <div id="badgeInfoDialog" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
         
-        <!-- 【最外部的大容器】 -->
-        <!-- ★ 修改指南：w-full max-w-[340px] 控制整个卡片的最大宽度；bg-[#FEFCE8] 是淡黄色背景；border-[6px] 控制紫色边框粗细 -->
+        <!-- 
+          ========================================================
+          【UI参数调节面板：弹窗外层大边框】
+          * 最大宽度：max-w-[320px] sm:max-w-[340px] (防止在手机端过宽)
+          * 背景颜色：bg-[#FEFCE8] (淡黄纸张底色)
+          * 边框粗细：border-[5px] sm:border-[6px] (极粗紫边)
+          * 圆角大小：rounded-[2rem] (超级圆润)
+          * 阴影厚度：shadow-[0_8px_0_#5E4B8B] (厚重的底部投影，8px)
+          ========================================================
+        -->
         <div class="relative bg-[#FEFCE8] border-[5px] sm:border-[6px] border-[#5E4B8B] rounded-[2rem] w-full max-w-[320px] sm:max-w-[340px] mx-4 mt-12 p-4 pt-10 pb-6 shadow-[0_8px_0_#5E4B8B]">
             
             <!-- 关闭按钮 (右上角的 X) -->
-            <!-- ★ 修改指南：-top-4 -right-4 可以把叉叉挪到框外去，text-3xl 控制叉叉大小 -->
             <button id="closeBadgeInfoBtn" class="absolute top-3 right-4 text-gray-400 hover:text-danger text-3xl transition-colors leading-none z-50">
                 <i class="fa-solid fa-times"></i>
             </button>
 
-<!-- ================================================== -->
-            <!-- ★★★ 终极贴纸控制台 (所有参数都在这，改数字即可) ★★★ -->
             <!-- ================================================== -->
-            <!-- 整体位置控制：改 top(上下) 和 left(左右) -->
+            <!-- ★★★ 终极贴纸控制台 (背后的大Logo和稀有度文字) ★★★ -->
+            <!-- ================================================== -->
             <div class="absolute z-[100] pointer-events-none" style="top: -50px; left: -15px; overflow: visible;">
                 <div class="relative w-[150px] h-[150px]">
-                    
-                    <!-- 【背后的大 Logo (陨石/火焰)】 -->
-                    <!-- ★ 控制台 1：直接在这里改数字，没有任何上限！ -->
-                    <!-- font-size: 控制大小（数值越大图案越大，比如 120px） -->
-                    <!-- opacity: 控制透明度（1是完全不透，0.5是半透，0.2是超透） -->
-                    <!-- top 和 left: 控制它在这个区域内的上下左右位置 -->
+                    <!-- 背后的图标 Logo (font-size: 90px 控制大小) -->
                     <i id="badgeInfoRarityIcon" 
                        class="absolute z-0 " 
                        style="font-size: 90px; opacity: 1; top: -10px; left: 123px; color: #FF8C00;"></i>
                     
-                    <!-- 【前面的文字 (SSS/A/B)】 -->
-                    <!-- ★ 控制台 2：直接在这里改数字！ -->
-                    <!-- top 和 left: 控制文字相对背后 Logo 的位置 (把 top 变大就往下走，left 变大就往右走) -->
+                    <!-- 前面的 SSS/A/B 文字 (font-size: 120px 控制大小) -->
                     <div class="absolute z-10 float-anim" style="top: -60px; left: -20px; padding: 15px; overflow: visible;">
-                        <!-- ★ 控制台 3：文字的大小 -->
-                        <!-- font-size: 控制文字大小（填 80px、100px 随便你，绝无上限！） -->
                         <span id="badgeInfoRarityText" 
                               class="font-black super-heavy-stroke italic text-white drop-shadow-[0_6px_0_rgba(94,75,139,0.5)]"
                               style="font-size: 120px;">SSS</span>
                     </div>
-
                 </div>
             </div>
-            <!-- ================================================== -->
 
-            <!-- 【容器 1：奖杯标题】 -->
+            <!-- 
+              【UI参数：容器 1 (奖杯标题胶囊)】
+              * 内边距：px-6 py-1.5 (决定胶囊的胖瘦长短)
+              * 描边与阴影：border-[4px] shadow-[0_4px_0_#5E4B8B]
+            -->
             <div class="flex justify-center mb-4 relative z-20">
-                <!-- ★ 修改指南：px-8 py-2 控制胶囊的长短胖瘦，border-[4px] 是描边，shadow-[0_4px_0_#5E4B8B] 是底部厚重阴影 -->
-                <!-- 注意：背景颜色将在 JS 里动态填入 50% 透明度的稀有度颜色 -->
                 <div id="badgeInfoTitleBg" class="border-[4px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-1.5 sm:py-2 shadow-[0_4px_0_#5E4B8B] w-[85%] flex justify-center items-center">
-                    <!-- ★ 修改指南：text-2xl 控制奖杯名字的大小，text-stroke 给它加上白底紫字的描边特效 -->
                     <span id="badgeInfoName" class="font-black text-white text-2xl sm:text-3xl tracking-widest leading-none drop-shadow-sm">奖杯名称</span>
                 </div>
             </div>
 
-            <!-- 【容器 2：奖杯描述】 -->
+            <!-- 
+              【UI参数：容器 2 (奖杯简短描述灰色小胶囊)】
+              * 背景：bg-[#C0C0C0] (经典灰色)
+              * 字体：text-xs (极小字体防撑破)
+            -->
             <div class="flex justify-center mb-6 relative z-10 -mt-1">
-                <!-- ★ 修改指南：bg-[#C0C0C0] 是灰色底板，shadow-[0_3px_0_#5E4B8B] 是小阴影 -->
                 <div class="bg-[#C0C0C0] border-[3px] border-[#5E4B8B] rounded-full px-5 py-1 shadow-[0_3px_0_#5E4B8B]">
                     <span id="badgeInfoDesc" class="font-black text-[#5E4B8B] text-xs sm:text-sm tracking-widest">奖杯的描述文字</span>
                 </div>
             </div>
 
-            <!-- 【容器 3：玩家头像与名字】 -->
+            <!-- 
+              【UI参数：容器 3 (玩家头像与单字名字)】
+            -->
             <div class="flex justify-center mb-8">
-                <!-- ★ 修改指南：bg-[#64C8C8] 是你图里的青色背景。如果你想用玩家专属色，我们会在 JS 里替换它 -->
                 <div id="badgeInfoPlayerBg" class="bg-[#64C8C8] border-[4px] border-[#5E4B8B] rounded-full px-4 sm:px-5 py-1 sm:py-1.5 flex items-center justify-center gap-2 sm:gap-3 shadow-[0_4px_0_#5E4B8B] min-w-[50%]">
-                    <!-- 头像框 -->
-<div class="w-10 h-10 sm:w-12 sm:h-12 bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-2xl overflow-hidden shrink-0 shadow-sm">
+                    <!-- 头像尺寸：w-10 h-10 -->
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-2xl overflow-hidden shrink-0 shadow-sm">
                         <img id="badgeInfoAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
                     </div>
-                    <!-- 玩家名字 -->
-                    <!-- ★ 修改指南：text-2xl 控制玩家名字的大小 -->
                     <span id="badgeInfoPlayer" class="font-black text-white text-stroke text-xl sm:text-2xl tracking-widest drop-shadow-sm">婷</span>
                 </div>
             </div>
 
-            <!-- 【容器 4：达成时机】 -->
+            <!-- 
+              【UI参数：容器 4 (达成时机记录框)】
+              * 左上角小蓝签：bg-[#6A96E5], 位置 -top-3.5 凸出边框
+              * 下方主白框：bg-white, 阴影 shadow-[0_4px_0_#5E4B8B]
+            -->
             <div class="relative w-full mb-8">
-                <!-- 左上角压边的独立小容器标签 -->
-                <!-- ★ 修改指南：-top-4 让他往上凸出，left-4 让他距左边一点距离。bg-[#6A96E5] 是天蓝色背景 -->
                 <div class="absolute -top-3.5 sm:-top-4 left-4 sm:left-6 bg-[#6A96E5] border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-5 py-0.5 z-10 shadow-[0_2px_0_#5E4B8B]">
                     <span class="font-black text-white text-xs sm:text-sm tracking-widest">达成时机</span>
                 </div>
-                <!-- 下方的信息大白框 -->
-                <!-- ★ 修改指南：pt-6 pb-3 控制上下留白。shadow-[0_4px_0_#5E4B8B] 是底部大阴影 -->
                 <div class="bg-white border-[4px] border-[#5E4B8B] rounded-[1.5rem] px-4 pt-5 sm:pt-6 pb-2.5 sm:pb-3 shadow-[0_4px_0_#5E4B8B] flex justify-center items-center">
                     <span id="badgeInfoRound" class="font-black text-[#2E7D32] text-sm sm:text-base text-center leading-tight tracking-wide">截止当前 第130局</span>
                 </div>
             </div>
 
-            <!-- 【容器 5：详细事件记录】 -->
+            <!-- 
+              【UI参数：容器 5 (详细事件记录框)】
+              * 左上角小红签：bg-[#E11D48]
+            -->
             <div class="relative w-full mb-2">
-                <!-- 左上角压边的独立小容器标签 -->
-                <!-- ★ 修改指南：bg-[#E11D48] 是玫红色背景 -->
                 <div class="absolute -top-3.5 sm:-top-4 left-4 sm:left-6 bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-full px-4 sm:px-5 py-0.5 z-10 shadow-[0_2px_0_#5E4B8B]">
                     <span class="font-black text-white text-xs sm:text-sm tracking-widest">详细事件记录</span>
                 </div>
-                <!-- 下方的信息大白框 -->
                 <div class="bg-white border-[4px] border-[#5E4B8B] rounded-[1.5rem] px-4 pt-6 sm:pt-7 pb-4 sm:pb-5 shadow-[0_4px_0_#5E4B8B] flex justify-center items-center min-h-[70px] sm:min-h-[80px]">
-                    <span id="badgeInfoDetail" class="font-black text-[#5E4B8B] text-xs sm:text-sm text-center leading-snug tracking-wider">累计由61局成为全场扣分最多的玩家</span>
+                    <span id="badgeInfoDetail" class="font-black text-[#5E4B8B] text-xs sm:text-sm text-center leading-snug tracking-wider">记录文案</span>
                 </div>
             </div>
 
@@ -1401,84 +1399,121 @@ const modulesConfig =[
         
         const defaultSectionOrder = modulesConfig.map(m => m.id);
 
-        const badgeDefs =[
-            { id: 'b1', rarity: 'S', name: '绝对统治', icon: 'fa-crown', color: '#FFD700', desc: '总分全场第一' },
-            { id: 'b2', rarity: 'S', name: '连胜天尊', icon: 'fa-fire-flame-curved', color: '#FF4500', desc: '最长连胜排第一' },
-            { id: 'b3', rarity: 'A', name: '究极爆发', icon: 'fa-meteor', color: '#FF8C00', desc: '创造单局最高正分' },
-            { id: 'b4', rarity: 'A', name: '稳如老狗', icon: 'fa-scale-balanced', color: '#4ADE80', desc: '每局正分极度平稳' },
-            { id: 'b5', rarity: 'A', name: '锋芒毕露', icon: 'fa-crosshairs', color: '#3B82F6', desc: '当赢家的次数最多' },
-            { id: 'b6', rarity: 'B', name: '究极劳模', icon: 'fa-calendar-check', color: '#8B5CF6', desc: '全场参与局数最多' },
-            { id: 'b7', rarity: 'S', name: '极限躺赢', icon: 'fa-bed', color: '#F472B6', desc: '赢过加分最少的一局' },
-            { id: 'b8', rarity: 'A', name: '极速超车', icon: 'fa-rocket', color: '#10B981', desc: '最新一局首次反超登顶' },
-            { id: 'b9', rarity: 'S', name: '终极背锅', icon: 'fa-poop', color: '#8B4513', desc: '总分全场倒数第一' },
-            { id: 'b10', rarity: 'A', name: '散财童子', icon: 'fa-coins', color: '#F59E0B', desc: '创造单局最高负分' },
-            { id: 'b11', rarity: 'S', name: '无底深渊', icon: 'fa-arrow-trend-down', color: '#EF4444', desc: '最长连败排第一' },
-            { id: 'b12', rarity: 'A', name: '大慈善家', icon: 'fa-hand-holding-heart', color: '#EC4899', desc: '单局垫底次数最多' },
-            { id: 'b13', rarity: 'S', name: '差之毫厘', icon: 'fa-ruler-horizontal', color: '#14B8A6', desc: '输过扣分最少的一局' },
-            { id: 'b14', rarity: 'B', name: '边缘ＯＢ', icon: 'fa-mug-hot', color: '#9CA3AF', desc: '全场逃避对局最多' },
-            { id: 'b15', rarity: 'A', name: '晚节不保', icon: 'fa-person-falling', color: '#EF4444', desc: '最新一局首次跌至垫底' },
-            { id: 'b16', rarity: 'A', name: '心跳玩家', icon: 'fa-wave-square', color: '#8B5CF6', desc: '分数起伏方差最大' },
-            { id: 'b17', rarity: 'A', name: '仰卧起坐', icon: 'fa-arrows-up-down', color: '#06B6D4', desc: '频繁交替赢一局输一局' },
-            { id: 'b18', rarity: 'SS', name: '步步高升', icon: 'fa-stairs', color: '#34D399', desc: '连赢且一次比一次多' },
-            { id: 'b19', rarity: 'SS', name: '自由落体', icon: 'fa-parachute-box', color: '#EF4444', desc: '连输且一次比一次狠' },
-            { id: 'b20', rarity: 'SS', name: '丝血反杀', icon: 'fa-heart-pulse', color: '#E11D48', desc: '曾跌落谷底现已逆袭第一' },
-            { id: 'b21', rarity: 'S', name: '乐极生悲', icon: 'fa-masks-theater', color: '#6366F1', desc: '上局暴赚，下局暴亏' },
-            { id: 'b22', rarity: 'S', name: '究极打工仔', icon: 'fa-briefcase', color: '#F43F5E', desc: '胜率最高，却不是第一' },
-            { id: 'b23', rarity: 'S', name: '胜率欺诈', icon: 'fa-user-secret', color: '#A855F7', desc: '胜率最低，却不是垫底' },
-            { id: 'b24', rarity: 'SS', name: '冰火交响', icon: 'fa-temperature-half', color: '#D946EF', desc: '包揽最高赢分与最高扣分' },
-            { id: 'b25', rarity: 'S', name: '佛系赢家', icon: 'fa-leaf', color: '#10B981', desc: '胜率过半但均赢分最小' },
-            { id: 'b26', rarity: 'SS', name: '孤独求败', icon: 'fa-user-ninja', color: '#1F2937', desc: '全场唯一总分正数' },
-            { id: 'b27', rarity: 'SS', name: '众矢之的', icon: 'fa-bullseye', color: '#EF4444', desc: '全场唯一总分负数' },
-            { id: 'b28', rarity: 'SS', name: '绝对零度', icon: 'fa-snowflake', color: '#93C5FD', desc: '打完多局总分奇迹般为0' },
-            { id: 'b29', rarity: 'S', name: '遥遥领先', icon: 'fa-binoculars', color: '#FFD700', desc: '总分超过第二名的两倍' },
-            { id: 'b30', rarity: 'SS', name: '完美控分', icon: 'fa-bullseye', color: '#10B981', desc: '总分恰好等于最高单局分' },
-            { id: 'b31', rarity: 'SS', name: '天选豹子', icon: 'fa-7', color: '#FCD34D', desc: '总分出现666,888等数字' },
-            { id: 'b32', rarity: 'SS', name: '恶魔之印', icon: 'fa-ghost', color: '#7C3AED', desc: '总分出现-44,-250等数字' },
-            { id: 'b33', rarity: 'S', name: '一人之下', icon: 'fa-user-tie', color: '#FDE047', desc: '总分第二且分差极小' },
-            { id: 'b34', rarity: 'A', name: '黄金绿叶', icon: 'fa-2', color: '#A3E635', desc: '单局拿第二名次数最多' },
-            { id: 'b35', rarity: 'S', name: '白忙一场', icon: 'fa-battery-empty', color: '#9CA3AF', desc: '赢局最多但总分却为负' },
-            { id: 'b36', rarity: 'S', name: '欧皇附体', icon: 'fa-clover', color: '#4ADE80', desc: '赢局最少但总分却为正' },
-            { id: 'b37', rarity: 'S', name: '苟分大师', icon: 'fa-shield-dog', color: '#FBBF24', desc: '从未第一或垫底且为正' },
-            { id: 'b38', rarity: 'S', name: '高开低走', icon: 'fa-arrow-trend-down', color: '#F87171', desc: '前期第一，现在倒数第一' },
-            { id: 'b39', rarity: 'SS', name: '厚积薄发', icon: 'fa-seedling', color: '#34D399', desc: '前期垫底，现在全场第一' },
-            { id: 'b40', rarity: 'A', name: '见好就收', icon: 'fa-person-running', color: '#60A5FA', desc: '大赢之后立刻逃避对局' },
-            { id: 'b41', rarity: 'A', name: '暴击狂魔', icon: 'fa-hammer', color: '#FB923C', desc: '平均每赢一局加分最高' },
-            { id: 'b42', rarity: 'A', name: '重伤专员', icon: 'fa-crutch', color: '#F43F5E', desc: '平均每输一局扣分最狠' },
-            { id: 'b43', rarity: 'S', name: '铁壁防守', icon: 'fa-shield-halved', color: '#64748B', desc: '输局最多却不是倒数第一' },
-            { id: 'b44', rarity: 'SS', name: '单点爆破', icon: 'fa-bomb', color: '#DC2626', desc: '单局赢分占了总分80%以上' },
-            { id: 'b45', rarity: 'SS', name: '不败金身', icon: 'fa-shield-virus', color: '#FCD34D', desc: '参局≥5且从未拿过负分' },
-            { id: 'b46', rarity: 'SS', name: '无人生还', icon: 'fa-heart-crack', color: '#111827', desc: '参局≥5且从未拿过正分' },
-            { id: 'b47', rarity: 'S', name: '岁月静好', icon: 'fa-spa', color: '#7DD3FC', desc: '分数起伏极小从不打大牌' },
-            { id: 'b48', rarity: 'S', name: '大出血', icon: 'fa-droplet', color: '#E11D48', desc: '一把输掉之前攒的所有正分' },
-            { id: 'b49', rarity: 'S', name: '惊天大锅', icon: 'fa-building-shield', color: '#D97706', desc: '一己之力承担单局80%负分' },
-            { id: 'b50', rarity: 'SS', name: '昨日重现', icon: 'fa-clock-rotate-left', color: '#C084FC', desc: '连续两局分数完全一模一样' },
-            { id: 'b51', rarity: 'SS', name: '能量守恒', icon: 'fa-scale-unbalanced', color: '#38BDF8', desc: '赢的分恰好等于上局输的分' },
-            { id: 'b52', rarity: 'SS', name: '精准狙击', icon: 'fa-crosshairs', color: '#EF4444', desc: '第一名惨败那局刚好是你赢' },
-            { id: 'b53', rarity: 'S', name: '精准扶贫', icon: 'fa-hand-holding-medical', color: '#10B981', desc: '给倒数第一名送分次数最多' },
-            { id: 'b54', rarity: 'SS', name: '雨后春笋', icon: 'fa-plant-wilt', color: '#84CC16', desc: '极低胜率下突然打出连胜' },
-            { id: 'b55', rarity: 'SS', name: '黄金分割', icon: 'fa-scissors', color: '#F59E0B', desc: '总分恰好是第一名的一半' },
-            { id: 'b56', rarity: 'SS', name: '同归于尽', icon: 'fa-skull-crossbones', color: '#52525B', desc: '与第一名同时扣局内最惨负分' },
-            { id: 'b57', rarity: 'SS', name: '回文美学', icon: 'fa-text-width', color: '#E879F9', desc: '总分是≥3位的回文数' },
-            { id: 'b58', rarity: 'SS', name: '质数法则', icon: 'fa-hashtag', color: '#F472B6', desc: '总分绝对值是≥11的质数' },
-            { id: 'b59', rarity: 'SS', name: '整整齐齐', icon: 'fa-grip', color: '#34D399', desc: '所有分数个位数全是0' },
-            { id: 'b60', rarity: 'SS', name: '一线生机', icon: 'fa-ruler', color: '#A78BFA', desc: '当前累计总分恰好为 +1' },
-            { id: 'b61', rarity: 'SS', name: '一步之遥', icon: 'fa-shoe-prints', color: '#9CA3AF', desc: '当前累计总分恰好为 -1' },
-            { id: 'b62', rarity: 'SS', name: '寂寞赢家', icon: 'fa-wind', color: '#94A3B8', desc: '赢了某一局但加分为0' },
-            { id: 'b63', rarity: 'SS', name: '绝境逢生', icon: 'fa-person-arrow-up-from-line', color: '#22D3EE', desc: '狂输50分后紧接着暴赚50分' },
-            { id: 'b64', rarity: 'SS', name: '首尾呼应', icon: 'fa-arrows-left-right', color: '#FCD34D', desc: '最新一局等于第一局的得分' }
+const badgeDefs =[
+            { id: 'b1', rarity: 'SSS', name: '绝对统治', icon: 'fa-crown', color: '#FFD700', desc: '累计总分全场最高' },
+            { id: 'b2', rarity: 'SSS', name: '终极背锅', icon: 'fa-poop', color: '#8B4513', desc: '累计总分全场最低' },
+            { id: 'b3', rarity: 'SSS', name: '孤独求败', icon: 'fa-user-ninja', color: '#1F2937', desc: '全场唯一正分玩家' },
+            { id: 'b4', rarity: 'SSS', name: '嗜血杀神', icon: 'fa-skull-crossbones', color: '#DC2626', desc: '累计淘汰其他玩家最多' },
+            { id: 'b5', rarity: 'SSS', name: '滴血认亲', icon: 'fa-droplet', color: '#E11D48', desc: '累计拿到一血出局最多' },
+            { id: 'b6', rarity: 'SS', name: '连胜天尊', icon: 'fa-fire-flame-curved', color: '#FF4500', desc: '保持连胜局数全场第一' },
+            { id: 'b7', rarity: 'SS', name: '散财童子', icon: 'fa-coins', color: '#FCD34D', desc: '单局扣除负分全场最高' },
+            { id: 'b8', rarity: 'SS', name: '丝血反杀', icon: 'fa-heart-pulse', color: '#F43F5E', desc: '曾跌落垫底后逆袭第一' },
+            { id: 'b9', rarity: 'SS', name: '冰火交响', icon: 'fa-temperature-half', color: '#D946EF', desc: '包揽最高赢分与最惨扣分' },
+            { id: 'b10', rarity: 'SS', name: '众矢之的', icon: 'fa-bullseye', color: '#EF4444', desc: '全场唯一负分玩家' },
+            { id: 'b11', rarity: 'SS', name: '完美控分', icon: 'fa-check-double', color: '#10B981', desc: '总分恰好等于单局最高分' },
+            { id: 'b12', rarity: 'SS', name: '不败金身', icon: 'fa-shield-virus', color: '#F59E0B', desc: '参局多次从未被扣过分' },
+            { id: 'b13', rarity: 'SS', name: '连环杀手', icon: 'fa-user-slash', color: '#7F1D1D', desc: '单局同杀淘汰玩家最多' },
+            { id: 'b14', rarity: 'SS', name: '毫发无损', icon: 'fa-shield-cat', color: '#34D399', desc: '参与多局从未被他人淘汰' },
+            { id: 'b15', rarity: 'SS', name: '时间刺客', icon: 'fa-hourglass-end', color: '#6366F1', desc: '耗尽时间结束的对局赢最多' },
+            { id: 'b16', rarity: 'S', name: '究极爆发', icon: 'fa-meteor', color: '#FF8C00', desc: '创造单局最高正分记录' },
+            { id: 'b17', rarity: 'S', name: '无底深渊', icon: 'fa-arrow-trend-down', color: '#B91C1C', desc: '保持连败局数全场第一' },
+            { id: 'b18', rarity: 'S', name: '究极打工', icon: 'fa-briefcase', color: '#F97316', desc: '胜率最高但总分不是第一' },
+            { id: 'b19', rarity: 'S', name: '绝对零度', icon: 'fa-snowflake', color: '#7DD3FC', desc: '激战多局后总分奇迹为零' },
+            { id: 'b20', rarity: 'S', name: '遥遥领先', icon: 'fa-binoculars', color: '#FDE047', desc: '总分超过第二名玩家两倍' },
+            { id: 'b21', rarity: 'S', name: '厚积薄发', icon: 'fa-seedling', color: '#84CC16', desc: '前期垫底现在全场第一' },
+            { id: 'b22', rarity: 'S', name: '无人生还', icon: 'fa-heart-crack', color: '#111827', desc: '参局多次从未拿过正分' },
+            { id: 'b23', rarity: 'S', name: '绝境逢生', icon: 'fa-person-arrow-up-from-line', color: '#22D3EE', desc: '狂输后紧接着暴赚回血' },
+            { id: 'b24', rarity: 'S', name: '擒贼擒王', icon: 'fa-chess-king', color: '#A855F7', desc: '淘汰总分第一名玩家最多' },
+            { id: 'b25', rarity: 'S', name: '医学奇迹', icon: 'fa-staff-snake', color: '#10B981', desc: '经历被复活后反败为胜' },
+            { id: 'b26', rarity: 'A', name: '稳如老狗', icon: 'fa-scale-balanced', color: '#4ADE80', desc: '每局正分起伏极小极平稳' },
+            { id: 'b27', rarity: 'A', name: '大慈善家', icon: 'fa-hand-holding-heart', color: '#F472B6', desc: '单局垫底次数全场最多' },
+            { id: 'b28', rarity: 'A', name: '乐极生悲', icon: 'fa-masks-theater', color: '#8B5CF6', desc: '上局暴赚之后下局暴亏' },
+            { id: 'b29', rarity: 'A', name: '胜率欺诈', icon: 'fa-user-secret', color: '#374151', desc: '胜率极低总分却没有垫底' },
+            { id: 'b30', rarity: 'A', name: '天选豹子', icon: 'fa-dice-three', color: '#FBBF24', desc: '总分出现罕见豹子号数字' },
+            { id: 'b31', rarity: 'A', name: '恶魔之印', icon: 'fa-ghost', color: '#9333EA', desc: '总分出现极其阴间的数字' },
+            { id: 'b32', rarity: 'A', name: '欧皇附体', icon: 'fa-clover', color: '#34D399', desc: '赢局最少但总分却为正' },
+            { id: 'b33', rarity: 'A', name: '暴击狂魔', icon: 'fa-hammer', color: '#FB923C', desc: '平均赢一局加分全场最高' },
+            { id: 'b34', rarity: 'A', name: '单点爆破', icon: 'fa-bomb', color: '#EF4444', desc: '单局赢分占总分八成以上' },
+            { id: 'b35', rarity: 'A', name: '惊天大锅', icon: 'fa-building-shield', color: '#D97706', desc: '单局独揽全场八成的负分' },
+            { id: 'b36', rarity: 'A', name: '精准狙击', icon: 'fa-crosshairs', color: '#BE123C', desc: '第一名惨败那局刚好你赢' },
+            { id: 'b37', rarity: 'A', name: '精准扶贫', icon: 'fa-hand-holding-medical', color: '#14B8A6', desc: '给倒数第一名送分最多' },
+            { id: 'b38', rarity: 'A', name: '一线生机', icon: 'fa-ruler', color: '#A78BFA', desc: '累计总分恰好为一分' },
+            { id: 'b39', rarity: 'A', name: '痛打落水', icon: 'fa-gavel', color: '#9D174D', desc: '淘汰总分垫底者次数最多' },
+            { id: 'b40', rarity: 'A', name: '反向猎杀', icon: 'fa-khanda', color: '#0369A1', desc: '低分逆袭淘汰高分玩家最多' },
+            { id: 'b41', rarity: 'B', name: '锋芒毕露', icon: 'fa-bolt', color: '#FCD34D', desc: '累计当赢家的次数全场最多' },
+            { id: 'b42', rarity: 'B', name: '差之毫厘', icon: 'fa-ruler-horizontal', color: '#2DD4BF', desc: '输过扣分最少的一局' },
+            { id: 'b43', rarity: 'B', name: '步步高升', icon: 'fa-stairs', color: '#4ADE80', desc: '连赢且加分金额递增' },
+            { id: 'b44', rarity: 'B', name: '自由落体', icon: 'fa-parachute-box', color: '#FB7185', desc: '连输且扣分金额递增' },
+            { id: 'b45', rarity: 'B', name: '佛系赢家', icon: 'fa-leaf', color: '#A3E635', desc: '胜率过半但均赢分最小' },
+            { id: 'b46', rarity: 'B', name: '一人之下', icon: 'fa-user-tie', color: '#60A5FA', desc: '总分第二且与第一分差极小' },
+            { id: 'b47', rarity: 'B', name: '白忙一场', icon: 'fa-battery-empty', color: '#9CA3AF', desc: '赢局最多但总分却为负' },
+            { id: 'b48', rarity: 'B', name: '苟分大师', icon: 'fa-shield-dog', color: '#FBBF24', desc: '从未第一或垫底且总分为正' },
+            { id: 'b49', rarity: 'B', name: '重伤专员', icon: 'fa-crutch', color: '#E11D48', desc: '平均每输一局扣分最狠' },
+            { id: 'b50', rarity: 'B', name: '大出血案', icon: 'fa-droplet-slash', color: '#BE123C', desc: '一局输掉之前攒的所有正分' },
+            { id: 'b51', rarity: 'B', name: '能量守恒', icon: 'fa-scale-unbalanced', color: '#38BDF8', desc: '赢的分恰好等于上局输的分' },
+            { id: 'b52', rarity: 'B', name: '雨后春笋', icon: 'fa-plant-wilt', color: '#84CC16', desc: '极低胜率下突然打出连胜' },
+            { id: 'b53', rarity: 'B', name: '黄金分割', icon: 'fa-scissors', color: '#FDE047', desc: '总分恰好是第一名的一半' },
+            { id: 'b54', rarity: 'B', name: '一步之遥', icon: 'fa-shoe-prints', color: '#9CA3AF', desc: '累计总分恰好为负一分' },
+            { id: 'b55', rarity: 'B', name: '极限互爆', icon: 'fa-explosion', color: '#F97316', desc: '凶手和自己在这局双双淘汰' },
+            { id: 'b56', rarity: 'B', name: '恩将仇报', icon: 'fa-hand-back-fist', color: '#9333EA', desc: '淘汰了曾复活过自己的人' },
+            { id: 'b57', rarity: 'B', name: '宿命之敌', icon: 'fa-user-injured', color: '#6B7280', desc: '被同一个玩家淘汰次数最多' },
+            { id: 'b58', rarity: 'B', name: '压轴出场', icon: 'fa-ticket', color: '#F472B6', desc: '存活到最后出局的次数最多' },
+            { id: 'b59', rarity: 'B', name: '浪费资源', icon: 'fa-trash', color: '#9CA3AF', desc: '复活后反而被扣了更多的分' },
+            { id: 'b60', rarity: 'B', name: '罚牌大户', icon: 'fa-layer-group', color: '#EF4444', desc: '单次被罚牌张数全场最高' },
+            { id: 'b61', rarity: 'C', name: '究极劳模', icon: 'fa-calendar-check', color: '#8B5CF6', desc: '全场参与局数全场最多' },
+            { id: 'b62', rarity: 'C', name: '极速超车', icon: 'fa-rocket', color: '#06B6D4', desc: '最新一局首次反超登顶第一' },
+            { id: 'b63', rarity: 'C', name: '边缘看客', icon: 'fa-mug-hot', color: '#A8A29E', desc: '全场逃避对局不参与最多' },
+            { id: 'b64', rarity: 'C', name: '心跳玩家', icon: 'fa-wave-square', color: '#EC4899', desc: '分数起伏方差全场最大' },
+            { id: 'b65', rarity: 'C', name: '黄金绿叶', icon: 'fa-2', color: '#A3E635', desc: '单局拿第二名次数全场最多' },
+            { id: 'b66', rarity: 'C', name: '高开低走', icon: 'fa-arrow-down-long', color: '#EF4444', desc: '曾当第一现沦为倒数第一' },
+            { id: 'b67', rarity: 'C', name: '铁壁防守', icon: 'fa-shield-halved', color: '#64748B', desc: '输局最多却不是倒数第一' },
+            { id: 'b68', rarity: 'C', name: '昨日重现', icon: 'fa-clock-rotate-left', color: '#C084FC', desc: '连续两局分数完全一模一样' },
+            { id: 'b69', rarity: 'C', name: '回文美学', icon: 'fa-text-width', color: '#E879F9', desc: '累计总分是多位的回文数' },
+            { id: 'b70', rarity: 'C', name: '整整齐齐', icon: 'fa-grip', color: '#34D399', desc: '参与局数所有得分尾数是零' },
+            { id: 'b71', rarity: 'C', name: '一击必杀', icon: 'fa-wand-magic-sparkles', color: '#8B5CF6', desc: '用最少罚牌淘汰了最多玩家' },
+            { id: 'b72', rarity: 'C', name: '辣手摧花', icon: 'fa-hand-fist', color: '#B91C1C', desc: '专注淘汰某一特定玩家最多' },
+            { id: 'b73', rarity: 'C', name: '天谴之子', icon: 'fa-cloud-bolt', color: '#6B7280', desc: '累计被淘汰次数全场最多' },
+            { id: 'b74', rarity: 'C', name: '光速下班', icon: 'fa-bolt-lightning', color: '#FDE047', desc: '游戏刚开局瞬间送出第一血' },
+            { id: 'b75', rarity: 'C', name: '稳居中游', icon: 'fa-arrows-down-to-line', color: '#9CA3AF', desc: '淘汰顺位始终处于中间最多' },
+            { id: 'b76', rarity: 'C', name: '熬鹰大师', icon: 'fa-clock', color: '#F97316', desc: '参与的对局平均耗时最长' },
+            { id: 'b77', rarity: 'C', name: '华佗在世', icon: 'fa-kit-medical', color: '#10B981', desc: '所在局有玩家被复活次数最多' },
+            { id: 'b78', rarity: 'C', name: '秽土转生', icon: 'fa-recycle', color: '#22C55E', desc: '被淘汰后又被复活的次数最多' },
+            { id: 'b79', rarity: 'C', name: '满血复活', icon: 'fa-battery-full', color: '#84CC16', desc: '被复活后最终居然不扣分' },
+            { id: 'b80', rarity: 'C', name: '首尾呼应', icon: 'fa-arrows-left-right', color: '#FCD34D', desc: '最新一局等于首局的得分' },
+            { id: 'b81', rarity: 'D', name: '极限躺赢', icon: 'fa-bed', color: '#A1A1AA', desc: '赢过加分金额最少的一局' },
+            { id: 'b82', rarity: 'D', name: '晚节不保', icon: 'fa-person-falling', color: '#EF4444', desc: '最新一局首次跌至全场垫底' },
+            { id: 'b83', rarity: 'D', name: '胜负交替', icon: 'fa-arrows-up-down', color: '#06B6D4', desc: '频繁交替赢一局输一局' },
+            { id: 'b84', rarity: 'D', name: '见好就收', icon: 'fa-person-running', color: '#60A5FA', desc: '大赢之后立刻选择了逃跑' },
+            { id: 'b85', rarity: 'D', name: '岁月静好', icon: 'fa-spa', color: '#7DD3FC', desc: '分数起伏极小从不打大牌' },
+            { id: 'b86', rarity: 'D', name: '质数法则', icon: 'fa-hashtag', color: '#F472B6', desc: '累计总分是纯粹的质数' },
+            { id: 'b87', rarity: 'D', name: '寂寞赢家', icon: 'fa-wind', color: '#94A3B8', desc: '赢了某一局但加分为零' },
+            { id: 'b88', rarity: 'D', name: '意外走火', icon: 'fa-gun', color: '#78716C', desc: '自己淘汰自己次数最多' },
+            { id: 'b89', rarity: 'D', name: '死于非命', icon: 'fa-skull', color: '#52525B', desc: '遭遇极其罕见特殊淘汰最多' },
+            { id: 'b90', rarity: 'D', name: '头铁硬送', icon: 'fa-helmet-safety', color: '#F59E0B', desc: '连续多局拿到一二血被淘汰' },
+            { id: 'b91', rarity: 'D', name: '绝杀时刻', icon: 'fa-stopwatch', color: '#EF4444', desc: '倒计时极少时间绝杀赢牌' },
+            { id: 'b92', rarity: 'D', name: '闪电战神', icon: 'fa-jet-fighter', color: '#3B82F6', desc: '开局极短时间内极速赢牌' },
+            { id: 'b93', rarity: 'D', name: '准时下班', icon: 'fa-briefcase', color: '#8B5CF6', desc: '参与的对局平均耗时最短' },
+            { id: 'b94', rarity: 'D', name: '超时惩罚', icon: 'fa-hourglass', color: '#9CA3AF', desc: '因为时间耗尽被系统淘汰最多' },
+            { id: 'b95', rarity: 'D', name: '垂死病中', icon: 'fa-bed-pulse', color: '#BE123C', desc: '被复活后仍在这局惨遭淘汰' },
+            { id: 'b96', rarity: 'D', name: '绝命毒师', icon: 'fa-flask', color: '#10B981', desc: '用特殊手段淘汰玩家最多' },
+            { id: 'b97', rarity: 'D', name: '免死金牌', icon: 'fa-medal', color: '#FDE047', desc: '身为最后赢家却一分没拿' },
+            { id: 'b98', rarity: 'D', name: '断层遗憾', icon: 'fa-ban', color: '#EF4444', desc: '距离打破最高连胜仅差一局' },
+            { id: 'b99', rarity: 'D', name: '毫厘之差', icon: 'fa-ruler-vertical', color: '#38BDF8', desc: '差一分就能反超上一名玩家' },
+            { id: 'b100', rarity: 'D', name: '默默无闻', icon: 'fa-mask', color: '#6B7280', desc: '全场获得奖杯数量全场最少' }
         ];
 
-const rarityColors = {
+        const rarityColors = {
             'SSS': '#EF4444', // SSS级大红色
-            'SS': '#FF00FF',  // SS级洋红色
+            'SS': '#D946EF',  // SS级洋红色
             'S': '#F59E0B',   // S级橙色
             'A': '#3B82F6',   // A级蓝色
             'B': '#10B981',   // B级绿色
-            'C': '#9CA3AF'    // C级灰色
+            'C': '#6B7280',   // C级灰色
+            'D': '#9CA3AF'    // D级浅灰
         };
 
         // 魔法：自动按稀有度从高到低排序所有奖杯
-        const raritySortMap = { 'SSS': 6, 'SS': 5, 'S': 4, 'A': 3, 'B': 2, 'C': 1 };
+        const raritySortMap = { 'SSS': 7, 'SS': 6, 'S': 5, 'A': 4, 'B': 3, 'C': 2, 'D': 1 };
         badgeDefs.sort((a, b) => raritySortMap[b.rarity] - raritySortMap[a.rarity]);
 
         let unlockedBadges = {}; 
@@ -3372,273 +3407,346 @@ function renderSessionSection() {
             return str === str.split('').reverse().join('');
         };
 
-        function renderBadgeWall() {
+function renderBadgeWall() {
             const active = gameData.players.filter(p => p.isActive);
             const rounds = viewRounds;
             const totalRounds = rounds.length;
+
+            // 初始化奖杯状态仓库
             unlockedBadges = {};
             badgeDefs.forEach(b => unlockedBadges[b.id] = new Set());
+            window.badgeDynamicData = {}; // 用于给弹窗存储动态文案
 
-            const awardIfUnique = (badgeId, condFn) => {
-                let matched = active.filter(condFn);
-                if (matched.length === 1) unlockedBadges[badgeId].add(matched[0].id);
-            };
+            if (active.length === 0 || totalRounds === 0) return; // 没有数据就不算
 
+            // ==========================================
+            // 🤖 第一阶段：战报数据大扫荡 (为每位玩家建立精密档案)
+            // ==========================================
             active.forEach(p => {
-                p._secBests = 0;
-                p._jingZhunFuPin = 0;
-                p._jiMoYingJia = false;
+                p._s = {
+                    id: p.id,
+                    kills: 0, killedByTarget: {}, firstBloods: 0, lastBloods: 0,
+                    revived: 0, timeOutKills: 0, timeOutDeaths: 0,
+                    flashWins: 0, clutchWins: 0, totalTime: 0, timeGames: 0,
+                    suicides: 0, multiKillsMax: 0, escapes: 0, zeroScoreWins: 0,
+                    neverKilled: true, scoreHistory:[], penaltyCards: 0,
+                    specialKills: 0, lateGameWins: 0, maxPosScore: 0, minNegScore: 0,
+                    avgWin: 0, avgLose: 0, winCount: 0, loseCount: 0
+                };
             });
 
-            if (active.length > 0 && totalRounds > 0) {
-                let maxTotal = Math.max(...active.map(p => p.total));
-                let minTotal = Math.min(...active.map(p => p.total));
-                let sortedTotals = active.map(p => p.total).sort((a,b)=>b-a);
-                let secondMaxTotal = sortedTotals[1] || 0;
-                
-                let globalMaxStreak = Math.max(...active.map(p => p.maxStreak));
-                let globalMaxLoseStreak = Math.max(...active.map(p => p.maxLoseStreak));
-                let globalMaxSingle = Math.max(...active.map(p => p.maxSingle));
-                let globalMinSingle = Math.min(...active.map(p => p.minSingle));
-                let maxWins = Math.max(...active.map(p => p.wins));
-                let maxGamesPlayed = Math.max(...active.map(p => p.gamesPlayed));
-                let minGamesPlayed = Math.min(...active.map(p => p.gamesPlayed));
-                let maxLasts = Math.max(...active.map(p => p.last));
-                
-                let allPosScores = [], allNegScores =[];
-                rounds.forEach(r => active.forEach(p => {
-                    let c = r.changes[p.id] || 0;
-                    if (c > 0) allPosScores.push(c);
-                    if (c < 0) allNegScores.push(c);
-                }));
-                let globalMinPosScore = allPosScores.length ? Math.min(...allPosScores) : Infinity;
-                let globalMaxNegScore = allNegScores.length ? Math.max(...allNegScores) : -Infinity;
-
-                let curTotals = {}; active.forEach(p => curTotals[p.id] = 0);
-                let roundStats = rounds.map(r => {
-                    let maxPos = 0, minNeg = 0;
-                    let uniqueScores = Array.from(new Set(Object.values(r.changes))).sort((a,b)=>b-a);
-                    let secBest = uniqueScores[1];
-                    active.forEach(p => {
-                        let c = r.changes[p.id] || 0;
-                        curTotals[p.id] += c;
-                        if (c > maxPos) maxPos = c;
-                        if (c < minNeg) minNeg = c;
-                        if (secBest !== undefined && c === secBest) p._secBests += 1;
-                    });
-                    let roundMinTotal = Math.min(...active.map(p=>curTotals[p.id]));
-                    let roundMaxTotal = Math.max(...active.map(p=>curTotals[p.id]));
-                    return {
-                        maxPos, minNeg,
-                        minTotalIds: active.filter(p=>curTotals[p.id]===roundMinTotal).map(p=>p.id),
-                        maxTotalIds: active.filter(p=>curTotals[p.id]===roundMaxTotal).map(p=>p.id),
-                        changes: r.changes,
-                        roundNum: r.round
-                    };
-                });
-
-                let totalsR3 = {}; active.forEach(p => totalsR3[p.id] = 0);
-                if (totalRounds >= 3) {
-                    rounds.slice(0,3).forEach(r => active.forEach(p => totalsR3[p.id] += (r.changes[p.id]||0)));
-                }
-                let maxR3 = totalRounds >= 3 ? Math.max(...Object.values(totalsR3)) : 0;
-                let minR3 = totalRounds >= 3 ? Math.min(...Object.values(totalsR3)) : 0;
-
-                let maxTotalPlayer = active.find(p=>p.total===maxTotal);
-                let minTotalPlayer = active.find(p=>p.total===minTotal);
+            // 遍历所有局数，疯狂提取数据
+            rounds.forEach((r, idx) => {
+                let rScores = Object.values(r.changes);
+                let roundMax = Math.max(...rScores);
+                let roundMin = Math.min(...rScores);
 
                 active.forEach(p => {
-                    let changes = rounds.map(r => r.changes[p.id] || 0).filter(c => c !== 0);
-                    p._allChanges = changes;
-                    if(changes.length > 1) {
-                        let mean = changes.reduce((a,b)=>a+b,0) / changes.length;
-                        p._sd = Math.sqrt(changes.reduce((a,b)=>a+Math.pow(b-mean,2),0) / changes.length);
-                    } else p._sd = -1;
-
-                    p._winRate = p.gamesPlayed > 0 ? p.wins / p.gamesPlayed : 0;
-                    let posC = changes.filter(c => c > 0);
-                    let negC = changes.filter(c => c < 0);
-                    p._avgWin = posC.length > 0 ? posC.reduce((a,b)=>a+b,0)/posC.length : 0;
-                    p._avgLose = negC.length > 0 ? negC.reduce((a,b)=>a+Math.abs(b),0)/negC.length : 0;
-                    p._lostCounts = negC.length;
-
-                    p._wasLastBefore = roundStats.slice(0, -1).some(rs => rs.minTotalIds.includes(p.id));
-                    p._isFirstLatest = totalRounds > 0 && roundStats[totalRounds-1].maxTotalIds.includes(p.id);
-                    p._wasFirstBefore = roundStats.slice(0, -1).some(rs => rs.maxTotalIds.includes(p.id));
-                    p._isLastLatest = totalRounds > 0 && roundStats[totalRounds-1].minTotalIds.includes(p.id);
-
-                    p._maxPosThenMaxNeg = false;
-                    for(let i=0; i<totalRounds-1; i++) {
-                        let r1 = roundStats[i], r2 = roundStats[i+1];
-                        if ((r1.changes[p.id]||0) === r1.maxPos && r1.maxPos > 0 &&
-                            (r2.changes[p.id]||0) === r2.minNeg && r2.minNeg < 0) { p._maxPosThenMaxNeg = true; break; }
-                    }
-
-                    let altCount=0, lastSign=0, incW=0, maxIncW=0, decL=0, maxDecL=0, prevC=null;
-                    p._jianHaoJiuShou = false; p._daChuXue = false; p._zuoRiChongXian = false; 
-                    p._nengLiangShouHeng = false; p._jueJingFengSheng = false;
+                    let s = p._s;
+                    let c = r.changes[p.id];
                     
-                    let curTForBleed = 0;
-                    rounds.forEach((r, idx) => {
-                        let c = r.changes[p.id] || 0; 
-                        let nextC = idx < totalRounds-1 ? (rounds[idx+1].changes[p.id]||0) : null;
-
-                        if (c > 30 && nextC === 0) p._jianHaoJiuShou = true;
-                        if (curTForBleed > 0 && c < 0 && Math.abs(c) > curTForBleed && (curTForBleed+c) < 0) p._daChuXue = true;
-                        curTForBleed += c;
-
-                        if (c===0) return;
-                        let sign = c>0?1:-1; if (lastSign!==0 && sign!==lastSign) altCount++; lastSign = sign;
-                        if (c>0 && prevC!==null && prevC>0 && c>prevC) { incW++; if(incW>maxIncW) maxIncW=incW; } else if(c>0) incW=1;
-                        if (c<0 && prevC!==null && prevC<0 && c<prevC) { decL++; if(decL>maxDecL) maxDecL=decL; } else if(c<0) decL=1;
-                        
-                        if (prevC!==null && c === prevC) p._zuoRiChongXian = true;
-                        if (prevC!==null && prevC < 0 && c > 0 && Math.abs(prevC) === c) p._nengLiangShouHeng = true;
-                        if (prevC!==null && prevC <= -50 && c >= 50) p._jueJingFengSheng = true;
-
-                        prevC = c;
-                    });
-                    p._altCount = altCount; p._maxIncWins = maxIncW; p._maxDecLosses = maxDecL;
-
-                    p._jingTianDaGuo = false; p._jingZhunJuJi = false; p._tongGuiYuJin = false;
-                });
-
-                rounds.forEach(r => {
-                    let lC = Object.values(r.changes).filter(c=>c<0);
-                    let sumL = lC.reduce((a,b)=>a+Math.abs(b),0);
-                    if(sumL > 0) active.forEach(p => { if((r.changes[p.id]||0)<0 && Math.abs(r.changes[p.id]||0)/sumL >= 0.8) p._jingTianDaGuo = true; });
-
-                    if(maxTotalPlayer && (r.changes[maxTotalPlayer.id]||0) === maxTotalPlayer.minSingle && maxTotalPlayer.minSingle < 0) {
-                        active.forEach(p => { if ((r.changes[p.id]||0) > 0) p._jingZhunJuJi = true; });
+                    if (c !== undefined) {
+                        s.scoreHistory.push(c);
+                        if (c > 0) { s.winCount++; s.avgWin += c; if (c > s.maxPosScore) s.maxPosScore = c; }
+                        if (c < 0) { s.loseCount++; s.avgLose += Math.abs(c); if (c < s.minNegScore) s.minNegScore = c; }
+                    } else {
+                        // 逃避对局记录
+                        if (idx > 0 && rounds[idx-1].changes[p.id] > 0) s.escapes++; 
                     }
-                    if(minTotalPlayer) {
-                        active.forEach(p => { if(p.id !== minTotalPlayer.id && (r.changes[p.id]||0) < 0 && (r.changes[minTotalPlayer.id]||0) > 0) p._jingZhunFuPin++; });
-                    }
-                    if(maxTotalPlayer && (r.changes[maxTotalPlayer.id]||0) < 0) {
-                        let minC = Math.min(...Object.values(r.changes));
-                        if((r.changes[maxTotalPlayer.id]||0) === minC) {
-                            active.forEach(p => { if(p.id !== maxTotalPlayer.id && (r.changes[p.id]||0) === minC) p._tongGuiYuJin = true; });
+
+                    if (r.v2Stats) {
+                        // 时间统计
+                        if (r.v2Stats.timerRemainAtEnd !== undefined) {
+                            s.totalTime += (480 - r.v2Stats.timerRemainAtEnd);
+                            s.timeGames++;
+                            if (r.winner === p.id) {
+                                if (480 - r.v2Stats.timerRemainAtEnd < 30) s.flashWins++; // 开局30秒内闪电战
+                                if (r.v2Stats.timerRemainAtEnd > 0 && r.v2Stats.timerRemainAtEnd <= 10) s.clutchWins++; // 剩10秒内绝杀
+                            }
+                            // 超时统计
+                            if (r.v2Stats.timerRemainAtEnd === 0 && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]) s.timeOutDeaths++;
+                        }
+
+                        // 复活统计
+                        if (r.v2Stats.revivedPlayerId === p.id) s.revived++;
+
+                        // 淘汰统计
+                        if (r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]) {
+                            s.neverKilled = false;
+                            let details = r.v2Stats.eliminationDetails[p.id] || {};
+                            if (details.cards) s.penaltyCards += parseInt(details.cards);
+                            
+                            let killerId = details.killerId;
+                            if (killerId === p.id) s.suicides++;
+                            else if (killerId) {
+                                s.killedByTarget[killerId] = (s.killedByTarget[killerId] || 0) + 1;
+                                let kp = active.find(x => x.id === killerId);
+                                if (kp) {
+                                    kp._s.kills++;
+                                    // 统计单局多杀
+                                    kp._s._tempKills = (kp._s._tempKills || 0) + 1;
+                                }
+                            }
+                            
+                            let mName = r.v2Stats.eliminated[p.id];
+                            if (mName && mName.includes('特殊')) s.specialKills++;
                         }
                     }
-                    active.forEach(p => { if(r.winner === p.id && (r.changes[p.id]||0) === 0) p._jiMoYingJia = true; });
                 });
 
-                let validSds = active.filter(p => p._sd >= 0).map(p => p._sd);
-                let minSdGlobal = validSds.length ? Math.min(...validSds) : -1;
-                let maxSdGlobal = validSds.length ? Math.max(...validSds) : -1;
-                let maxAlt = Math.max(...active.map(p=>p._altCount));
-                let maxInc = Math.max(...active.map(p=>p._maxIncWins));
-                let maxDec = Math.max(...active.map(p=>p._maxDecLosses));
-                let maxWinRate = Math.max(...active.map(p=>p._winRate));
-                let minWinRate = Math.min(...active.map(p=>p._winRate));
-                
-                let maxSecBests = Math.max(...active.map(p=>p._secBests||0));
-                let maxAvgWin = Math.max(...active.map(p=>p._avgWin));
-                let maxAvgLose = Math.max(...active.map(p=>p._avgLose));
-                let maxLosts = Math.max(...active.map(p=>p._lostCounts));
-                let maxFuPin = Math.max(...active.map(p=>p._jingZhunFuPin));
-                let minAvgWinScore = Math.min(...active.filter(p=>p._winRate>0.5 && p._avgWin>0).map(p=>p._avgWin));
-
-                awardIfUnique('b1', p => p.total === maxTotal && p.total > 0);
-                awardIfUnique('b2', p => p.maxStreak === globalMaxStreak && p.maxStreak > 1);
-                awardIfUnique('b3', p => p.maxSingle === globalMaxSingle && p.maxSingle > 0);
-                awardIfUnique('b4', p => p._sd === minSdGlobal && p._sd >= 0);
-                awardIfUnique('b5', p => p.wins === maxWins && p.wins > 0);
-                awardIfUnique('b6', p => p.gamesPlayed === maxGamesPlayed && p.gamesPlayed > 0);
-                awardIfUnique('b7', p => rounds.map(r=>r.changes[p.id]||0).filter(c=>c>0).includes(globalMinPosScore));
-                awardIfUnique('b8', p => !p._wasFirstBefore && p._isFirstLatest);
-                awardIfUnique('b9', p => p.total === minTotal && p.total < 0);
-                awardIfUnique('b10', p => p.minSingle === globalMinSingle && p.minSingle < 0);
-                awardIfUnique('b11', p => p.maxLoseStreak === globalMaxLoseStreak && p.maxLoseStreak > 1);
-                awardIfUnique('b12', p => p.last === maxLasts && p.last > 0);
-                awardIfUnique('b13', p => rounds.map(r=>r.changes[p.id]||0).filter(c=>c<0).includes(globalMaxNegScore));
-                awardIfUnique('b14', p => p.gamesPlayed === minGamesPlayed && minGamesPlayed < totalRounds);
-                awardIfUnique('b15', p => !p._wasLastBefore && p._isLastLatest);
-                awardIfUnique('b16', p => p._sd === maxSdGlobal && p._sd > 0);
-                awardIfUnique('b17', p => p._altCount === maxAlt && p._altCount >= 3);
-                awardIfUnique('b18', p => p._maxIncWins === maxInc && p._maxIncWins >= 3);
-                awardIfUnique('b19', p => p._maxDecLosses === maxDec && p._maxDecLosses >= 3);
-                awardIfUnique('b20', p => p._wasLastBefore && p._isFirstLatest);
-                awardIfUnique('b21', p => p._maxPosThenMaxNeg);
-                awardIfUnique('b22', p => p._winRate === maxWinRate && p.total !== maxTotal);
-                awardIfUnique('b23', p => p._winRate === minWinRate && p.total !== minTotal);
-                awardIfUnique('b24', p => p.maxSingle === globalMaxSingle && p.minSingle === globalMinSingle && p.maxSingle > 0 && p.minSingle < 0);
-                awardIfUnique('b25', p => p._winRate > 0.5 && p._avgWin === minAvgWinScore);
-                awardIfUnique('b26', p => p.total > 0 && active.filter(x=>x.total > 0).length === 1);
-                awardIfUnique('b27', p => p.total < 0 && active.filter(x=>x.total < 0).length === 1);
-                awardIfUnique('b28', p => p.total === 0 && p.gamesPlayed >= 5);
-                awardIfUnique('b29', p => p.total === maxTotal && p.total > (secondMaxTotal * 2) && p.total > 0);
-                awardIfUnique('b30', p => p.total === p.maxSingle && p.gamesPlayed >= 3 && p.total > 0);
-                awardIfUnique('b31', p => /^(11|22|33|44|55|66|77|88|99|111|222|333|444|555|666|777|888|999)$/.test(Math.abs(p.total).toString()));
-                awardIfUnique('b32', p =>[-44, -250, -444, -233].includes(p.total));
-
-                awardIfUnique('b33', p => p.total === sortedTotals[1] && p.total > 0 && (maxTotal - p.total) < 10);
-                awardIfUnique('b34', p => (p._secBests||0) === maxSecBests && maxSecBests > 0);
-                awardIfUnique('b35', p => p.wins === maxWins && p.total < 0 && maxWins > 0);
-                let minWinsPos = Math.min(...active.filter(p=>p.wins>0).map(p=>p.wins));
-                awardIfUnique('b36', p => p.wins === minWinsPos && p.total > 0 && p.wins > 0);
-                awardIfUnique('b37', p => p.gamesPlayed > 5 && !p._wasFirstBefore && !p._isFirstLatest && !p._wasLastBefore && !p._isLastLatest && p.total > 0);
-                if (totalRounds >= 3) {
-                    awardIfUnique('b38', p => totalsR3[p.id] === maxR3 && p.total === minTotal);
-                    awardIfUnique('b39', p => totalsR3[p.id] === minR3 && p.total === maxTotal);
+                // 一血和多杀结算
+                if (r.v2Stats && r.v2Stats.eliminationEvents) {
+                    let evs = r.v2Stats.eliminationEvents;
+                    if (evs.length > 0) {
+                        evs[0].forEach(id => { let p = active.find(x=>x.id===id); if(p) p._s.firstBloods++; });
+                        evs[evs.length-1].forEach(id => { let p = active.find(x=>x.id===id); if(p) p._s.lastBloods++; });
+                    }
                 }
-                awardIfUnique('b40', p => p._jianHaoJiuShou);
-                awardIfUnique('b41', p => p._avgWin === maxAvgWin && p.wins > 0);
-                awardIfUnique('b42', p => p._avgLose === maxAvgLose && p._lostCounts > 0);
-                awardIfUnique('b43', p => p._lostCounts === maxLosts && p.total !== minTotal && maxLosts > 0);
-                awardIfUnique('b44', p => p.total > 0 && p.maxSingle > (p.total * 0.8));
-                awardIfUnique('b45', p => p.gamesPlayed >= 5 && p._lostCounts === 0);
-                awardIfUnique('b46', p => p.gamesPlayed >= 5 && p.wins === 0);
-                awardIfUnique('b47', p => p.gamesPlayed >= 5 && p.maxSingle <= 15 && p.minSingle >= -15);
-                awardIfUnique('b48', p => p._daChuXue);
-                awardIfUnique('b49', p => p._jingTianDaGuo);
-                awardIfUnique('b50', p => p._zuoRiChongXian);
-                awardIfUnique('b51', p => p._nengLiangShouHeng);
-                awardIfUnique('b52', p => p._jingZhunJuJi);
-                awardIfUnique('b53', p => p._jingZhunFuPin === maxFuPin && maxFuPin > 0);
-                awardIfUnique('b54', p => p._winRate <= 0.3 && p.maxStreak >= 2 && p.wins > 0);
-                awardIfUnique('b55', p => p.total === Math.floor(maxTotal/2) && p.total > 0);
-                awardIfUnique('b56', p => p._tongGuiYuJin);
-                awardIfUnique('b57', p => Math.abs(p.total) >= 100 && isPalindrome(Math.abs(p.total)));
-                awardIfUnique('b58', p => Math.abs(p.total) >= 11 && isPrime(Math.abs(p.total)));
-                awardIfUnique('b59', p => p.gamesPlayed > 0 && p._allChanges.every(c=>c%10===0));
-                awardIfUnique('b60', p => p.total === 1);
-                awardIfUnique('b61', p => p.total === -1);
-                awardIfUnique('b62', p => p._jiMoYingJia);
-                awardIfUnique('b63', p => p._jueJingFengSheng);
-                awardIfUnique('b64', p => p._allChanges.length > 1 && p._allChanges[0] === p._allChanges[p._allChanges.length-1]);
+                active.forEach(p => { 
+                    if (p._s._tempKills && p._s._tempKills > p._s.multiKillsMax) p._s.multiKillsMax = p._s._tempKills;
+                    p._s._tempKills = 0; 
+                });
+            });
+
+            // ==========================================
+            // ⚖️ 第二阶段：终极奖杯评审庭 (防并列、防冲突算法)
+            // 核心逻辑：核心数值越大越好 > 次数越多越好 > 达成越晚(最近)越好
+            // ==========================================
+            function check(badgeId, evalFn) {
+                let cands =[];
+                active.forEach(p => {
+                    let res = evalFn(p); // 传入真实的玩家对象
+                    if (res && res.val !== null && res.val !== undefined && res.val !== false && res.val !== 0) {
+                        cands.push({ pId: p.id, ...res });
+                    }
+                });
+                
+                if (cands.length > 0) {
+                    // 三重终极过滤排序法
+                    cands.sort((a, b) => {
+                        if (b.val !== a.val) return b.val - a.val; // 1. 比谁数值大 (核心数据)
+                        if (b.c !== a.c) return b.c - a.c;         // 2. 比谁次数多 (熟练度)
+                        return b.r - a.r;                          // 3. 比谁最近达成 (状态火热)
+                    });
+                    let winner = cands[0];
+                    unlockedBadges[badgeId].add(winner.pId); // 颁发奖杯
+                    
+                    // 保存给弹窗用的超详细解说词
+                    window.badgeDynamicData[badgeId] = {
+                        pId: winner.pId,
+                        roundStr: winner.timeStr || `截止当前 (第${totalRounds}局)`,
+                        detailStr: winner.desc || `满足了该奖杯的获取条件！`
+                    };
+                }
             }
 
-// 像素级复刻：生成内部三块独立元素的奖杯HTML
+ // ==========================================
+            // 🏆 第三阶段：100个成就法则注入！(超详细硬核数据联动版)
+            // ==========================================
+            let sTotals = active.map(x=>x.total).sort((a,b)=>b-a);
+            let maxTotal = sTotals[0];
+            let minTotal = sTotals[sTotals.length-1];
+            let topP = active.find(x=>x.total===maxTotal);
+            let botP = active.find(x=>x.total===minTotal);
+            let maxStreak = Math.max(...active.map(p=>p.maxStreak));
+            let maxLoseStreak = Math.max(...active.map(p=>p.maxLoseStreak));
+            let totalKills = active.reduce((sum, p) => sum + p._s.kills, 0);
+
+            // 小工具：获取他杀得最多的人
+            const getMostKilled = (p) => {
+                let keys = Object.keys(p._s.killedByTarget);
+                if(keys.length===0) return {name:'未知', count:0};
+                let tgt = keys.reduce((a,b)=>p._s.killedByTarget[a]>p._s.killedByTarget[b]?a:b);
+                let tgtP = active.find(x=>x.id==tgt);
+                return { name: tgtP?tgtP.name:'未知', count: p._s.killedByTarget[tgt] };
+            };
+            
+            // 小工具：获取杀他最多的人
+            const getMostKilledBy = (p) => {
+                let killers = {};
+                active.forEach(k => { if (k._s.killedByTarget[p.id]) killers[k.id] = k._s.killedByTarget[p.id]; });
+                let keys = Object.keys(killers);
+                if(keys.length===0) return {name:'未知', count:0};
+                let killerId = keys.reduce((a,b)=>killers[a]>killers[b]?a:b);
+                let killerP = active.find(x=>x.id==killerId);
+                return { name: killerP?killerP.name:'未知', count: killers[killerId] };
+            };
+
+            // 【SSS级】
+            check('b1', p => p.total === maxTotal && p.total > 0 ? { val: p.total, c: 1, r: totalRounds, desc:`历经 ${p.gamesPlayed} 局鏖战，最终以 ${p.total} 分稳居全场第一，甩开第二名(${sTotals[1]||0}分)足足 ${p.total - (sTotals[1]||0)} 分！`} : null);
+            check('b2', p => p.total === minTotal && p.total < 0 ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`在 ${p.gamesPlayed} 局中承受了最多炮火，以 ${p.total} 的惨烈负分垫底，落后倒数第二名高达 ${Math.abs((sTotals[sTotals.length-2]||0) - p.total)} 分！`} : null);
+            check('b3', p => (p.total > 0 && active.filter(x=>x.total>0).length===1) ? { val: p.total, c: 1, r: totalRounds, desc:`全场 ${active.length} 名玩家全在负分泥潭挣扎，唯独你一人以 ${p.total} 分保持正数，真正的高处不胜寒！`} : null);
+            check('b4', p => p._s.kills > 0 ? { val: p._s.kills, c: p._s.kills, r: totalRounds, desc:`化身修罗，亲手将 ${p._s.kills} 名玩家送出局外，占全场总击杀数(${totalKills}次)的 ${((p._s.kills/totalKills)*100).toFixed(1)}%！`} : null);
+            check('b5', p => p._s.firstBloods > 0 ? { val: p._s.firstBloods, c: 1, r: totalRounds, desc:`第一滴血提款机，累计 ${p._s.firstBloods} 次在开局暴毙成为第一个出局者，占你总淘汰次数的 ${((p._s.firstBloods/p._s.loseCount)*100).toFixed(1)}%！`} : null);
+
+            // 【SS级】
+            check('b6', p => p.maxStreak > 1 && p.maxStreak === maxStreak ? { val: p.maxStreak, c: 1, r: totalRounds, timeStr:`第 ${p.maxStreakRange} 局期间`, desc:`打出了全场最高不可匹敌的 ${p.maxStreak} 连胜纪录，断层领先！`} : null);
+            check('b7', p => p.minSingle < 0 ? { val: Math.abs(p.minSingle), c: 1, r: totalRounds, timeStr:`第 ${p.minSingleRound} 局`, desc:`单局大出血，一波狂扣了 ${p.minSingle} 分，这一把的亏损占了你总负分的 ${((Math.abs(p.minSingle)/(p._s.avgLose*p._s.loseCount))*100).toFixed(1)}%！`} : null);
+            check('b8', p => p.total === maxTotal && p._wasLastBefore ? { val: p.total, c: 1, r: totalRounds, timeStr:`第 ${totalRounds} 局 (最新)`, desc:`曾在第 ${p.minTotalRound} 局以 ${p.minTotal} 分跌落全场倒数第一，随后力挽狂澜，最终以 ${p.total} 分逆袭登顶，完成跨越 ${p.total - p.minTotal} 分的惊天反杀！`} : null);
+            check('b9', p => (p.maxSingle === Math.max(...active.map(x=>x.maxSingle)) && p.minSingle === Math.min(...active.map(x=>x.minSingle)) && p.maxSingle>0 && p.minSingle<0) ? { val: p.maxSingle + Math.abs(p.minSingle), c: 1, r: totalRounds, desc:`包揽极值：在第 ${p.maxSingleRound} 局创下最高赢分(+${p.maxSingle})，又在第 ${p.minSingleRound} 局创下最惨扣分(${p.minSingle})，落差高达 ${p.maxSingle - p.minSingle} 分！`} : null);
+            check('b10', p => (p.total < 0 && active.filter(x=>x.total<0).length===1) ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`全场 ${active.length} 人中，唯独你一人以 ${p.total} 分跌入负数深渊，精准吸纳了全场所有的火力伤害。`} : null);
+            check('b11', p => (p.total === p.maxSingle && p.total > 0 && p.gamesPlayed >= 3) ? { val: p.total, c: 1, r: totalRounds, desc:`在第 ${p.maxSingleRound} 局拿下了 +${p.maxSingle} 分，历经 ${p.gamesPlayed} 局后，总分居然奇迹般地卡在精准的 ${p.total} 分，分毫不差！`} : null);
+            check('b12', p => (p.gamesPlayed >= 5 && p._s.loseCount === 0) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`参战 ${p.gamesPlayed} 局，胜率高达 ${(p._winRate*100).toFixed(1)}%，且没有一局被扣过分，全程金身不破！`} : null);
+            check('b13', p => p._s.multiKillsMax > 1 ? { val: p._s.multiKillsMax, c: 1, r: totalRounds, desc:`手段残忍，曾在某一局内施展终极杀招，同时收割了 ${p._s.multiKillsMax} 名玩家！`} : null);
+            check('b14', p => (p.gamesPlayed >= 5 && p._s.neverKilled) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`参与了 ${p.gamesPlayed} 局，竟然从未被任何玩家亲自淘汰过，极致走位规避所有伤害！`} : null);
+            check('b15', p => p._s.timeOutKills > 0 ? { val: p._s.timeOutKills, c: 1, r: totalRounds, desc:`最懂利用规则的玩家，在倒计时耗尽时依靠系统制裁规则，硬生生赢下了 ${p._s.timeOutKills} 局！`} : null);
+
+            // 【S级】
+            check('b16', p => p.maxSingle > 0 ? { val: p.maxSingle, c: 1, r: totalRounds, timeStr:`第 ${p.maxSingleRound} 局`, desc:`打出惊世骇俗的操作，单局一波狂卷 +${p.maxSingle} 分，创造全场单局最高加分纪录！`} : null);
+            check('b17', p => p.maxLoseStreak > 1 && p.maxLoseStreak === maxLoseStreak ? { val: p.maxLoseStreak, c: 1, r: totalRounds, timeStr:`第 ${p.maxLoseStreakRange} 局期间`, desc:`经历了暗无天日的 ${p.maxLoseStreak} 连败，这期间疯狂大出血成为了全场的提款机...`} : null);
+            check('b18', p => (p._winRate === Math.max(...active.map(x=>x._winRate)) && p.total !== maxTotal && p.gamesPlayed > 2) ? { val: p._winRate, c: p.wins, r: totalRounds, desc:`胜率高达 ${(p._winRate*100).toFixed(1)}% 傲视群雄，赢了 ${p.wins} 局，但每次加分微薄，导致 ${p.total} 分遗憾未能夺冠。`} : null);
+            check('b19', p => (p.total === 0 && p.gamesPlayed >= 5) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`经历了长达 ${p.gamesPlayed} 局的血雨腥风，加减法完美抵消，总分奇迹般地定格在了 0 分！`} : null);
+            check('b20', p => (p.total === maxTotal && p.total > ((sTotals[1]||0) * 2) && p.total > 0) ? { val: p.total, c: 1, r: totalRounds, desc:`以 ${p.total} 分稳居第一，是第二名(${sTotals[1]||0}分)的 ${(p.total/(sTotals[1]||1)).toFixed(2)} 倍，降维打击！`} : null);
+            check('b21', p => (p.total === maxTotal && p._wasLastBefore) ? { val: p.total, c: 1, r: totalRounds, desc:`曾在第 ${p.minTotalRound} 局以 ${p.minTotal} 分惨遭垫底，随后稳扎稳打，最终以 ${p.total} 分登顶第一笑到最后！`} : null);
+            check('b22', p => (p.gamesPlayed >= 5 && p.wins === 0) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`参战 ${p.gamesPlayed} 局，极其凄惨地赢局数为 0，没有一局拿到过正分，全程都在挨打...`} : null);
+            check('b23', p => p._jueJingFengSheng ? { val: p.total, c: 1, r: totalRounds, desc:`前一局刚遭遇断崖式暴跌惨扣数十分，紧接着下一局立刻爆发赚回大分，节目效果拉满！`} : null);
+            check('b24', p => (topP && p._s.killedByTarget[topP.id]) ? { val: p._s.killedByTarget[topP.id], c: 1, r: totalRounds, desc:`无视小虾米，专门盯着总分第一大佬【${topP.name}】杀，共计将其淘汰了 ${p._s.killedByTarget[topP.id]} 次！`} : null);
+            check('b25', p => p._s.revivedThenWin > 0 ? { val: p._s.revivedThenWin, c: 1, r: totalRounds, desc:`本已出局，被队友复活后抓住机会绝地反击，在 ${p._s.revivedThenWin} 局中上演了死而复生的逆天翻盘戏码！`} : null);
+
+            // 【A级】
+            check('b26', p => p._sd !== undefined && p._sd >= 0 ? { val: 1000 - p._sd, c: p.gamesPlayed, r: totalRounds, desc:`每局得分标准差仅为 ${p._sd.toFixed(2)} (全场最低)，在 ${p.gamesPlayed} 局中稳扎稳打，毫无破绽。`} : null);
+            check('b27', p => p.last > 0 ? { val: p.last, c: p.last, r: totalRounds, desc:`在全场 ${totalRounds} 局中，有高达 ${p.last} 局成为全场扣分最多的大冤种，堪称最强送分童子。`} : null);
+            check('b28', p => p._maxPosThenMaxNeg ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`刚才还是赢家，下局瞬间崩盘！经历了一局打出最高加分后紧接着暴死扣除最高负分的过山车体验。`} : null);
+            check('b29', p => (p._winRate === Math.min(...active.map(x=>x._winRate)) && p.total !== minTotal && p.gamesPlayed > 2) ? { val: 100 - (p._winRate*100), c: 1, r: totalRounds, desc:`胜率低至令人发指的 ${(p._winRate*100).toFixed(1)}%，但凭借偶尔一把的大分，硬是让 ${p.total} 分摆脱了垫底命运。`} : null);
+            check('b30', p => /^(11|22|33|44|55|66|77|88|99|111|222|333|444|555|666|777|888|999)$/.test(Math.abs(p.total).toString()) ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`在经历了 ${p.gamesPlayed} 局的加减运算后，总分竟定格在 ${p.total} 分，打出了极其罕见的豹子号！`} : null);
+            check('b31', p =>[-44, -250, -444, -233, -748].includes(p.total) ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`总分不偏不倚刚好卡在了极其阴间的 ${p.total} 分，仿佛被上了恶魔的诅咒。`} : null);
+            check('b32', p => (p.wins === Math.min(...active.filter(x=>x.wins>0).map(x=>x.wins)) && p.total > 0 && p.wins > 0) ? { val: p.total, c: 1, r: totalRounds, desc:`全场仅仅只赢了 ${p.wins} 局(最少)，但单局赢的全是大分，硬是把总分抬到了 ${p.total} 分。`} : null);
+            check('b33', p => (p.wins > 0 && p._s.avgWin > 0) ? { val: p._s.avgWin, c: p.wins, r: totalRounds, desc:`不出手则已，赢的 ${p.wins} 局中，平均每局狂赚 +${p._s.avgWin.toFixed(1)} 分，暴击率全场第一。`} : null);
+            check('b34', p => (p.total > 0 && p.maxSingle > (p.total * 0.8)) ? { val: p.maxSingle, c: 1, r: totalRounds, timeStr:`第 ${p.maxSingleRound} 局`, desc:`一波狂卷 +${p.maxSingle} 分，这一把的加分居然占了你总分(${p.total}分)的 ${((p.maxSingle/p.total)*100).toFixed(1)}%！`} : null);
+            check('b35', p => p._jingTianDaGuo ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`曾在一局中，一己之力背负了该局全场总扣分 80% 以上的黑锅，堪称团队最强护盾。`} : null);
+            check('b36', p => p._jingZhunJuJi ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`在第一名大佬单局狂扣数十分惨遭血洗的那一局里，偏偏是你拿下了胜利，堪称最致命狙击。`} : null);
+            check('b37', p => p._jingZhunFuPin > 0 ? { val: p._jingZhunFuPin, c: p._jingZhunFuPin, r: totalRounds, desc:`作为输家，你给全场倒数第一的大冤种当了高达 ${p._jingZhunFuPin} 次提款机，精准扶贫！`} : null);
+            check('b38', p => p.total === 1 ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`鏖战了 ${p.gamesPlayed} 局，总分不偏不倚卡在了危险边缘的 1 分，保住了最后的尊严。`} : null);
+            check('b39', p => (botP && p._s.killedByTarget[botP.id]) ? { val: p._s.killedByTarget[botP.id], c: 1, r: totalRounds, desc:`专门挑软柿子捏！将全场垫底的【${botP.name}】残忍淘汰了 ${p._s.killedByTarget[botP.id]} 次！`} : null);
+            check('b40', p => (topP && p.total < topP.total && p._s.killedByTarget[topP.id]) ? { val: p._s.killedByTarget[topP.id], c: 1, r: totalRounds, desc:`身处低分段却毫不畏惧，强势将总分第一的大佬爆头淘汰了 ${p._s.killedByTarget[topP.id]} 次！`} : null);
+
+            // 【B级】
+            check('b41', p => p.wins > 0 ? { val: p.wins, c: p.wins, r: totalRounds, desc:`在 ${p.gamesPlayed} 局中，足足有 ${p.wins} 局拿下了最终赢家，胜率高达 ${(p._winRate*100).toFixed(1)}%。`} : null);
+            check('b42', p => p.minSingle < 0 ? { val: 1000 - Math.abs(p.minSingle), c: 1, r: totalRounds, timeStr:`第 ${p.minSingleRound} 局`, desc:`虽然在这局输了，但极其极限地只扣了 ${Math.abs(p.minSingle)} 分，损失全场最小。`} : null);
+            check('b43', p => p._maxIncWins >= 3 ? { val: p._maxIncWins, c: 1, r: totalRounds, desc:`曾连续 ${p._maxIncWins} 局连赢，且加分金额一把比一把高，如同坐上了火箭！`} : null);
+            check('b44', p => p._maxDecLosses >= 3 ? { val: p._maxDecLosses, c: 1, r: totalRounds, desc:`曾连续 ${p._maxDecLosses} 局连败，且扣分金额一把比一把惨烈，体验了真正的自由落体。`} : null);
+            check('b45', p => (p._winRate > 0.5 && p._s.avgWin > 0) ? { val: 1000 - p._s.avgWin, c: p.wins, r: totalRounds, desc:`胜率高达 ${(p._winRate*100).toFixed(1)}%，但赢的局平均只加可怜的 +${p._s.avgWin.toFixed(1)} 分，主打陪伴。`} : null);
+            check('b46', p => (p.total === sTotals[1] && p.total > 0) ? { val: 1000 - (sTotals[0]-p.total), c: 1, r: totalRounds, desc:`总分 ${p.total} 分位列第二，距离登顶全场第一名仅差微乎其微的 ${sTotals[0]-p.total} 分差距！`} : null);
+            check('b47', p => (p.wins > 0 && p.total < 0) ? { val: p.wins, c: p.wins, r: totalRounds, desc:`赢了全场最多的 ${p.wins} 局，但因为被抓了几次大出血，导致总分依旧是惨淡的 ${p.total} 分。`} : null);
+            check('b48', p => (p.gamesPlayed > 5 && !p._wasFirstBefore && !p._isFirstLatest && !p._wasLastBefore && !p._isLastLatest && p.total > 0) ? { val: p.total, c: p.gamesPlayed, r: totalRounds, desc:`苟了 ${p.gamesPlayed} 局，从未当过单局第一也未垫底，靠着极强的混分能力拿下了 ${p.total} 分。`} : null);
+            check('b49', p => (p._s.loseCount > 0 && p._s.avgLose > 0) ? { val: p._s.avgLose, c: p._s.loseCount, r: totalRounds, desc:`一旦输牌就是致命伤！输的 ${p._s.loseCount} 局中，平均每局都要惨扣 ${p._s.avgLose.toFixed(1)} 分。`} : null);
+            check('b50', p => p._daChuXue ? { val: Math.abs(p.minSingle), c: 1, r: totalRounds, timeStr:`第 ${p.minSingleRound} 局`, desc:`手握大把正分时，突然在这局狂扣 ${Math.abs(p.minSingle)} 分，一把输出去了所有家当！`} : null);
+            check('b51', p => p._nengLiangShouHeng ? { val: p.maxSingle, c: 1, r: totalRounds, desc:`上一局刚输掉的分数，在紧接着的下一局精准无比地全赢了回来，宇宙能量守恒定律！`} : null);
+            check('b52', p => (p._winRate <= 0.3 && p.maxStreak >= 2) ? { val: p.maxStreak, c: 1, r: totalRounds, timeStr:`第 ${p.maxStreakRange} 局期间`, desc:`总体胜率低至 ${(p._winRate*100).toFixed(1)}%，却逆天改命强行打出 ${p.maxStreak} 连胜！`} : null);
+            check('b53', p => (p.total === Math.floor(maxTotal/2) && p.total > 0) ? { val: p.total, c: 1, r: totalRounds, desc:`经过精密的计算，你的总分(${p.total}分)分毫不差恰好是第一名大佬(${maxTotal}分)的一半！`} : null);
+            check('b54', p => p.total === -1 ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`鏖战了 ${p.gamesPlayed} 局，距离回本仅仅只差一丁点，总分死死卡在了 -1 分。`} : null);
+            check('b55', p => p._tongGuiYuJin ? { val: Math.abs(p.minSingle), c: 1, r: totalRounds, desc:`手段极其暴烈！在这局中不仅干掉了别人，连自己也一同陪葬扣除巨分双双淘汰！`} : null);
+            check('b56', p => p._s.killedByTarget[p._s.revivedBy] ? { val: p._s.killedByTarget[p._s.revivedBy], c: 1, r: totalRounds, desc:`忘恩负义！对方曾在危难之际复活了你，你却转手就将恩人无情淘汰！`} : null);
+            check('b57', p => Math.max(...Object.values(p._s.killedByTarget)) > 1 ? { val: Math.max(...Object.values(p._s.killedByTarget)), c: 1, r: totalRounds, desc:`仿佛碰到了命中克星，被【${getMostKilledBy(p).name}】一个人就无情追杀了 ${getMostKilledBy(p).count} 次！`} : null);
+            check('b58', p => p._s.lastBloods > 0 ? { val: p._s.lastBloods, c: 1, r: totalRounds, desc:`走位极其灵活，在 ${p.gamesPlayed} 局中，累计有 ${p._s.lastBloods} 次苟到了最后一个才被淘汰出局。`} : null);
+            check('b59', p => p._s.revivedThenLose > 0 ? { val: p._s.revivedThenLose, c: 1, r: totalRounds, desc:`被队友复活了 ${p._s.revivedThenLose} 次，结果非但没翻盘，反而出局送出了更多的负分！`} : null);
+            check('b60', p => p._s.penaltyCards > 0 ? { val: p._s.penaltyCards, c: 1, r: totalRounds, desc:`被狂贴标签，曾在一局中单次吞下高达 ${p._s.penaltyCards} 张的天量罚牌，被压得喘不过气！`} : null);
+
+            // 【C级】
+            check('b61', p => p.gamesPlayed > 0 ? { val: p.gamesPlayed, c: p.gamesPlayed, r: totalRounds, desc:`全勤王！在总共 ${totalRounds} 局游戏中一场不落，全程高强度肝满了 ${p.gamesPlayed} 局！`} : null);
+            check('b62', p => (p._isFirstLatest && !p._wasFirstBefore) ? { val: p.total, c: 1, r: totalRounds, desc:`蛰伏许久，终于在最新结束的第 ${totalRounds} 局中斩获大分，首次以 ${p.total} 分反超登顶全场第一！`} : null);
+            check('b63', p => p._s.escapes > 0 ? { val: p._s.escapes, c: 1, r: totalRounds, desc:`战况激烈时选择了明哲保身，全场累计有 ${p._s.escapes} 局选择了挂机OB，逃避对局。`} : null);
+            check('b64', p => p._sd > 0 ? { val: p._sd, c: 1, r: totalRounds, desc:`得分标准差高达 ${p._sd.toFixed(2)}，单局最高赢过 +${p.maxSingle}，最惨扣过 ${p.minSingle}，纯纯的心跳玩家。`} : null);
+            check('b65', p => p._secBests > 0 ? { val: p._secBests, c: 1, r: totalRounds, desc:`差一点就是赢家！在 ${p.gamesPlayed} 局中，有 ${p._secBests} 局精准地拿下了全场第二名的比分。`} : null);
+            check('b66', p => (p._wasFirstBefore && p.total === minTotal) ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`曾在第 ${p.maxTotalRound} 局以 ${p.maxTotal} 分傲视群雄，如今却在第 ${totalRounds} 局以 ${p.total} 分惨遭全场垫底，狂跌 ${p.maxTotal - p.total} 分！`} : null);
+            check('b67', p => (p._s.loseCount > 0 && p.total !== minTotal) ? { val: p._s.loseCount, c: 1, r: totalRounds, desc:`被狂揍了 ${p._s.loseCount} 局，总扣分高达 ${Math.round(p._s.avgLose * p._s.loseCount)} 分，但凭借强大毅力硬是没有变成倒数第一。`} : null);
+            check('b68', p => p._zuoRiChongXian ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`命运重演！在连续的两局中，得分竟然分毫不差，一模一样都是 ${p._allChanges[p._allChanges.length-1]} 分！`} : null);
+            check('b69', p => (Math.abs(p.total) >= 100 && isPalindrome(Math.abs(p.total))) ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`经过精密的计算，累计总分 ${Math.abs(p.total)} 分，正着读反着读完全一样，极具回文美学。`} : null);
+            check('b70', p => (p.gamesPlayed > 0 && p._allChanges && p._allChanges.every(c=>c%10===0)) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`参与的 ${p.gamesPlayed} 局中，所有局的得分个位数全是 0，毫无零头，强迫症福音！`} : null);
+            check('b71', p => (p._s.kills > 0 && p._s.penaltyCards === 0) ? { val: p._s.kills, c: 1, r: totalRounds, desc:`成本控制大师！整场游戏仅仅吃了 0 张罚牌，却兵不血刃地淘汰了 ${p._s.kills} 名玩家！`} : null);
+            check('b72', p => Math.max(...Object.values(p._s.killedByTarget)) > 1 ? { val: Math.max(...Object.values(p._s.killedByTarget)), c: 1, r: totalRounds, desc:`如同附骨之疽！专门盯着【${getMostKilled(p).name}】疯狂输出，共计将其残忍淘汰了 ${getMostKilled(p).count} 次！`} : null);
+            check('b73', p => p._s.loseCount > 0 ? { val: p._s.loseCount, c: 1, r: totalRounds, desc:`天煞孤星！全场如同自带嘲讽光环，累计被各种玩家淘汰了高达 ${p._s.loseCount} 次，全场最惨。`} : null);
+            check('b74', p => p._s.firstBloods > 0 ? { val: p._s.firstBloods, c: 1, r: totalRounds, desc:`在游戏开局阶段频繁白给，累计 ${p._s.firstBloods} 次成为全场第一滴血，光速下班。`} : null);
+            check('b75', p => (!p._isFirstLatest && !p._isLastLatest) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`在 ${p.gamesPlayed} 局中，既不首死也不压轴，淘汰顺位始终处于不上不下的中间位置。`} : null);
+            check('b76', p => p._s.timeGames > 0 ? { val: Math.floor(p._s.totalTime / p._s.timeGames), c: 1, r: totalRounds, desc:`极其有耐心！参与的对局平均每把都要耗时 ${Math.floor(p._s.totalTime / p._s.timeGames)} 秒，不把对手熬死决不罢休。`} : null);
+            check('b77', p => p._s.revived > 0 ? { val: p._s.revived, c: 1, r: totalRounds, desc:`有你在场就犹如华佗在世！你参与的对局中，累计见证了 ${p._s.revived} 次队友被复活的奇迹！`} : null);
+            check('b78', p => p.reviveCount > 0 ? { val: p.reviveCount, c: 1, r: totalRounds, desc:`被淘汰后又被队友施展秽土转生，全场累计被抢救回来了 ${p.reviveCount} 次！`} : null);
+            check('b79', p => (p._s.revivedThenWin > 0 && p.total >= 0) ? { val: p.total, c: 1, r: totalRounds, desc:`被复活后非但不送，反而打出了超强压制力，最终以 ${p.total >= 0 ? p.total : '正'} 分保本保命！`} : null);
+            check('b80', p => (p._s.scoreHistory.length > 1 && p._s.scoreHistory[0] === p._s.scoreHistory[p._s.scoreHistory.length-1]) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`仿佛一个轮回！在最新一局的得分(${p._allChanges[p._allChanges.length-1]}分)恰好等同于你第一局的首秀得分！`} : null);
+
+            // 【D级】
+            check('b81', p => (p.wins > 0) ? { val: 1000 - Math.min(...p._s.scoreHistory.filter(c=>c>0)), c: 1, r: totalRounds, desc:`在获胜的局中，单局最少只赢了微薄的 +${Math.min(...p._s.scoreHistory.filter(c=>c>0))} 分，堪称极限躺赢。`} : null);
+            check('b82', p => (p._isLastLatest && !p._wasLastBefore) ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`前期顺风顺水，却在最新结束的第 ${totalRounds} 局防线崩溃，首次以 ${p.total} 分跌落至全场垫底！`} : null);
+            check('b83', p => p._altCount >= 3 ? { val: p._altCount, c: 1, r: totalRounds, desc:`状态极其不稳定！在近期的对局中，频繁交替上演赢一局、输一局的戏码，反转高达 ${p._altCount} 次。`} : null);
+            check('b84', p => p._jianHaoJiuShou ? { val: p.maxSingle, c: 1, r: totalRounds, desc:`在某一局大赚一波之后，立刻嗅到危险气息，下一局果断选择逃跑OB，深谙见好就收之道。`} : null);
+            check('b85', p => (p.maxSingle <= 15 && p.minSingle >= -15) ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`在 ${p.gamesPlayed} 局中，局内最高仅加 +${p.maxSingle}，最惨仅扣 ${p.minSingle}，绝不打大牌，岁月静好。`} : null);
+            check('b86', p => (Math.abs(p.total) >= 11 && isPrime(Math.abs(p.total))) ? { val: Math.abs(p.total), c: 1, r: totalRounds, desc:`经过 ${p.gamesPlayed} 局的加减运算，最终总分定格在了 ${Math.abs(p.total)} 分，这是一个只能被1和自身整除的孤独质数。`} : null);
+            check('b87', p => p._jiMoYingJia ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`在某一局中虽然成为了最后赢家，但因为对手全跑光或没牌，导致系统结算加分为 0，赢了个寂寞！`} : null);
+            check('b88', p => p._s.suicides > 0 ? { val: p._s.suicides, c: 1, r: totalRounds, desc:`枪口向内！全场操作失误，导致自己把自己淘汰的次数高达 ${p._s.suicides} 次！`} : null);
+            check('b89', p => p._s.specialKills > 0 ? { val: p._s.specialKills, c: 1, r: totalRounds, desc:`死法千奇百怪！全场遭遇了极其罕见的特殊方式淘汰高达 ${p._s.specialKills} 次。`} : null);
+            check('b90', p => p._s.firstBloods >= 2 ? { val: p._s.firstBloods, c: 1, r: totalRounds, desc:`完全不长记性！连续多局头铁硬送，累计拿到了一血和二血等超前顺位淘汰。`} : null);
+            check('b91', p => p._s.clutchWins > 0 ? { val: p._s.clutchWins, c: 1, r: totalRounds, desc:`大心脏！在倒计时极少的情况下，顶住压力绝杀赢牌，完成了 ${p._s.clutchWins} 次压哨胜利！`} : null);
+            check('b92', p => p._s.flashWins > 0 ? { val: p._s.flashWins, c: 1, r: totalRounds, desc:`出牌如风！在开局极短时间内极速打空手牌，完成了 ${p._s.flashWins} 次闪电战胜利！`} : null);
+            check('b93', p => p._s.timeGames > 0 ? { val: 10000 - Math.floor(p._s.totalTime / p._s.timeGames), c: 1, r: totalRounds, desc:`拒绝加班！参与的对局平均耗时极短，速战速决绝不拖泥带水。`} : null);
+            check('b94', p => p._s.timeOutDeaths > 0 ? { val: p._s.timeOutDeaths, c: 1, r: totalRounds, desc:`磨洋工的代价！因为时间耗尽被系统强行制裁淘汰的次数高达 ${p._s.timeOutDeaths} 次。`} : null);
+            check('b95', p => p._s.revivedThenLose > 0 ? { val: p._s.revivedThenLose, c: 1, r: totalRounds, desc:`刚被队友抢救回来还没捂热，又在这局中光速暴毙惨遭淘汰，白瞎了队友的心血！`} : null);
+            check('b96', p => p._s.specialKills > 0 ? { val: p._s.specialKills, c: 1, r: totalRounds, desc:`手段极其阴狠！善用偏门左道，在淘汰对手时大量使用了非传统的特殊机制！`} : null);
+            check('b97', p => p._jiMoYingJia ? { val: p.gamesPlayed, c: 1, r: totalRounds, desc:`手握免死金牌，身为最后赢家结算时，却硬是一分没拿到手，徒留虚名。`} : null);
+            check('b98', p => p.maxStreak > 0 ? { val: p.maxStreak, c: 1, r: totalRounds, desc:`在第 ${p.maxStreakRange} 局打出了 ${p.maxStreak} 连胜，距离打破全场最高连胜(${maxStreak}连胜)仅差最后一哆嗦，太遗憾了！`} : null);
+            check('b99', p => { let sTotals = active.map(x=>x.total).sort((a,b)=>b-a); return (sTotals[0]-p.total === 1) ? { val: p.total, c: 1, r: totalRounds, desc:`总分 ${p.total} 分，距离反超上一名玩家仅仅只差了极其微弱的 1 分，令人扼腕叹息！`} : null; });
+            check('b100', p => { let count = badgeDefs.filter(b=>unlockedBadges[b.id].has(p.id)).length; return count > 0 ? { val: 100 - count, c: 1, r: totalRounds, desc:`打满了全场，但最终在奖杯结算时全场隐身，拿到的奖杯数量全场最少，默默无闻...`} : null; });
+
+            // ==========================================
+            // 🎨 第四阶段：利用前面积攒好的UI模板画出奖杯墙
+            // ==========================================
             const badgeHtml = badgeDefs.map(b => {
                 const unlockedPlayerId = Array.from(unlockedBadges[b.id])[0];
                 const p = unlockedPlayerId ? gameData.players.find(x => x.id === unlockedPlayerId) : null;
                 const isUnlocked = !!p;
                 let rColor = rarityColors[b.rarity] || '#10B981'; 
 
-                // w-[22vw] 和 max-w-[85px] 确保在手机端一行刚好能塞下4列，总共显示3x4=12个
                 return `
-                <div class="badge-item flex flex-col justify-between w-[22.5vw] max-w-[85px] sm:w-[95px] h-[135px] sm:h-[155px] shrink-0 gap-[3px] sm:gap-1 p-[3px] sm:p-1 rounded-[12px] sm:rounded-2xl border-[2.5px] sm:border-[3px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] ; cursor-pointer  transition-transform hover:scale-[1.03]" data-id="${b.id}"> 
+                <!-- 
+                  ========================================================
+                  【UI参数调节面板：单个奖杯卡片 (总外框)】
+                  * 宽度：w-[22.5vw] (手机端), sm:w-[95px] (电脑端)
+                  * 高度：h-[135px] (手机端), sm:h-[155px] (电脑端)
+                  * 描边：border-[2.5px] sm:border-[3px] (边框粗细), border-[#5E4B8B] (紫边)
+                  * 圆角：rounded-[12px] sm:rounded-2xl (整体圆弧大小)
+                  * 阴影：shadow-[0_2px_0_#5E4B8B] (底部紫色立体阴影厚度)
+                  * 间距：gap-[3px] sm:gap-1 (内部上中下三块的空隙), p-[3px] sm:p-1 (边框内缩量)
+                  ========================================================
+                -->
+                <div class="badge-item flex flex-col justify-between w-[22.5vw] max-w-[85px] sm:w-[95px] h-[135px] sm:h-[155px] shrink-0 gap-[3px] sm:gap-1 p-[3px] sm:p-1 rounded-[12px] sm:rounded-2xl border-[2.5px] sm:border-[3px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] cursor-pointer transition-transform hover:scale-[1.03]" data-id="${b.id}"> 
                     
-                    <!-- 1. 上部独立模块：图标 + 标题 -->
+                    <!-- 
+                      【UI参数：上半部 (图标与名字区)】
+                      * 圆角：rounded-lg (使内部这个白框也呈现圆角)
+                      * 背景：bg-white (白色底)
+                    -->
                     <div class="relative w-full border-[2px] border-[#5E4B8B] rounded-lg flex flex-col items-center justify-center p-1 bg-white flex-1 shadow-[0_2px_0_#5E4B8B] min-h-0 ${isUnlocked ? '' : 'grayscale opacity-50'}">
+                        
+                        <!-- 左上角稀有度标签 (SSS/SS/A等) -->
                         <div class="absolute -top-1.5 -left-1.5 px-1 sm:px-1.5 py-0 rounded-[4px] font-black text-[15px] sm:text-[9px] text-white border-[2px] border-[#5E4B8B] leading-none tracking-tighter shadow-[0_4px_0_#5E4B8B]" style="background-color: ${rColor};">${b.rarity}</div>
+                        
+                        <!-- 核心图标 (text-2xl sm:text-3xl 控制图标大小) -->
                         <i class="fa-solid ${b.icon} text-2xl sm:text-3xl mt-1.5 text-stroke drop-shadow-[0_3px_0_#5E4B8B] pointer-events-none" style="color: ${isUnlocked ? b.color : '#9CA3AF'};"></i>
+                        
+                        <!-- 奖杯名字 (text-[10px] sm:text-[11px] 控制字体大小) -->
                         <div class="font-black text-[10px] sm:text-[11px] text-[#5E4B8B] w-full text-center leading-tight mt-1 pointer-events-none tracking-tighter truncate">${b.name}</div>
                     </div>
                     
-                    <!-- 2. 中部独立模块：描述 -->
+                    <!-- 
+                      【UI参数：中部 (简短描述区)】
+                      * 高度：h-[26px] sm:h-[30px] (固定高度防止撑破)
+                      * 背景：bg-[#E2E8F0] (浅灰蓝色底)
+                    -->
                     <div class="w-full bg-[#E2E8F0] border-[2px] border-[#5E4B8B] rounded-lg p-0.5 flex items-center justify-center shadow-[0_2px_0_#5E4B8B] h-[26px] sm:h-[30px] shrink-0 ${isUnlocked ? '' : 'grayscale opacity-50'}">
                         <div class="font-bold text-[7px] sm:text-[8px] text-[#5E4B8B] text-center leading-tight transform scale-90 sm:scale-100 break-words">${b.desc}</div>
                     </div>
                     
-                    <!-- 3. 底部独立模块：玩家头像与名字色块 -->
+                    <!-- 
+                      【UI参数：下半部 (玩家头像与名字)】
+                      * 高度：h-[22px] sm:h-[26px] (固定底部栏高度)
+                    -->
                     <div class="w-full border-[2px] border-[#5E4B8B] rounded-lg p-0.5 flex items-center justify-center shadow-[0_2px_0_#5E4B8B] h-[22px] sm:h-[26px] shrink-0 shadow-inner ${isUnlocked ? '' : 'grayscale opacity-50'}" style="background-color: ${isUnlocked ? p.color : '#E5E7EB'};">
                         ${isUnlocked ? `
                             <div class="flex items-center justify-center gap-1 w-full overflow-hidden px-0.5">
+                                <!-- 头像图片 (w-3.5 h-3.5 控制大小) -->
                                 <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[4px] border-[1.5px] border-[#5E4B8B] overflow-hidden bg-white shrink-0">
                                     <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
                                 </div>
+                                <!-- 玩家缩写 (text-[9px] sm:text-[11px] 控制名字大小) -->
                                 <span class="text-white font-black text-[9px] sm:text-[11px] truncate text-stroke leading-none pb-[1px]">${p.name.slice(-1)}</span>
                             </div>
                         ` : `<span class="text-gray-400 font-bold text-[10px] sm:text-xs tracking-widest pointer-events-none">-</span>`}
@@ -3647,11 +3755,12 @@ function renderSessionSection() {
                 </div>`;
             }).join('');
 
-            // 把画好的奖杯分别塞进两个Grid里，实现无缝循环障眼法
+            // 把画好的奖杯塞进去，实现马达滚动
             const grid1 = document.getElementById('badgeGrid1');
             const grid2 = document.getElementById('badgeGrid2');
             if (grid1) grid1.innerHTML = badgeHtml;
             if (grid2) grid2.innerHTML = badgeHtml;
+
 // ====================================================
             // 【修正版】智能滚动马达：修复手指触摸时意外恢复滑动的问题
             // ====================================================
@@ -3679,7 +3788,7 @@ function renderSessionSection() {
                 const resumeMotor = () => {
                     clearTimeout(resumeTimer);
                     // 手指离开后，重新开始 1 秒的倒计时，1秒后才恢复移动
-                    resumeTimer = setTimeout(() => { window.isBadgeInteracting = false; }, 1000);
+                    resumeTimer = setTimeout(() => { window.isBadgeInteracting = false; }, 3000);
                 };
 
                 // 不管是鼠标还是手指，只要碰到或滑动，就锁死马达！
@@ -5358,248 +5467,33 @@ function updateUndoRedoButtons() {
                 }
             });
             // --- 新增：排行榜内奖杯的点击事件 结束 ---
+// ==========================================================
+            // ★★★ 图1 弹窗数据灌入核心引擎 (读取大脑缓存，自动排版) ★★★
+            // ==========================================================
             document.body.addEventListener('click', e => {
                 const item = e.target.closest('.badge-item');
                 if (!item) return;
                 const bId = item.dataset.id;
                 const bDef = badgeDefs.find(b => b.id === bId);
-                const unlockedPlayerId = Array.from(unlockedBadges[bId] || [])[0];
                 
-                if (!unlockedPlayerId) return; 
+                // 从大脑(缓存)里读取该奖杯的获奖者
+                const bData = window.badgeDynamicData[bId];
+                if (!bData) return; // 没人拿奖就不弹窗
 
-                const p = gameData.players.find(x => x.id === unlockedPlayerId);
+                const p = gameData.players.find(x => x.id === bData.pId);
                 if (!p) return;
 
-                const active = gameData.players.filter(x => x.isActive);
-                const rounds = gameData.rounds;
-                const totalRounds = rounds.length;
-
-                let roundStr = `截止至当前 (第${totalRounds}局)`;
-                let detailStr = `符合条件时的总分: ${p.total}`;
-
-                if (bId === 'b1') {
-                    let sorted = active.map(x=>x.total).sort((a,b)=>b-a);
-                    detailStr = `以 ${p.total} 分稳居第一，领先第二名 ${p.total - sorted[1]} 分！`;
-                } else if (bId === 'b2') {
-                    roundStr = p.maxStreakRange ? `区间: ${p.maxStreakRange}局` : roundStr;
-                    detailStr = `全场无人能破的连赢神话，狂拿 ${p.maxStreak} 连胜！`;
-                } else if (bId === 'b3') {
-                    roundStr = `第${p.maxSingleRound}局`;
-                    detailStr = `此局惊天大翻盘，一波狂卷 +${p.maxSingle} 分！`;
-                } else if (bId === 'b4') {
-                    detailStr = `每局得分标准差仅为 ${p._sd.toFixed(2)}，毫无破绽的稳健。`;
-                } else if (bId === 'b5') {
-                    detailStr = `在 ${p.gamesPlayed} 局中，足足当了 ${p.wins} 次大赢家！`;
-                } else if (bId === 'b6') {
-                    detailStr = `一次都没缺席，全勤肝满了 ${p.gamesPlayed} 局。`;
-                } else if (bId === 'b7') {
-                    let minP = Math.min(...rounds.map(r=>r.changes[p.id]||0).filter(c=>c>0));
-                    let rObj = rounds.find(r=>(r.changes[p.id]||0)===minP);
-                    if(rObj) roundStr = `第${rObj.round}局`;
-                    detailStr = `惊险拿下这局，但只捡漏了 +${minP} 分。`;
-                } else if (bId === 'b8') {
-                    roundStr = `第${totalRounds}局 (最新)`;
-                    detailStr = `蛰伏许久，终于在刚刚这局以 ${p.total} 分逆袭登顶！`;
-                } else if (bId === 'b9') {
-                    detailStr = `以 ${p.total} 的惨淡负分排在全场最末尾。`;
-                } else if (bId === 'b10') {
-                    roundStr = `第${p.minSingleRound}局`;
-                    detailStr = `这一把输麻了，满手大牌狂扣了 ${p.minSingle} 分！`;
-                } else if (bId === 'b11') {
-                    roundStr = p.maxLoseStreakRange ? `区间: ${p.maxLoseStreakRange}局` : roundStr;
-                    detailStr = `度过了暗无天日的 ${p.maxLoseStreak} 连败岁月...`;
-                } else if (bId === 'b12') {
-                    detailStr = `累计有 ${p.last} 局成为全场扣分最多的大冤种。`;
-                } else if (bId === 'b13') {
-                    let minN = Math.max(...rounds.map(r=>r.changes[p.id]||0).filter(c=>c<0));
-                    let rObj = rounds.find(r=>(r.changes[p.id]||0)===minN);
-                    if(rObj) roundStr = `第${rObj.round}局`;
-                    detailStr = `虽然没赢，但仅仅只损失了 ${minN} 分。`;
-                } else if (bId === 'b14') {
-                    detailStr = `全场只参与了 ${p.gamesPlayed} 局，其余时间全在摸鱼！`;
-                } else if (bId === 'b15') {
-                    roundStr = `第${totalRounds}局 (最新)`;
-                    detailStr = `在最新一局结算后，不幸以 ${p.total} 分跌至全场倒数第一。`;
-                } else if (bId === 'b16') {
-                    detailStr = `得分标准差高达 ${p._sd.toFixed(2)}，主打一个大起大落！`;
-                } else if (bId === 'b17') {
-                    detailStr = `赢一局输一局，状态反转了 ${p._altCount} 次。`;
-                } else if (bId === 'b18') {
-                    detailStr = `曾连续 ${p._maxIncWins} 局赢分，且加分金额一把比一把高！`;
-                } else if (bId === 'b19') {
-                    detailStr = `曾连续 ${p._maxDecLosses} 局输分，且扣分金额一把比一把狠！`;
-                } else if (bId === 'b20') {
-                    detailStr = `曾经跌落至倒数第一，现已硬生生打回到全场第一（${p.total}分）！`;
-                } else if (bId === 'b21') {
-                    let rIndex = -1, val1=0, val2=0;
-                    for(let i=0; i<totalRounds-1; i++){
-                        let c1 = rounds[i].changes[p.id]||0; let c2 = rounds[i+1].changes[p.id]||0;
-                        let maxPos1 = Math.max(...active.map(a=>rounds[i].changes[a.id]||0));
-                        let minNeg2 = Math.min(...active.map(a=>rounds[i+1].changes[a.id]||0));
-                        if(c1 === maxPos1 && c1 > 0 && c2 === minNeg2 && c2 < 0) { rIndex = i; val1 = c1; val2 = c2; break; }
-                    }
-                    if(rIndex !== -1) {
-                        roundStr = `第${rounds[rIndex].round}局~第${rounds[rIndex+1].round}局`;
-                        detailStr = `上把刚狂赚了 +${val1} 分，下把立刻垫底惨扣 ${val2} 分！`;
-                    }
-                } else if (bId === 'b22') {
-                    detailStr = `胜率高达 ${(p._winRate*100).toFixed(1)}%，但总分（${p.total}）竟不是第一！`;
-                } else if (bId === 'b23') {
-                    detailStr = `胜率低至 ${(p._winRate*100).toFixed(1)}%，但总分（${p.total}）居然没有垫底！`;
-                } else if (bId === 'b24') {
-                    detailStr = `同时创造了单局最高赢分(+${p.maxSingle})与最惨扣分(${p.minSingle})！`;
-                } else if (bId === 'b25') {
-                    detailStr = `胜率过半，但赢的局平均只可怜地加了 +${p._avgWin.toFixed(1)} 分。`;
-                } else if (bId === 'b26') {
-                    detailStr = `全场唯一正分（${p.total}分），其他人全在水深火热中。`;
-                } else if (bId === 'b27') {
-                    detailStr = `全场唯一负分（${p.total}分），精准吸纳了所有人的伤害。`;
-                } else if (bId === 'b28') {
-                    detailStr = `激战了 ${p.gamesPlayed} 局，总分居然奇迹般地完美归零！`;
-                } else if (bId === 'b29') {
-                    let sorted = active.map(x=>x.total).sort((a,b)=>b-a);
-                    detailStr = `总分 ${p.total} 分，是第二名（${sorted[1]}分）的 ${(p.total/sorted[1]).toFixed(1)} 倍！`;
-                } else if (bId === 'b30') {
-                    detailStr = `神乎其技！当前总分 ${p.total} 刚好等于个人的历史单局最高加分！`;
-                } else if (bId === 'b31') {
-                    detailStr = `打出了极为罕见的总分豹子号：${p.total} 分！`;
-                } else if (bId === 'b32') {
-                    detailStr = `获得了极其阴间的总分：${p.total} 分！`;
-                } else if (bId === 'b33') {
-                    let sorted = active.map(x=>x.total).sort((a,b)=>b-a);
-                    detailStr = `总分 ${p.total} 分，距离第一名仅差 ${sorted[0] - p.total} 分！`;
-                } else if (bId === 'b34') {
-                    detailStr = `共有 ${p._secBests} 局精准拿到了全场第二名的比分。`;
-                } else if (bId === 'b35') {
-                    detailStr = `赢了足足 ${p.wins} 局（全场最多），总分却还是亏本的 ${p.total} 分。`;
-                } else if (bId === 'b36') {
-                    detailStr = `仅仅只赢了 ${p.wins} 局，总分居然奇迹般地维持在正数（${p.total}分）。`;
-                } else if (bId === 'b37') {
-                    detailStr = `苟了 ${p.gamesPlayed} 局，从未当过第一也未垫底，靠混拿了 ${p.total} 分。`;
-                } else if (bId === 'b38') {
-                    let r3 = 0; rounds.slice(0,3).forEach(r => r3 += (r.changes[p.id]||0));
-                    detailStr = `前3局曾狂砍 ${r3} 分位列第一，现在却以 ${p.total} 分惨遭垫底。`;
-                } else if (bId === 'b39') {
-                    let r3 = 0; rounds.slice(0,3).forEach(r => r3 += (r.changes[p.id]||0));
-                    detailStr = `前3局仅有 ${r3} 分惨遭垫底，现在却以 ${p.total} 分逆袭登顶！`;
-                } else if (bId === 'b40') {
-                    let rIndex = -1, val = 0;
-                    rounds.forEach((r, idx) => { if((r.changes[p.id]||0)>30 && idx<totalRounds-1 && (rounds[idx+1].changes[p.id]||0)===0) { rIndex=idx; val=r.changes[p.id]; } });
-                    if(rIndex !== -1) { roundStr = `第${rounds[rIndex].round}局`; detailStr = `这局大赚 +${val} 分后，立刻在下局选择了逃跑OB！`; }
-                } else if (bId === 'b41') {
-                    detailStr = `赢的局中，平均每把都要从别人身上狂加 +${p._avgWin.toFixed(1)} 分！`;
-                } else if (bId === 'b42') {
-                    detailStr = `输的局中，平均每把都要大出血惨扣 ${p._avgLose.toFixed(1)} 分！`;
-                } else if (bId === 'b43') {
-                    detailStr = `输了足足 ${p._lostCounts} 局，凭借超强防御力硬是没有变成倒数第一。`;
-                } else if (bId === 'b44') {
-                    roundStr = `第${p.maxSingleRound}局`;
-                    detailStr = `单局赢的 +${p.maxSingle} 分，占了总分(${p.total})的 ${((p.maxSingle/p.total)*100).toFixed(1)}%！`;
-                } else if (bId === 'b45') {
-                    detailStr = `激战 ${p.gamesPlayed} 局，至今竟没有一局被扣过分！`;
-                } else if (bId === 'b46') {
-                    detailStr = `参战 ${p.gamesPlayed} 局，至今没有赢过任何一局...`;
-                } else if (bId === 'b47') {
-                    detailStr = `局内最高仅加 +${p.maxSingle}，最惨仅扣 ${p.minSingle}，与世无争。`;
-                } else if (bId === 'b48') {
-                    let t=0, rIndex=-1, val=0;
-                    for(let i=0; i<totalRounds; i++){
-                        let c = rounds[i].changes[p.id]||0;
-                        if(t>0 && c<0 && Math.abs(c)>t && (t+c)<0) { rIndex=i; val=c; break;}
-                        t+=c;
-                    }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局`; detailStr = `手握正分时，被一把扣了 ${val} 分直接打回负数原形！`;}
-                } else if (bId === 'b49') {
-                    let rIndex = -1, myL=0, allL=0;
-                    for(let i=0; i<totalRounds; i++){
-                        let negs = Object.values(rounds[i].changes).filter(c=>c<0);
-                        let sumL = negs.reduce((a,b)=>a+Math.abs(b),0);
-                        let c = rounds[i].changes[p.id]||0;
-                        if(c<0 && sumL>0 && Math.abs(c)/sumL>=0.8) { rIndex=i; myL=c; allL=sumL; break;}
-                    }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局`; detailStr = `全场共扣 ${allL} 分，你一个人就背了 ${myL} 分大锅！`; }
-                } else if (bId === 'b50') {
-                    let rIndex=-1, val=0;
-                    for(let i=0; i<totalRounds-1; i++){
-                        let c1 = rounds[i].changes[p.id]||0; let c2 = rounds[i+1].changes[p.id]||0;
-                        if(c1!==0 && c1===c2) { rIndex=i; val=c1; break; }
-                    }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局~第${rounds[rIndex+1].round}局`; detailStr = `这两局的分数竟然一模一样，都是 ${val} 分！`; }
-                } else if (bId === 'b51') {
-                    let rIndex=-1, val=0;
-                    for(let i=0; i<totalRounds-1; i++){
-                        let c1 = rounds[i].changes[p.id]||0; let c2 = rounds[i+1].changes[p.id]||0;
-                        if(c1<0 && c2>0 && Math.abs(c1)===c2) { rIndex=i; val=c2; break; }
-                    }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局~第${rounds[rIndex+1].round}局`; detailStr = `上局刚扣了 -${val} 分，这局精准赢回了 +${val} 分！`; }
-                } else if (bId === 'b52') {
-                    let rIndex=-1, maxTotalPlayer = active.find(a=>a.total===Math.max(...active.map(x=>x.total)));
-                    if (maxTotalPlayer) {
-                        for(let i=0; i<totalRounds; i++){
-                            if(rounds[i].changes[maxTotalPlayer.id] === maxTotalPlayer.minSingle && maxTotalPlayer.minSingle < 0 && (rounds[i].changes[p.id]||0)>0) { rIndex=i; break; }
-                        }
-                    }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局`; detailStr = `当总分第一名被血入 ${maxTotalPlayer.minSingle} 分时，刚好是你赢了！`; }
-                } else if (bId === 'b53') {
-                    detailStr = `在当前倒第一赢的局里，你作为输家给他“爆金币”了高达 ${p._jingZhunFuPin} 次！`;
-                } else if (bId === 'b54') {
-                    roundStr = p.maxStreakRange ? `区间: ${p.maxStreakRange}局` : roundStr;
-                    detailStr = `总体胜率仅 ${(p._winRate*100).toFixed(1)}%，却逆天改命打出过 ${p.maxStreak} 连胜！`;
-                } else if (bId === 'b55') {
-                    let maxT = Math.max(...active.map(x=>x.total));
-                    detailStr = `总分 ${p.total} 分，分毫不差刚好是第一名（${maxT}分）的一半！`;
-                } else if (bId === 'b56') {
-                    let rIndex=-1, val=0, maxTotalPlayer = active.find(a=>a.total===Math.max(...active.map(x=>x.total)));
-                    if (maxTotalPlayer) {
-                        for(let i=0; i<totalRounds; i++){
-                            let c1 = rounds[i].changes[maxTotalPlayer.id]||0; let c2 = rounds[i].changes[p.id]||0;
-                            let minC = Math.min(...Object.values(rounds[i].changes));
-                            if(c1===minC && c2===minC && c1<0) { rIndex=i; val=c1; break; }
-                        }
-                    }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局`; detailStr = `把总分第一名拖下水，两人同时在这局扣了最惨的 ${val} 分！`; }
-                } else if (bId === 'b57') {
-                    detailStr = `累计总分 ${Math.abs(p.total)}，正着读反着读完全一样！`;
-                } else if (bId === 'b58') {
-                    detailStr = `累计总分 ${Math.abs(p.total)}，是一个只能被 1 和自身整除的孤独质数！`;
-                } else if (bId === 'b59') {
-                    detailStr = `参与的 ${p.gamesPlayed} 局中，所有的分数个位数全是 0，毫无零头！`;
-                } else if (bId === 'b60') {
-                    detailStr = `历经千辛万苦，总分仅仅只有卡在起跑线的 +1 分。`;
-                } else if (bId === 'b61') {
-                    detailStr = `距离回本只差一点点，总分恰好被死死卡在 -1 分。`;
-                } else if (bId === 'b62') {
-                    let rIndex=-1;
-                    for(let i=0; i<totalRounds; i++){ if(rounds[i].winner===p.id && (rounds[i].changes[p.id]||0)===0) { rIndex=i; break; } }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局`; detailStr = `好不容易赢了，但其他人居然也跑光了没牌，导致加分为 0！`; }
-                } else if (bId === 'b63') {
-                    let rIndex=-1, v1=0, v2=0;
-                    for(let i=0; i<totalRounds-1; i++){
-                        let c1 = rounds[i].changes[p.id]||0; let c2 = rounds[i+1].changes[p.id]||0;
-                        if(c1<=-50 && c2>=50) { rIndex=i; v1=c1; v2=c2; break; }
-                    }
-                    if(rIndex!==-1) { roundStr = `第${rounds[rIndex].round}局~第${rounds[rIndex+1].round}局`; detailStr = `前一局狂输了 ${v1} 分，紧接着下一局立刻暴赚 ${v2} 分回血！`; }
-                } else if (bId === 'b64') {
-                    let firstVal = p._allChanges[0];
-                    detailStr = `仿佛一个轮回，最新一局的得分 ${firstVal} 恰好等同于第一局的得分！`;
-                }
-
-// ==========================================================
-                // ★★★ 图1 弹窗数据灌入核心引擎 ★★★
-                // ==========================================================
-                // 1. 获取稀有度专属颜色 (SS 是粉色，SSS 是红色，S是橙色等)
+                // 1. 获取稀有度专属颜色
                 let rColor = rarityColors[bDef.rarity] || '#10B981';
 
                 // 2. 左上角炫酷稀有度文字与背景 LOGO
                 els.badgeInfoRarityText.textContent = bDef.rarity;
                 els.badgeInfoRarityText.style.color = rColor;
                 els.badgeInfoRarityIcon.className = `fa-solid ${bDef.icon} absolute z-0 super-heavy-stroke`;
-                // 给后面的 LOGO 一点辅助色，如果不喜欢可以固定写 '#FF8C00'
-                els.badgeInfoRarityIcon.style.color = bDef.color; 
+                els.badgeInfoRarityIcon.style.color = bDef.color; // LOGO底色跟随奖杯主题色
 
-                // 3. 奖杯标题，以及那 50% 透明度的底色
+                // 3. 奖杯标题，以及 45% 透明度的底色
                 els.badgeInfoName.textContent = bDef.name;
-                // 魔法：hexToRgba 将颜色转换为半透明，完美还原你的要求！
                 els.badgeInfoTitleBg.style.backgroundColor = hexToRgba(rColor, 0.45); 
 
                 // 4. 描述文字
@@ -5607,14 +5501,12 @@ function updateUndoRedoButtons() {
                 
                 // 5. 玩家区域 (头像 + 名字)
                 els.badgeInfoAvatar.src = p.avatar;
-                // 为了极致的图1复刻，名字只提取单字
                 els.badgeInfoPlayer.textContent = p.name ? p.name.slice(-1) : '?'; 
-                // 让玩家胶囊的底色变成玩家的代表色 (透明度90%)
-                els.badgeInfoPlayerBg.style.backgroundColor = hexToRgba(p.color, 0.85);
+                els.badgeInfoPlayerBg.style.backgroundColor = hexToRgba(p.color, 0.85); // 代表色 85% 透明度
                 
-                // 6. 填入时机与记录
-                els.badgeInfoRound.textContent = roundStr;
-                els.badgeInfoDetail.textContent = detailStr;
+                // 6. 填入时机与记录 (直接从大脑缓存里提取完美生成的解说词)
+                els.badgeInfoRound.textContent = bData.roundStr;
+                els.badgeInfoDetail.textContent = bData.detailStr;
 
                 // 7. 见证奇迹：弹出窗口！
                 els.badgeInfoDialog.classList.remove('hidden');
@@ -5859,12 +5751,12 @@ function checkResetTimer() {
 // ==========================================
 // 6. 渲染统计表格 (双视图完美整合版)
 // ==========================================
-// 控制视图的全局变量 (1 = 新版卡片视图, 0 = 旧版简约视图)
-window.methodStatViewMode = 1;
+// 控制视图的全局变量 (2 = 全新像素级复刻视图, 1 = 卡片视图, 0 = 列表视图)
+window.methodStatViewMode = 2;
 
-// 绑定给 HTML 按钮的切换视图函数
+// 绑定给 HTML 按钮的切换视图函数 (3种视图循环切换)
 window.toggleMethodStatView = function() {
-    window.methodStatViewMode = window.methodStatViewMode === 1 ? 0 : 1;
+    window.methodStatViewMode = (window.methodStatViewMode + 1) % 3;
     if(typeof renderMethodStatsTable === 'function') renderMethodStatsTable();
 };
 
@@ -5876,6 +5768,9 @@ function renderMethodStatsTable() {
     const winContainer = document.getElementById('newWinStatsList');
     const loseContainer = document.getElementById('newLoseStatsList');
     if(!winContainer || !loseContainer) return;
+
+    // 找到 HTML 里那个并排的旧白色大画框
+    const dualBox = winContainer.parentElement.parentElement;
 
     // 小工具 1：获取方式对应分类的颜色
     const getCatColor = (methodName, type) => {
@@ -5907,10 +5802,9 @@ function renderMethodStatsTable() {
         return item && item.url ? item.url : defaultUrl;
     };
 
-    // 小工具 3：寻找经历过该方式最多次的玩家（找"受害者"或"熟练者"）
+    // 小工具 3：寻找经历过该方式最多次的玩家
     const getTopPlayer = (methodName, type) => {
-        let maxVal = 0;
-        let topP = null;
+        let maxVal = 0; let topP = null;
         const active = gameData.players.filter(p => p.isActive);
         active.forEach(p => {
             let val = type === 'win' ? (p.winMethods[methodName] || 0) : (p.loseMethods[methodName] || 0);
@@ -5919,7 +5813,6 @@ function renderMethodStatsTable() {
         return topP;
     };
 
-    // 旧版视图画笔
     const buildOldRows = (statsObj, total, type) => {
         let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
         if (keys.length === 0) return '<div class="text-center text-gray-400 font-bold text-[10px] sm:text-xs py-2">暂无数据</div>';
@@ -5930,70 +5823,171 @@ function renderMethodStatsTable() {
             let bgColor = getCatColor(m, type);
             return `
             <div class="flex items-stretch border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] overflow-hidden bg-white shadow-sm h-7 sm:h-9 method-stat-row cursor-pointer hover:scale-[1.02] transition-transform shrink-0" data-method="${m}" data-type="${type}">
-                <div class="w-[45%] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] font-black text-[#5E4B8B] text-[10px] sm:text-[13px] tracking-widest px-1 truncate" style="background-color: ${bgColor};">${m}</div>
-                <div class="w-[30%] flex items-center justify-center border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] font-black text-[16px] sm:text-[20px]" style="color: ${numColor}; line-height: 1;">${count}</div>
+                <div class="w-[45%] flex items-center justify-center border-r-[2px] sm:border-[3px] border-[#5E4B8B] font-black text-[#5E4B8B] text-[10px] sm:text-[13px] tracking-widest px-1 truncate" style="background-color: ${bgColor};">${m}</div>
+                <div class="w-[30%] flex items-center justify-center border-r-[2px] sm:border-[3px] border-[#5E4B8B] font-black text-[16px] sm:text-[20px]" style="color: ${numColor}; line-height: 1;">${count}</div>
                 <div class="w-[25%] flex items-center justify-center font-black text-[#5E4B8B] text-[9px] sm:text-[12px]">${pct}</div>
             </div>`;
         }).join('');
     };
 
-    // 新版视图画笔 (像素级复刻图1卡片)
     const buildNewCardRows = (statsObj, total, type) => {
         let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
         if (keys.length === 0) return '<div class="text-center text-gray-400 font-bold text-[10px] sm:text-xs py-2">暂无数据</div>';
         let numColor = type === 'win' ? '#16a34a' : '#dc2626'; 
-        
         return keys.map(m => {
             let count = statsObj[m];
             let pct = total > 0 ? Math.round((count / total) * 100) + '%' : '0%';
             let bgColor = getCatColor(m, type);
             let imgUrl = getMethodUrl(m, type);
             let topPlayer = getTopPlayer(m, type);
-            
             let pName = topPlayer && topPlayer.name ? topPlayer.name.slice(-1) : '?';
             let pColor = topPlayer ? topPlayer.color : '#9CA3AF';
 
             return `
             <div class="flex border-[3px] border-[#5E4B8B] bg-white rounded-[0.5rem] p-1 gap-1.5 method-stat-row cursor-pointer hover:scale-[1.02] transition-transform shadow-[0_2px_0_#5E4B8B] h-[65px] sm:h-[80px] shrink-0" data-method="${m}" data-type="${type}">
-                
-                <!-- 左侧图片区 (等比例缩放) -->
                 <div class="w-[48px] sm:w-[60px] h-full border-[2px] border-[#5E4B8B] rounded-sm overflow-hidden bg-white shrink-0 flex items-center justify-center relative p-[1px]">
                     <img src="${imgUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
                 </div>
-                
-                <!-- 右侧信息区 -->
                 <div class="flex-1 flex flex-col justify-between gap-0.5 min-w-0 h-full">
-                    
-                    <!-- 上方：分类颜色底色 + 方式名称 -->
                     <div class="border-[2px] border-[#5E4B8B] rounded-[4px] flex items-center justify-center py-[2px] sm:py-0.5 px-1 w-full shadow-[0_1px_0_#5E4B8B]" style="background-color: ${bgColor};">
                         <span class="font-black text-[#5E4B8B] text-[10px] sm:text-xs truncate tracking-widest leading-none drop-shadow-sm">${m}</span>
                     </div>
-                    
-                    <!-- 下方：次数 | 百分比 | 玩家 -->
                     <div class="flex border-[2px] border-[#5E4B8B] rounded-[4px] overflow-hidden bg-white w-full h-6 sm:h-7 shadow-[0_1px_0_#5E4B8B]">
-                        <!-- 次数 -->
                         <div class="w-[35%] flex items-center justify-center font-black text-[12px] sm:text-[14px] border-r-[2px] border-[#5E4B8B] leading-none" style="color: ${numColor};">${count}</div>
-                        <!-- 百分比 -->
                         <div class="flex-1 flex items-center justify-center font-black text-[9px] sm:text-[11px] text-[#9BA4C5] border-r-[2px] border-[#5E4B8B] leading-none">${pct}</div>
-                        <!-- 最多玩家 -->
                         <div class="w-6 sm:w-8 flex items-center justify-center font-black text-[10px] sm:text-[12px] text-white text-stroke leading-none" style="background-color: ${pColor};">${pName}</div>
                     </div>
-
                 </div>
             </div>`;
         }).join('');
     };
 
-    // 根据当前的视图状态渲染
-    if (window.methodStatViewMode === 1) {
-        winContainer.innerHTML = buildNewCardRows(gameData.methodStats.win, totalWins, 'win');
-        loseContainer.innerHTML = buildNewCardRows(gameData.methodStats.lose, totalLoses, 'lose');
-    } else {
-        winContainer.innerHTML = buildOldRows(gameData.methodStats.win, totalWins, 'win');
-        loseContainer.innerHTML = buildOldRows(gameData.methodStats.lose, totalLoses, 'lose');
+    // ==============================================================
+    // 🎨 全新画笔：图1完美复刻视图 (View Mode 2) 
+    // ==============================================================
+    const buildUltimateView = (statsObj, type) => {
+        let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
+        if (keys.length === 0) return ''; 
+        
+        let titleText = type === 'win' ? '胜利方式统计' : '淘汰方式统计';
+        let themeColor = type === 'win' ? '#70bf30' : '#ff2534';
+        
+        let cardsHtml = keys.map(m => {
+            let count = statsObj[m];
+            let imgUrl = getMethodUrl(m, type);
+            
+            return `
+            <!-- 
+              ========================================================
+              【UI参数调节面板：容器3 (单个卡牌总容器)】
+              * 宽度控制：w-[10.5vw] (根据手机屏幕百分比分配，保证一页正好露出8个)
+              * 宽度保护：min-w-[38px] max-w-[55px] (防止缩得太小或被拉得太大)
+              * 间距控制：gap-[4px] sm:gap-1.5 (图片和底部次数胶囊之间的垂直距离)
+              ========================================================
+            -->
+            <div class="flex flex-col items-center gap-[6px] sm:gap-4 shrink-0 w-[10.5vw] min-w-[38px] max-w-[55px] sm:w-[55px] method-stat-row cursor-pointer hover:scale-105 transition-transform" data-method="${m}" data-type="${type}">
+                
+                <!-- 
+                  【UI参数调节面板：容器3-1 (图片展示区)】
+                  * 形状比例：aspect-[2/3] (经典修长的卡牌比例)
+                  * 边框描边：border-[2px] sm:border-[2.5px] 颜色：border-[#5E4B8B] 
+                  * 圆角大小：rounded-[4px] sm:rounded-[6px]
+                  * 底部投影：shadow-[0_4px_0_#5E4B8B] (厚重的紫色阴影，4px厚)
+                  * 溢出隐藏：overflow-hidden (极其重要！确保等比缩放的图片被切成圆角)
+                  * 图片缩放模式：object-contain (核心逻辑！确保图片等比缩放贴合边缘且不被乱切)
+                -->
+                <div class="w-full aspect-[2/3] bg-white border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[4px] sm:rounded-[6px] shadow-[0_4px_0_#5E4B8B] overflow-hidden flex items-center justify-center ">
+                    <img src="${imgUrl}" class="w-full h-full object-cover" crossorigin="anonymous">
+                </div>
+                
+                <!-- 
+                  【UI参数调节面板：容器3-2 (次数显示胶囊)】
+                  * 形状：rounded-full (完美胶囊形状)
+                  * 描边：border-[2px] 颜色：border-[#5E4B8B]
+                  * 投影：shadow-[0_4px_0_#5E4B8B]
+                  * 字体：text-white (纯白文字无描边), text-[10px] sm:text-xs (字号)
+                  * 高度：h-[16px] sm:h-[22px] (强制固定高度，不被文字撑破)
+                -->
+                <div class="w-full h-[16px] sm:h-[22px] rounded-full border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B] flex items-center justify-center" style="background-color: ${themeColor};">
+                    <span class="text-white font-black text-[11px] sm:text-[13px] leading-none transform translate-y-[0.5px]">${count}</span>
+                </div>
+            </div>`;
+        }).join('');
+
+        return `
+        <!-- 
+          ========================================================
+          【整体大板块包裹器 (标题 + 大白框)】
+          * 外边距：mb-6 sm:mb-8 (与下一个板块拉开间距)
+          ========================================================
+        -->
+        <div class="flex flex-col items-center w-full mb-6 px-1 sm:px-2">
+            
+            <!-- 
+              【UI参数调节面板：容器1 (大标题胶囊)】
+              * 内边距：px-8 py-1 sm:py-1.5 (控制胶囊的胖瘦长短)
+              * 描边：border-[3px] 颜色：border-[#5E4B8B]
+              * 投影：shadow-[0_4px_0_#5E4B8B]
+              * 字体：text-white (纯白无描边)
+              * 间距：mb-3 sm:mb-4 (与下方容器2的距离)
+            -->
+            <div class="border-[3px] border-[#5E4B8B] rounded-full px-8 sm:px-12 py-1 sm:py-1.5 shadow-[0_4px_0_#5E4B8B] mb-3 sm:mb-4 z-10" style="background-color: ${themeColor};">
+                <span class="font-black text-white text-[15px] sm:text-[18px] tracking-widest leading-none">${titleText}</span>
+            </div>
+            
+            <!-- 
+              【UI参数调节面板：容器2 (容纳卡牌的白色外边框容器)】
+              * 颜色：bg-white
+              * 圆角：rounded-[1rem] sm:rounded-2xl
+              * 描边：border-[3px] sm:border-[4px] 颜色：border-[#5E4B8B]
+              * 投影：shadow-[0_4px_0_#5E4B8B]
+              * 内填充：p-2 sm:p-3 (框边界与内部卡牌的距离)
+            -->
+            <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl shadow-[0_4px_0_#5E4B8B] p-2 sm:p-3">
+                <!-- 
+                  【滑动轨道控制 (容纳容器3)】
+                  * 允许手机原生横滑，但隐藏难看滚动条：overflow-x-auto scrollbar-hide
+                  * 元素间距：gap-[5px] sm:gap-2 (卡片之间的横向距离)
+                  * 底部留白：pb-[6px] (极其重要！给卡片底部的4px投影留出空间，防止被残忍切断)
+                -->
+                <div class="flex items-start justify-start gap-[5px] sm:gap-2 w-full overflow-x-auto scrollbar-hide pb-[6px] px-0.5">
+                    ${cardsHtml}
+                </div>
+            </div>
+        </div>`;
+    };
+
+    // -----------------------------------------------------------
+    // 视图切换调度中心
+    // -----------------------------------------------------------
+    if (window.methodStatViewMode === 0 || window.methodStatViewMode === 1) {
+        dualBox.style.display = 'flex'; // 恢复原本的并排布局大框
+        let ultimateBox = document.getElementById('methodStatUltimateContainer');
+        if (ultimateBox) ultimateBox.style.display = 'none';
+
+        if (window.methodStatViewMode === 1) {
+            winContainer.innerHTML = buildNewCardRows(gameData.methodStats.win, totalWins, 'win');
+            loseContainer.innerHTML = buildNewCardRows(gameData.methodStats.lose, totalLoses, 'lose');
+        } else {
+            winContainer.innerHTML = buildOldRows(gameData.methodStats.win, totalWins, 'win');
+            loseContainer.innerHTML = buildOldRows(gameData.methodStats.lose, totalLoses, 'lose');
+        }
+    } else if (window.methodStatViewMode === 2) {
+        dualBox.style.display = 'none'; // 彻底隐藏原本的并排布局大框
+
+        let ultimateBox = document.getElementById('methodStatUltimateContainer');
+        if (!ultimateBox) {
+            // 如果是第一次进入视图2，动态创建一个专属于它的容器
+            ultimateBox = document.createElement('div');
+            ultimateBox.id = 'methodStatUltimateContainer';
+            ultimateBox.className = 'w-full flex flex-col mt-2';
+            dualBox.parentElement.appendChild(ultimateBox);
+        }
+        ultimateBox.style.display = 'flex';
+        // 依次画出 胜利板块 和 淘汰板块
+        ultimateBox.innerHTML = buildUltimateView(gameData.methodStats.win, 'win') + buildUltimateView(gameData.methodStats.lose, 'lose');
     }
 }
-
 // 【新增核心功能】画出淘汰顺序表
 function renderEliminationOrder() {
     const bloodNames =['一血', '二血', '三血', '四血', '五血', '六血', '七血', '八血', '九血', '十血'];
