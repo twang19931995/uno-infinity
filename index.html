@@ -34,6 +34,31 @@
     </script>
 
     <style type="text/tailwindcss">
+
+/* --- 【新增】淘汰顺位表格高级固定样式 --- */
+@layer utilities {
+    /* 锁定第一横排 (上下滑动时不动) */
+    .sticky-header th {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+    /* 锁定第一竖列 (左右滑动时不动) */
+    .sticky-col {
+        position: sticky;
+        left: 0;
+        z-index: 10;
+    }
+    /* 锁定左上角的交叉点 (上下左右滑动都不动) */
+    .sticky-cross {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 30;
+    }
+}
+/* -------------------------------------- */
+
 /* --- 【新增】时间记录模块：电子屏字体与专属样式 --- */
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -785,17 +810,37 @@
 <!-- ======================================= -->
 
 <!-- ======================================= -->
-        <!-- 【新增】淘汰顺序统计模块 开始          -->
+        <!-- 【全新复刻】淘汰顺序统计模块 开始          -->
         <!-- ======================================= -->
-        <section id="eliminationOrderSection" class="kawaii-card p-3 sm:p-5 mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg sm:text-xl font-bold text-[#5E4B8B] flex items-center">
-                    <i class="fa-solid fa-list-ol text-primary mr-2"></i>淘汰顺位详细信息
-                </h2>
-                <div class="flex gap-2">
-                    <button id="elimOrderTab2" class="px-3 py-1 rounded-xl font-bold text-xs sm:text-sm transition-colors bg-[#5E4B8B] text-white shadow-[0_2px_0_rgba(0,0,0,0.2)] active:translate-y-0.5 active:shadow-none">详细轮次</button>
-                    <button id="elimOrderTab1" class="px-3 py-1 rounded-xl font-bold text-xs sm:text-sm transition-colors bg-gray-100 text-gray-500 hover:bg-gray-200 shadow-[0_2px_0_rgba(0,0,0,0.1)] active:translate-y-0.5 active:shadow-none">综合统计</button>
+        <section id="eliminationOrderSection" class="kawaii-card p-3 sm:p-5 mb-6 relative">
+            
+            <!-- 容器1 & 容器2：标题与切换按钮区 -->
+            <div class="flex flex-col items-center mb-4 sm:mb-6 w-full relative gap-3">
+                
+                <!-- 容器1：主标题 -->
+                <!--[小白调节区] bg-[#fff799]是浅黄底色，text-[#5E4B8B]是紫色文字，shadow-[0_4px_0_#5E4B8B]是4像素的底部紫色投影 -->
+                <div class="bg-[#fff799] border-[3px] border-[#5E4B8B] rounded-full px-8 sm:px-12 py-1.5 shadow-[0_4px_0_#5E4B8B] z-10">
+                    <span class="font-black text-[#5E4B8B] text-lg sm:text-xl tracking-widest leading-none">对战顺位记录</span>
                 </div>
+
+                <!-- 容器2：视图切换按钮组 -->
+                <!-- [小白调节区] bg-[#5E4B8B]是外框颜色，shadow-[0_4px_0_#5E4B8B]是外框投影 -->
+                <div class="flex items-center justify-center bg-[#5E4B8B] border-[3px] border-[#5E4B8B] rounded-full overflow-hidden shadow-[0_4px_0_#5E4B8B]">
+                    <!-- 左侧：详细轮次按钮。默认背景色为图1的 #7ecef4 -->
+                    <button id="elimOrderTab2" class="px-6 py-1.5 font-black text-sm sm:text-base transition-colors bg-[#7ecef4] text-white">详细轮次</button>
+                    <!-- 右侧：综合统计按钮。默认背景色为图1的 #b3d465 -->
+                    <button id="elimOrderTab1" class="px-6 py-1.5 font-black text-sm sm:text-base transition-colors bg-[#b3d465] text-[#5E4B8B]">综合统计</button>
+                </div>
+            </div>
+
+            <!-- 详细轮次视图 (容器3：表格大外框) -->
+            <!-- [小白调节区] max-h-[380px]：控制这里最大能显示多高（约能显示7-10行），超出就会出现内部滑动。
+                 overflow-auto scrollbar-hide：允许上下左右滑动，但隐藏丑陋的滚动条！ -->
+            <div id="elimOrderView2" class="overflow-auto scrollbar-hide border-[3px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl shadow-[0_4px_0_#5E4B8B] max-h-[380px] sm:max-h-[450px] w-full relative bg-white">
+                <!-- min-w-max 确保内容过多时可以左右滑动，不会挤作一团 -->
+                <table class="w-full text-center border-collapse min-w-max" id="elimRoundTable">
+                    <!-- JS动态填充 -->
+                </table>
             </div>
 
             <!-- 详细轮次视图 (默认显示) -->
@@ -6337,34 +6382,42 @@ function renderEliminationOrder() {
     playerTableHTML += `</tbody>`;
     plTab.innerHTML = playerTableHTML;
 
-// 渲染详细轮次 (复刻图1)
+// ==========================================
+    // 渲染详细轮次 (百分百像素级复刻最新图1)
+    // ==========================================
     const getShortName = (name) => name ? name.slice(-1) : '?';
-    // 血次对应的红色底色 (一血最深，逐级变浅)
-    const bloodBgColors =['#73161C', '#841B22', '#C62025', '#CF3237', '#E5585E', '#F08080', '#FFA07A', '#FFC0CB'];
-
-    let roundTableHTML = `<thead class="border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] shadow-sm"><tr>`;
-    // 轮次表头
-    roundTableHTML += `<th class="py-1 px-0.5 sm:px-1 border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] bg-[#8F9AA9] text-white w-[8%] sm:w-[8%] text-[10px] sm:text-xs">轮次</th>`;
     
-    // 活跃玩家表头
+    //[小白调节区：血次对应的底色] 一血最深，逐级变浅。严格复刻图1要求。
+    const bloodBgColors =['#9c0a00', '#ba1b0f', '#d43024', '#eb483a', '#f5695d', '#fa8a82', '#ffaba6', '#ffcfcc'];
+
+    // --- 开始构建表头 (第一横排) ---
+    // [小白调节区] sticky-header 让它在上下滑动时固定在顶部不动。
+    let roundTableHTML = `<thead class="sticky-header shadow-sm"><tr>`;
+    
+    // 1. 左上角交叉点 (轮次表头)：上下左右滑动都不动 (sticky-cross)
+    // bg-[#389ff5] 是图1中的亮蓝色，text-white 白字。
+    roundTableHTML += `<th class="sticky-cross py-1 px-1 border-r-[2px] sm:border-r-[3px] border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] bg-[#389ff5] text-white w-[10%] min-w-[40px] sm:min-w-[50px] text-[10px] sm:text-xs"></th>`;
+    
+    // 2. 活跃玩家表头：底色为玩家专属色，文字白色外描边
     active.forEach(p => {
         roundTableHTML += `
-        <th class="py-1 px-0.5 sm:px-1 border-r-[2px] sm:border-r-[3px] border-[#5E4B8B]" style="background-color:${p.color};">
-            <div class="flex items-center justify-center gap-0.5 sm:gap-1">
-                <div class="w-4 h-4 sm:w-6 sm:h-6 rounded-[4px] sm:rounded-md border-[1.5px] sm:border-[2px] border-[#5E4B8B] overflow-hidden bg-black shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous"></div>
-                <span class="text-white font-black text-[11px] sm:text-sm text-stroke tracking-widest leading-none">${getShortName(p.name)}</span>
-            </div>
+        <th class="py-2 px-1 border-r-[2px] sm:border-r-[3px] border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] min-w-[70px] sm:min-w-[90px]" style="background-color:${p.color};">
+            <!-- text-stroke 是白色外描边 -->
+            <span class="text-white font-black text-[14px] sm:text-[18px] text-stroke tracking-widest leading-none drop-shadow-sm">${getShortName(p.name)}</span>
         </th>`;
     });
     
-    // 复活与时间表头
-    roundTableHTML += `<th class="py-1 px-0.5 sm:px-1 border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] bg-[#A3E088] text-[#5E4B8B] w-[13%] sm:w-[12%] text-[9px] sm:text-xs leading-tight">该局<br>复活玩家</th>`;
-    roundTableHTML += `<th class="py-1 px-0.5 sm:px-1 bg-[#FFD11A] text-[#5E4B8B] w-[13%] sm:w-[12%] text-[9px] sm:text-xs leading-tight">剩余<br>时间</th>`;
-    roundTableHTML += `</tr></thead><tbody>`;
+    // 3. 右侧三个特殊表头 (复活玩家、本局耗时、剩余时间)
+    // bg-[#1f8316] 深绿色, bg-[#00b7ef] 亮蓝色, bg-[#88abda] 灰蓝色
+    roundTableHTML += `<th class="py-1 px-1 border-r-[2px] sm:border-r-[3px] border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] bg-[#1f8316] text-white min-w-[45px] sm:min-w-[55px] text-[10px] sm:text-[11px] leading-tight font-black tracking-widest">复活<br>玩家</th>`;
+    roundTableHTML += `<th class="py-1 px-1 border-r-[2px] sm:border-r-[3px] border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] bg-[#00b7ef] text-white min-w-[55px] sm:min-w-[65px] text-[10px] sm:text-[11px] leading-tight font-black tracking-widest">本局<br>耗时</th>`;
+    roundTableHTML += `<th class="py-1 px-1 border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] bg-[#88abda] text-white min-w-[55px] sm:min-w-[65px] text-[10px] sm:text-[11px] leading-tight font-black tracking-widest">剩余<br>时间</th>`;
+    roundTableHTML += `</tr></thead><tbody class="bg-white">`;
 
+    // 时间格式化工具 (处理成 00:00 格式)
     const formatTime = (secs) => {
-        if (secs === undefined || secs === null || secs <= 0) return '/';
-        const m = String(Math.floor(secs / 60));
+        if (secs === undefined || secs === null || isNaN(secs) || secs < 0) return '00:00';
+        const m = String(Math.floor(secs / 60)).padStart(2, '0');
         const s = String(secs % 60).padStart(2, '0');
         return `${m}:${s}`;
     };
@@ -6373,97 +6426,126 @@ function renderEliminationOrder() {
     
     // 如果没有数据时的显示
     if (reversedRounds.length === 0) {
-        roundTableHTML += `<tr><td colspan="${active.length + 3}" class="py-4 text-gray-400 bg-white">暂无数据</td></tr>`;
+        roundTableHTML += `<tr><td colspan="${active.length + 4}" class="py-6 text-gray-400 font-bold bg-white text-sm">暂无对战顺位数据</td></tr>`;
     }
 
-    // 循环每一局的数据画格子
+    // --- 开始循环每一局画格子 ---
     reversedRounds.forEach(r => {
         if (!r.v2Stats) return;
 
-        roundTableHTML += `<tr class="border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] last:border-b-0 bg-white">`;
-        // 画轮次
-        roundTableHTML += `<td class="py-1 sm:py-1.5 px-0.5 sm:px-1 border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] bg-[#7D8899] text-white font-black text-xs sm:text-base opacity-90">${r.round}</td>`;
+        roundTableHTML += `<tr class="border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] last:border-b-0">`;
+        
+        // 1. 画首列轮次 (左右滑动时固定不动 sticky-col)
+        // bg-[#389ff5] 亮蓝色底，白色字体
+        roundTableHTML += `<td class="sticky-col py-1 sm:py-1.5 px-0.5 sm:px-1 border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] bg-[#389ff5] text-white font-black text-lg sm:text-xl drop-shadow-sm">${r.round}</td>`;
 
         let elimEvents = r.v2Stats.eliminationEvents ||[];
         let elimDetails = r.v2Stats.eliminationDetails || {};
 
-        // 画每一个玩家的格子
+        // 2. 画每一个玩家的格子
         active.forEach(p => {
             roundTableHTML += `<td class="p-0 border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] h-full align-middle">`;
             
-            // 1. 如果是胜利玩家 (绿底白字 WIN)
+            // --- 情况 A: 胜利玩家 ---
+            // bg-[#70bf30] 绿色底，白字 "胜"
             if (r.winner === p.id) {
-                roundTableHTML += `<div class="w-full h-full min-h-[30px] sm:min-h-[40px] bg-[#89C548] flex items-center justify-center">
-                    <span class="text-white font-black text-[12px] sm:text-base tracking-widest text-stroke">WIN</span>
+                roundTableHTML += `<div class="w-full h-full min-h-[40px] sm:min-h-[50px] bg-[#70bf30] flex items-center justify-center">
+                    <span class="text-white font-black text-[22px] sm:text-[26px] tracking-widest drop-shadow-md">胜</span>
                 </div>`;
             } 
-            // 2. 如果是被淘汰的玩家 (带凶手和几血)
+            // --- 情况 B: 被淘汰玩家 (图1精美复刻版) ---
             else if (r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]) {
                 let bloodLevelIndex = elimEvents.findIndex(group => group.includes(p.id));
-                let bloodLevelStr = bloodLevelIndex >= 0 ? bloodNames[bloodLevelIndex] : '淘汰';
+                let bloodNum = bloodLevelIndex >= 0 ? (bloodLevelIndex + 1) : '-'; // 显示数字几血
                 let bgColor = bloodBgColors[Math.min(bloodLevelIndex >= 0 ? bloodLevelIndex : 0, bloodBgColors.length - 1)];
 
                 let killerId = elimDetails[p.id] ? elimDetails[p.id].killerId : null;
                 let killerP = killerId ? gameData.players.find(x => x.id === killerId) : null;
 
-                if (killerP) {
-                    // 有凶手：上半部分白底写凶手名，下半部分红底写几血
-                    roundTableHTML += `
-                    <div class="flex flex-col w-full h-full min-h-[30px] sm:min-h-[40px]">
-                        <div class="h-1/2 bg-white flex items-center justify-center border-b-[1.5px] sm:border-b-[2px] border-[#5E4B8B] py-[1px]">
-                            <span class="font-black text-[10px] sm:text-[11px]" style="color:${killerP.color}">${getShortName(killerP.name)}</span>
-                        </div>
-                        <div class="h-1/2 flex items-center justify-center py-[1px]" style="background-color:${bgColor}">
-                            <span class="text-white font-black text-[10px] sm:text-[11px] tracking-widest">${bloodLevelStr}</span>
-                        </div>
-                    </div>`;
-                } else {
-                    // 没有凶手(自然淘汰)：一整块红底写几血
-                    roundTableHTML += `
-                    <div class="w-full h-full min-h-[30px] sm:min-h-[40px] flex items-center justify-center py-[1px]" style="background-color:${bgColor}">
-                        <span class="text-white font-black text-[10px] sm:text-[11px] tracking-widest">${bloodLevelStr}</span>
-                    </div>`;
+                let killerName = '系统'; let kColor = '#6B7280';
+                if (killerId === p.id) {
+                    killerName = '自己'; kColor = p.color; // 极其严谨：如果是自杀显示“自己”和自己的颜色
+                } else if (killerP) {
+                    killerName = getShortName(killerP.name); kColor = killerP.color;
                 }
+
+                // 提取我们之前新增保存的该局耗时（用来作为存活时间的近似值展现）
+                let surviveTime = r.v2Stats.stopwatchTime ? formatTime(r.v2Stats.stopwatchTime) : '00:00';
+
+                // [小白调节区：被淘汰玩家卡片内部排版]
+                roundTableHTML += `
+                <div class="w-full h-full min-h-[40px] sm:min-h-[50px] relative flex items-center justify-between p-1" style="background-color:${bgColor}">
+                    
+                    <!-- 内部容器1：左侧显示几血的超大数字 (白字) -->
+                    <div class="font-black text-white text-[28px] sm:text-[34px] leading-none pl-1 sm:pl-2 drop-shadow-md tracking-tighter">${bloodNum}</div>
+                    
+                    <!-- 右侧容器：上下排列名字和时间 -->
+                    <div class="flex flex-col items-end justify-center gap-[2px] pr-0.5 sm:pr-1">
+                        <!-- 内部容器2：凶手名字胶囊 (白字白描边，底色为玩家色，放右上) -->
+                        <div class="rounded-[4px] border-[1.5px] border-white px-1 py-[1px] shadow-sm" style="background-color: ${kColor};">
+                            <span class="font-black text-white text-[9px] sm:text-[10px] text-stroke leading-none block tracking-widest">${killerName}</span>
+                        </div>
+                        
+                        <!-- 内部容器3：存活时间 (白色字体，专属 LESLIE 电子字体) -->
+                        <span class="font-leslie text-white text-[10px] sm:text-[12px] tracking-wider leading-none drop-shadow-sm mt-0.5">${surviveTime}</span>
+                    </div>
+                </div>`;
             } 
-            // 3. 既没赢也没死 (存活)
+            // --- 情况 C: 未参与或没死没赢 (灰色底) ---
             else {
-                roundTableHTML += `<div class="w-full h-full min-h-[30px] sm:min-h-[40px] bg-white flex items-center justify-center">
-                    <span class="text-[#5E4B8B] font-bold text-[11px] sm:text-sm">/</span>
+                roundTableHTML += `<div class="w-full h-full min-h-[40px] sm:min-h-[50px] bg-[#e5e7eb] flex items-center justify-center">
+                    <span class="text-[#9ca3af] font-bold text-[14px] sm:text-base">/</span>
                 </div>`;
             }
 
             roundTableHTML += `</td>`;
         });
 
-        // 画该局复活玩家
-        let revivedStr = '<span class="text-[#5E4B8B] font-bold text-[11px] sm:text-sm">/</span>';
-        let revivedBg = 'bg-white';
+        // 3. 画复活玩家列
+        // [小白调节区] 如果有复活：bg-[#00ff00] 亮绿，白字外描边。如果没有：bg-[#acd598] 浅绿，黑字斜杠
+        let revivedStr = '<span class="text-[#5E4B8B] font-black text-[16px] sm:text-lg">/</span>';
+        let revivedBg = 'bg-[#acd598]';
         if (r.v2Stats.revivedPlayerId) {
             let rp = gameData.players.find(x => x.id === r.v2Stats.revivedPlayerId);
             if (rp) { 
-                revivedBg = 'bg-[#DCA1AD]'; // 图1同款复活粉底色
-                revivedStr = `
-                <div class="flex items-center justify-center gap-0.5 sm:gap-1 w-full h-full px-0.5">
-                    <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-[4px] sm:rounded-md border-[1.5px] sm:border-[2px] border-[#5E4B8B] overflow-hidden bg-black shrink-0"><img src="${rp.avatar}" class="w-full h-full object-cover" crossorigin="anonymous"></div>
-                    <span class="text-white font-black text-[10px] sm:text-[13px] text-stroke tracking-widest leading-none">${getShortName(rp.name)}</span>
-                </div>`;
+                revivedBg = 'bg-[#00ff00]'; 
+                revivedStr = `<span class="text-white font-black text-[14px] sm:text-[16px] text-stroke tracking-widest leading-none drop-shadow-sm">${getShortName(rp.name)}</span>`;
             }
         }
         roundTableHTML += `<td class="p-0 border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] ${revivedBg} h-full align-middle">
-            <div class="flex items-center justify-center w-full h-full min-h-[30px] sm:min-h-[40px]">${revivedStr}</div>
+            <div class="flex items-center justify-center w-full h-full min-h-[40px] sm:min-h-[50px]">${revivedStr}</div>
         </td>`;
 
-        // 画剩余时间
-        let timeStr = '/';
-        let timeBg = 'bg-[#7D8899]';
-        let timeColor = 'text-[#5E4B8B]'; 
-        if (r.v2Stats.timerRemainAtEnd > 0) {
-            timeStr = formatTime(r.v2Stats.timerRemainAtEnd);
-            timeBg = 'bg-[#FFF7E0]'; // 有时间时图1同款浅黄底色
-            timeColor = 'text-[#5E4B8B]';
+        // 4. 画本局耗时列 (固定格式：bg-[#cadaef] 浅蓝灰，紫色电子字体)
+        let totalTimeStr = r.v2Stats.stopwatchTime ? formatTime(r.v2Stats.stopwatchTime) : '00:00';
+        roundTableHTML += `<td class="py-1 px-1 bg-[#cadaef] border-r-[2px] sm:border-r-[3px] border-[#5E4B8B] align-middle text-center">
+            <span class="font-leslie text-[#5E4B8B] font-bold text-[11px] sm:text-[13px] tracking-wider leading-none block">${totalTimeStr}</span>
+        </td>`;
+
+        // 5. 画剩余时间列 (判定是否进入倒计时)
+        let timeStr = '未进入<br>倒计时';
+        let timeBg = 'bg-[#ababab]';
+        let timeColor = 'text-white';
+        let timeFontClass = 'font-black text-[8px] sm:text-[9px] leading-tight';
+
+        if (r.v2Stats.timerRemainAtEnd !== undefined && r.v2Stats.timerRemainAtEnd !== null) {
+            if (r.v2Stats.timerRemainAtEnd <= 0) {
+                // 耗尽状态
+                timeStr = '耗尽';
+                timeBg = 'bg-[#fb2a53]'; // 大红色
+                timeColor = 'text-white';
+                timeFontClass = 'font-black text-[13px] sm:text-[15px] tracking-widest drop-shadow-sm';
+            } else {
+                // 有剩余时间 (与本局耗时同款配色)
+                timeStr = formatTime(r.v2Stats.timerRemainAtEnd);
+                timeBg = 'bg-[#cadaef]'; 
+                timeColor = 'text-[#5E4B8B]';
+                timeFontClass = 'font-leslie font-bold text-[11px] sm:text-[13px] tracking-wider';
+            }
         }
-        roundTableHTML += `<td class="py-1 px-0.5 sm:px-1 ${timeBg} ${timeColor} font-black text-[11px] sm:text-sm tracking-wider align-middle">
-            ${timeStr}
+        
+        roundTableHTML += `<td class="py-1 px-1 ${timeBg} align-middle text-center">
+            <span class="${timeColor} ${timeFontClass} block">${timeStr}</span>
         </td>`;
 
         roundTableHTML += `</tr>`;
@@ -6613,20 +6695,28 @@ function bindV2Events() {
         document.getElementById('closeSessionFilterBtn').onclick = () => {
             document.getElementById('sessionFilterDialog').classList.add('hidden');
         };
-    // 绑定淘汰顺序统计的 Tab 切换
+// 绑定淘汰顺序统计的 Tab 切换 (适配全新的颜色 UI)
     const t1 = document.getElementById('elimOrderTab1');
     const t2 = document.getElementById('elimOrderTab2');
     const v1 = document.getElementById('elimOrderView1');
     const v2 = document.getElementById('elimOrderView2');
     if(t1 && t2) {
         t1.onclick = () => {
-            t1.classList.replace('bg-gray-100', 'bg-[#5E4B8B]'); t1.classList.replace('text-gray-500', 'text-white');
-            t2.classList.replace('bg-[#5E4B8B]', 'bg-gray-100'); t2.classList.replace('text-white', 'text-gray-500');
+            // 点击综合统计 (变绿 #b3d465，紫字)
+            t1.classList.replace('bg-[#5E4B8B]', 'bg-[#b3d465]'); 
+            t1.classList.add('text-[#5E4B8B]'); t1.classList.remove('text-white');
+            // 详细轮次变回暗紫色
+            t2.classList.replace('bg-[#7ecef4]', 'bg-[#5E4B8B]'); 
+            t2.classList.add('text-[#5E4B8B]'); t2.classList.remove('text-white');
             v1.classList.remove('hidden'); v2.classList.add('hidden');
         };
         t2.onclick = () => {
-            t2.classList.replace('bg-gray-100', 'bg-[#5E4B8B]'); t2.classList.replace('text-gray-500', 'text-white');
-            t1.classList.replace('bg-[#5E4B8B]', 'bg-gray-100'); t1.classList.replace('text-white', 'text-gray-500');
+            // 点击详细轮次 (变蓝 #7ecef4，白字)
+            t2.classList.replace('bg-[#5E4B8B]', 'bg-[#7ecef4]'); 
+            t2.classList.add('text-white'); t2.classList.remove('text-[#5E4B8B]');
+            // 综合统计变回暗紫色
+            t1.classList.replace('bg-[#b3d465]', 'bg-[#5E4B8B]'); 
+            t1.classList.add('text-[#5E4B8B]'); t1.classList.remove('text-[#5E4B8B]');
             v2.classList.remove('hidden'); v1.classList.add('hidden');
         };
     }
