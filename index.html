@@ -6422,7 +6422,7 @@ function renderEliminationOrder() {
         </th>`;
     });
     
-    // 3. 右侧三个特殊表头：钉在顶部 top-0，z-index 次高 (20)！
+    // 3. 右侧三个特殊表头：钉在顶部 top-0，z-index 次高 (20)！ 
     roundTableHTML += `<th class="sticky top-0 z-[20] py-1 px-1 border-r-[2px] sm:border-r-[3px] border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] bg-[#1f8316] text-white min-w-[45px] sm:min-w-[55px] text-[10px] sm:text-[11px] leading-tight font-black tracking-widest shadow-sm">复活<br>玩家</th>`;
     roundTableHTML += `<th class="sticky top-0 z-[20] py-1 px-1 border-r-[2px] sm:border-r-[3px] border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] bg-[#00b7ef] text-white min-w-[55px] sm:min-w-[65px] text-[10px] sm:text-[11px] leading-tight font-black tracking-widest shadow-sm">本局<br>耗时</th>`;
     roundTableHTML += `<th class="sticky top-0 z-[20] py-1 px-1 border-b-[2px] sm:border-b-[3px] border-[#5E4B8B] bg-[#88abda] text-white min-w-[55px] sm:min-w-[65px] text-[10px] sm:text-[11px] leading-tight font-black tracking-widest shadow-sm">剩余<br>时间</th>`;
@@ -6483,15 +6483,15 @@ function renderEliminationOrder() {
 
                 let surviveTime = r.v2Stats.stopwatchTime ? formatTime(r.v2Stats.stopwatchTime) : '00:00';
 
-                // [小白调节区：被淘汰玩家卡片内部排版]
+                // [小白调节区：被淘汰玩家卡片内部排版]-text-stroke style="background-color: ${kColor};
                 roundTableHTML += `
                 <div class="w-full h-full min-h-[40px] sm:min-h-[50px] relative flex items-center justify-between p-1" style="background-color:${bgColor}">
                     <div class="font-black text-white text-[28px] sm:text-[34px] leading-none pl-1 sm:pl-2 drop-shadow-md tracking-tighter">${bloodNum}</div>
                     <div class="flex flex-col items-end justify-center gap-[2px] pr-0.5 sm:pr-1">
-                        <div class="rounded-[4px] border-[1.5px] border-white px-1 py-[1px] shadow-sm" style="background-color: ${kColor};">
-                            <span class="font-black text-white text-[9px] sm:text-[10px] text-stroke leading-none block tracking-widest">${killerName}</span>
+                        <div class="top-0xl rounded-[0px] border-[0px] border-white px-0 py-[0px] shadow-sm style="background-color: ${kColor};">
+                            <span class="font-black text-[9px] sm:text-[10px]  leading-none text-white block tracking-widest">${killerName}</span>
                         </div>
-                        <span class="font-leslie text-white text-[10px] sm:text-[12px] tracking-wider leading-none drop-shadow-sm mt-0.5">${surviveTime}</span>
+                        <span class="font-leslie text-white text-[6px] sm:text-[6px] tracking-wider leading-none drop-shadow-sm mt-0.5">${surviveTime}</span>
                     </div>
                 </div>`;
             } 
@@ -6529,7 +6529,7 @@ function renderEliminationOrder() {
         let timeStr = '未进入<br>倒计时';
         let timeBg = 'bg-[#ababab]';
         let timeColor = 'text-white';
-        let timeFontClass = 'font-black text-[8px] sm:text-[9px] leading-tight';
+        let timeFontClass = 'font-black text-[10px] sm:text-[6px] leading-tight';
 
         if (r.v2Stats.timerRemainAtEnd !== undefined && r.v2Stats.timerRemainAtEnd !== null) {
             if (r.v2Stats.timerRemainAtEnd <= 0) {
