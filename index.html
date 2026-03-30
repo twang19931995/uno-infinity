@@ -203,47 +203,34 @@
         .status-scroll::-webkit-scrollbar-thumb { background: #B0B0B0; border: 2px solid #5E4B8B; }
     </style>
 </head>
-<body class="min-h-screen pb-10" id="appBody" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
+<body class="min-h-screen pb-[120px]" id="appBody" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);"><body class="min-h-screen pb-[120px]" id="appBody" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
     
     <div id="mainContainer" class="container mx-auto px-2 py-4 max-w-[800px] relative flex flex-col"> 
+<!-- 【极其关键：防死机幽灵口袋】专门用来骗过老JS引擎，防止报错卡死全局 -->
+        <div id="ghost-elements" style="display: none;">
+            <button id="presetMenuBtn"></button>
+            <button id="savePresetBtn"></button>
+            <button id="exportPresetsBtn"></button>
+            <button id="importPresetsBtn"></button>
+            <input type="file" id="importPresetsFile">
+            <div id="presetListContainer"></div>
+            <button id="staticModuleBtn"></button>
+        </div>
         
-<!-- 右上角三剑客按钮组 -->
-        <div class="absolute top-4 right-4 z-50 flex gap-2 items-start">
-            <!-- 1. 布局预设按钮 (蓝) -->
+<!-- 【修改后】右上角专属设置按钮 (已删除预设和模块排序) -->
+        <div class="absolute top-4 right-4 z-50 flex items-start">
             <div class="relative">
-                <button id="presetMenuBtn" class="w-9 h-9 sm:w-10 sm:h-10 bg-[#93C5FD] border-[3px] sm:border-4 border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110">
-                    <i class="fa-solid fa-table-cells-large text-[#5E4B8B] text-sm sm:text-base"></i>
-                </button>
-                <!-- 预设下拉面板 -->
-                <div id="presetPalette" class="hidden absolute right-0 top-12 bg-white border-4 border-[#5E4B8B] p-4 rounded-2xl w-64 shadow-xl z-50 max-h-[80vh] overflow-y-auto custom-scroll">
-                    <h3 class="text-xs font-bold text-gray-400 mb-3 border-b border-gray-100 pb-2">我的布局预设</h3>
-                    <div id="presetListContainer" class="flex flex-col gap-2 mb-3">
-                        <!-- JS动态填充 -->
-                    </div>
-<button id="savePresetBtn" class="w-full kawaii-btn bg-success text-white py-1.5 text-sm shadow-sm hover:brightness-110 border-[3px]">
-                        <i class="fa-solid fa-plus mr-1"></i>保存当前布局
-                    </button>
-                    <!-- 新增的导出导入按钮 -->
-                    <div class="flex gap-2 mt-2">
-                        <button id="exportPresetsBtn" class="flex-1 kawaii-btn bg-white text-[#5E4B8B] py-1.5 text-sm shadow-sm hover:bg-gray-50 border-[3px]">导出</button>
-                        <button id="importPresetsBtn" class="flex-1 kawaii-btn bg-white text-[#5E4B8B] py-1.5 text-sm shadow-sm hover:bg-gray-50 border-[3px]">导入</button>
-                        <input type="file" id="importPresetsFile" class="hidden" accept=".xlsx, .xls">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. 模块集成按钮 (黄) -->
-            <button id="staticModuleBtn" class="w-9 h-9 sm:w-10 sm:h-10 bg-[#FFD93D] border-[3px] sm:border-4 border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" title="模块显示与排序">
-                <i class="fa-solid fa-layer-group text-[#5E4B8B] text-sm sm:text-base"></i>
-            </button>
-
-            <!-- 3. 页面文字设置按钮 (红) -->
-            <div class="relative">
-                <button id="bgSwitcherBtn" class="w-9 h-9 sm:w-10 sm:h-10 bg-[#F87171] border-[3px] sm:border-4 border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110">
+                <!-- 
+                  【小白调节区：右上角设置按钮】
+                  * bg-[#F87171]: 按钮底色（红色）
+                  * border-[3px]: 描边粗细
+                  * shadow-[0_3px_0_#5E4B8B]: 底部的厚重投影
+                -->
+                <button id="bgSwitcherBtn" class="w-9 h-9 sm:w-10 sm:h-10 bg-[#F87171] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110">
                     <i class="fa-solid fa-gear text-white text-sm sm:text-base"></i>
                 </button>
-                <!-- 设置下拉面板 -->
-                <div id="bgPalette" class="hidden absolute right-0 top-12 bg-white border-4 border-[#5E4B8B] p-4 rounded-2xl w-72 shadow-xl z-50 max-h-[80vh] overflow-y-auto custom-scroll">
+                <!-- 设置下拉面板 (保留原样) -->
+                <div id="bgPalette" class="hidden absolute right-0 top-12 bg-white border-[4px] border-[#5E4B8B] p-4 rounded-2xl w-[280px] shadow-xl z-50 max-h-[80vh] overflow-y-auto custom-scroll">
                     <h3 class="text-xs font-bold text-gray-400 mb-2">全局背景风格</h3>
                     <div class="grid grid-cols-4 gap-2 mb-4" id="bodyBgGrid"></div>
                     <h3 class="text-xs font-bold text-gray-400 mb-2 border-t border-gray-100 pt-2">卡片底色</h3>
@@ -284,9 +271,21 @@
             </div>
         </div>
 
-<header id="mainHeader" class="text-center mb-6" style="order: 0;">
-            <h1 class="text-4xl md:text-6xl font-black text-white drop-shadow-[0_4px_0_#5E4B8B] py-2 tracking-wide">UNO INFINITY</h1>
-        </header>
+<!-- 【新增】手机端顶部动态胶囊标题 -->
+        <div id="topTabHeader" class="flex justify-center items-center w-full mt-2 mb-6 sticky top-4 z-[45]">
+            <!-- 
+              【小白调节区：顶部动态胶囊】
+              * px-10 py-2: 控制胶囊的宽窄和高矮，数值越大胶囊越长越厚
+              * rounded-full: 让它变成完美的半圆形胶囊
+              * border-[4px]: 紫色描边的粗细
+              * shadow-[0_4px_0_#5E4B8B]: 底部的厚重紫色阴影！
+              * transition-colors duration-300: 颜色切换时的平滑渐变动画
+              * (特效备用代码：如果你想要外发光，可以加上 shadow-[0_0_15px_rgba(255,255,255,0.8)])
+            -->
+            <div id="topTabCapsule" class="bg-[#FCA5A5] border-[4px] border-[#5E4B8B] rounded-full px-12 py-2 shadow-[0_4px_0_#5E4B8B] transition-colors duration-300 flex items-center justify-center min-w-[160px]">
+                <span id="topTabText" class="font-black text-[#5E4B8B] text-xl tracking-widest">实时结算</span>
+            </div>
+        </div>
 
 <!-- 【新增】区间展示模块 (图1) 像素级复刻版 -->
         <section id="sessionFilterDisplay" class="mb-6 cursor-pointer transform transition-transform active:scale-95" onclick="openSessionModal()" style="order: 0;">
@@ -962,12 +961,7 @@
 
             </div>
             
-            <!-- 底部三个点缀圆圈指示器 -->
-            <div class="flex justify-center items-center gap-3 mt-5 mb-1">
-                <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#5E4B8B] shadow-[0_2px_0_rgba(0,0,0,0.2)]"></div>
-                <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-[3px] border-[#5E4B8B] bg-white shadow-[0_2px_0_rgba(0,0,0,0.1)]"></div>
-                <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-[3px] border-[#5E4B8B] bg-white shadow-[0_2px_0_rgba(0,0,0,0.1)]"></div>
-            </div>
+    
         </section>
 
         <section id="chartSection" class="kawaii-card p-5 mb-6">
@@ -1139,6 +1133,59 @@
             <button id="resetBtn" class="kawaii-btn bg-danger text-white py-3 text-lg"><i class="fa-solid fa-trash-can mr-2"></i>重置游戏</button>
         </div>
 
+<!-- 【新增】手机端底部 5 大导航栏 (像素级复刻) -->
+        <!-- 
+          【小白调节区：导航栏整体大外框】
+          * fixed bottom-0 left-0 w-full: 绝对锁定在屏幕最底部
+          * bg-[#BBE2D6]: 导航栏的底色，默认调成图1的薄荷淡绿底色！
+          * border-t-[4px] border-[#5E4B8B]: 导航栏顶部的那条粗紫线
+          * pb-6 pt-2: 针对全面屏手机(如iPhone)底部横条的防挡留白
+        -->
+        <nav class="fixed bottom-0 left-0 w-full bg-[#BBE2D6] border-t-[4px] border-[#5E4B8B] z-[999] px-2 sm:px-4 pt-2 pb-6 flex justify-between items-end shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
+            
+            <!-- 
+              【小白调节区：导航栏内的 5 个按钮】
+              * w-[65px] h-[65px]: 控制每个按钮的大小
+              * bg-[#...]: 每个按钮默认的底色
+              * -mt-6: 负边距魔法！让按钮向上凸起，突破导航栏的顶线，实现图1的立体效果！
+            -->
+
+            <!-- 1. 成就奖杯 (黄) -->
+            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab1">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#FDE047] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">成就<br>奖杯</span>
+                </div>
+            </div>
+
+            <!-- 2. 排行榜单 (绿) -->
+            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab2">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#A3D977] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">排行<br>榜单</span>
+                </div>
+            </div>
+
+            <!-- 3. 实时结算 (主C位，橙色) -->
+            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn active-tab" data-tab="tab3">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#FCA5A5] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box transform scale-110">
+                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">实时<br>结算</span>
+                </div>
+            </div>
+
+            <!-- 4. 详细数据 (蓝) -->
+            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab4">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#93C5FD] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">详细<br>数据</span>
+                </div>
+            </div>
+
+            <!-- 5. 数据备份 (粉紫) -->
+            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab5">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#F472B6] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">数据<br>备份</span>
+                </div>
+            </div>
+
+        </nav>
     </div>
 
 
@@ -6960,7 +7007,91 @@ gameData.currentSessionIndex = -1;
                 if(typeof window.startRandomSelector === 'function') window.startRandomSelector();
             };
         }
+// ==========================================================
+// ★★★ 手机端专属：底部导航与 5大分类引擎 ★★★
+// ==========================================================
+(function() {
+    const mobileTabs = {
+        'tab1': { name: '成就奖杯', color: '#FDE047', modules:['achievementsSection', 'badgeSection'] },
+        'tab2': { name: '排行榜单', color: '#A3D977', modules:['championSectionWrapper', 'leaderboardSection', 'barSection'] },
+        'tab3': { name: '实时结算', color: '#FCA5A5', modules:['playerSection', 'timeRecordSection', 'timerSection', 'randomSelectorSection', 'latestStatusSection'] },
+        'tab4': { name: '详细数据', color: '#93C5FD', modules:['oneVsOneSection', 'penaltyStatsSection', 'penaltySection', 'sessionFilterDisplay', 'methodStatSection', 'eliminationOrderSection', 'chartSection', 'pieChartSection', 'radarSection', 'sessionSection'] },
+        'tab5': { name: '数据备份', color: '#F472B6', modules: ['cloudShareSection', 'dataIOSection', 'tableSection', 'methodManagerSection'] }
+    };
 
+    let currentMobileTab = 'tab3';
+
+    window.switchMobileTab = function(tabId) {
+        currentMobileTab = tabId;
+        const config = mobileTabs[tabId];
+
+        // 1. 隐藏所有模块
+        const allModules =[...mobileTabs.tab1.modules, ...mobileTabs.tab2.modules, ...mobileTabs.tab3.modules, ...mobileTabs.tab4.modules, ...mobileTabs.tab5.modules];
+        allModules.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.setProperty('display', 'none', 'important');
+        });
+
+        // 2. 唤醒当前分页的模块，特殊排版防变形处理！
+        config.modules.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) {
+                // 如果是数据备份和详细表格板块，必须使用 flex 才能保证里面的按钮乖乖排列
+                if (id === 'dataIOSection' || id === 'tableSection') {
+                    el.style.setProperty('display', 'flex', 'important');
+                } else {
+                    el.style.setProperty('display', 'block', 'important');
+                }
+                el.style.order = index; 
+            }
+        });
+
+        // 3. 同步顶部胶囊
+        const topText = document.getElementById('topTabText');
+        const topCapsule = document.getElementById('topTabCapsule');
+        if (topText && topCapsule) {
+            topText.textContent = config.name;
+            topCapsule.style.backgroundColor = config.color;
+        }
+
+        // 4. 底部按钮动画
+        document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+            const iconBox = btn.querySelector('.tab-icon-box');
+            if (btn.dataset.tab === tabId) {
+                btn.classList.add('active-tab');
+                iconBox.classList.add('scale-110');
+            } else {
+                btn.classList.remove('active-tab');
+                iconBox.classList.remove('scale-110');
+            }
+        });
+        
+        window.dispatchEvent(new Event('resize'));
+    };
+
+    function deployMobileEngine() {
+        // 摧毁原本的模块强制隐藏样式（极其关键，防止旧记录让模块彻底失踪！）
+        const oldHiddenStyle = document.getElementById('moduleHiddenStyles');
+        if (oldHiddenStyle) oldHiddenStyle.remove();
+
+        document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                switchMobileTab(btn.dataset.tab);
+            };
+        });
+
+        window.renderModuleToggles = function() { console.log('模块排序已接管'); };
+        
+        // 默认点击第三个按钮，加载【实时结算】！
+        switchMobileTab('tab3');
+    }
+
+    if (document.readyState === 'complete') {
+        setTimeout(deployMobileEngine, 100);
+    } else {
+        window.addEventListener('load', () => setTimeout(deployMobileEngine, 100));
+    }
+})();
         window.onload = init;
 // ==========================================
 // 【终极纠错霸体引擎：全功能修复版】
