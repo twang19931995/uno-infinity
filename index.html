@@ -217,98 +217,135 @@
             <button id="staticModuleBtn"></button>
         </div>
         
-<!-- 【修改后】右上角专属设置按钮 (已删除预设和模块排序) -->
-        <div class="absolute top-4 right-4 z-50 flex items-start">
-            <div class="relative">
-                <!-- 
-                  【小白调节区：右上角设置按钮】
-                  * bg-[#F87171]: 按钮底色（红色）
-                  * border-[3px]: 描边粗细
-                  * shadow-[0_3px_0_#5E4B8B]: 底部的厚重投影
-                -->
-                <button id="bgSwitcherBtn" class="w-9 h-9 sm:w-10 sm:h-10 bg-[#F87171] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110">
-                    <i class="fa-solid fa-gear text-white text-sm sm:text-base"></i>
-                </button>
-                <!-- 设置下拉面板 (保留原样) -->
-                <div id="bgPalette" class="hidden absolute right-0 top-12 bg-white border-[4px] border-[#5E4B8B] p-4 rounded-2xl w-[280px] shadow-xl z-50 max-h-[80vh] overflow-y-auto custom-scroll">
-                    <h3 class="text-xs font-bold text-gray-400 mb-2">全局背景风格</h3>
-                    <div class="grid grid-cols-4 gap-2 mb-4" id="bodyBgGrid"></div>
-                    <h3 class="text-xs font-bold text-gray-400 mb-2 border-t border-gray-100 pt-2">卡片底色</h3>
-                    <div class="grid grid-cols-5 gap-2 mb-4" id="cardBgGrid"></div>
-                    <h3 class="text-xs font-bold text-gray-400 mb-2 border-t border-gray-100 pt-2">字体个性化</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <span class="text-xs text-[#5E4B8B] font-bold"><i class="fa-solid fa-font mr-1"></i>中文字体</span>
-                            <select id="fontZhSelect" class="w-full text-sm border-2 border-[#5E4B8B] rounded-lg p-1 mt-1 bg-gray-50 cursor-pointer">
-                                <option value="'Microsoft YaHei', sans-serif">默认 - 微软雅黑</option>
-                                <option value="'ZCOOL KuaiLe', cursive">可爱 - 站酷快乐体</option>
-                                <option value="'Ma Shan Zheng', cursive">古风 - 马善政毛笔</option>
-                                <option value="'Noto Sans SC', sans-serif">现代 - 思源黑体</option>
-                                <option value="'Noto Serif SC', serif">优雅 - 思源宋体</option>
-                            </select>
-                        </div>
-                        <div>
-                            <span class="text-xs text-[#5E4B8B] font-bold"><i class="fa-solid fa-1 mr-1"></i>数字字体</span>
-                            <select id="fontNumSelect" class="w-full text-sm border-2 border-[#5E4B8B] rounded-lg p-1 mt-1 bg-gray-50 cursor-pointer">
-                                <option value="'Fredoka'">圆润 - Fredoka</option>
-                                <option value="'Rubik Bubbles'">趣味 - 泡泡体</option>
-                                <option value="'Bangers'">漫画 - 爆炸体</option>
-                                <option value="'Oswald'">硬朗 - Oswald</option>
-                                <option value="'Roboto Mono'">极客 - 等宽</option>
-                            </select>
-                        </div>
-                        <div>
-                            <span class="text-xs text-[#5E4B8B] font-bold"><i class="fa-solid fa-a mr-1"></i>英文字体</span>
-                            <select id="fontEnSelect" class="w-full text-sm border-2 border-[#5E4B8B] rounded-lg p-1 mt-1 bg-gray-50 cursor-pointer">
-                                <option value="'Fredoka'">圆润 - Fredoka</option>
-                                <option value="'Lobster'">艺术 - Lobster</option>
-                                <option value="'Pacifico'">手写 - Pacifico</option>
-                                <option value="sans-serif">系统默认</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-<!-- 【新增】手机端顶部动态胶囊标题 -->
-        <div id="topTabHeader" class="flex justify-center items-center w-full mt-2 mb-6 sticky top-4 z-[45]">
+<!-- 【全新修复】手机端顶部固定导航栏 (含动态标题与设置按钮) -->
+        <!-- 
+          ========================================================
+          【小白调节区：顶部整体背景栏参数说明】
+          [控制代码] bg-[#BBE2D6][使用方法] 修改此颜色码，可改变顶部整个长条背景的颜色(图2是薄荷绿)。[控制代码] border-b-[4px] border-[#5E4B8B]
+          [使用方法] 底部紫色分割线的粗细(4px)和颜色(#5E4B8B)。
+          [控制代码] py-2.5
+          [使用方法] 顶部背景栏的上下留白，数值越大，背景栏越厚。
+          ========================================================
+        -->
+        <div class="fixed top-0 left-0 w-full z-[100] bg-[#BBE2D6] border-b-[4px] border-[#5E4B8B] py-2.5 sm:py-3 flex justify-center items-center shadow-md">
+            
+            <!-- 中间：动态胶囊标题 -->
             <!-- 
-              【小白调节区：顶部动态胶囊】
-              * px-10 py-2: 控制胶囊的宽窄和高矮，数值越大胶囊越长越厚
-              * rounded-full: 让它变成完美的半圆形胶囊
-              * border-[4px]: 紫色描边的粗细
-              * shadow-[0_4px_0_#5E4B8B]: 底部的厚重紫色阴影！
-              * transition-colors duration-300: 颜色切换时的平滑渐变动画
-              * (特效备用代码：如果你想要外发光，可以加上 shadow-[0_0_15px_rgba(255,255,255,0.8)])
+              ========================================================
+              【小白调节区：顶部动态胶囊参数说明】
+              [控制代码] px-8 sm:px-12 py-1.5
+              [使用方法] 修改px后面的数字(左右宽度)，py后面的数字(上下高度)。数值越大胶囊越长/越胖。
+              [控制代码] rounded-[0.8rem]
+              [使用方法] 控制胶囊的圆角弧度。如果想要纯半圆，改成 rounded-full。
+              [控制代码] border-[3px] border-[#5E4B8B]
+              [使用方法] 修改3px改变边框粗细，修改#5E4B8B改变边框颜色(深紫色)。
+              [控制代码] shadow-[0_4px_0_#5E4B8B]
+              [使用方法] 控制底部厚重投影。4px是投影厚度，修改它可以变厚或变薄。
+              [特效备份] 如果想加外发光，可以在后面追加：shadow-[0_0_15px_rgba(255,255,255,0.6)]
+              ========================================================
             -->
-            <div id="topTabCapsule" class="bg-[#FCA5A5] border-[4px] border-[#5E4B8B] rounded-full px-12 py-2 shadow-[0_4px_0_#5E4B8B] transition-colors duration-300 flex items-center justify-center min-w-[160px]">
-                <span id="topTabText" class="font-black text-[#5E4B8B] text-xl tracking-widest">实时结算</span>
+            <div id="topTabCapsule" class="bg-[#FCA5A5] border-[3px] border-[#5E4B8B] rounded-[0.8rem] px-8 sm:px-12 py-1.5 shadow-[0_4px_0_#5E4B8B] transition-colors duration-300 flex items-center justify-center min-w-[140px]">
+                <span id="topTabText" class="font-black text-[#5E4B8B] text-lg sm:text-xl tracking-widest">实时结算</span>
+            </div>
+
+            <!-- 右侧：设置按钮 -->
+            <div class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2">
+                <div class="relative">
+                    <button id="bgSwitcherBtn" class="w-8 h-8 sm:w-10 sm:h-10 bg-[#F87171] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110">
+                        <i class="fa-solid fa-gear text-white text-xs sm:text-base"></i>
+                    </button>
+                    <!-- 设置下拉面板 -->
+                    <div id="bgPalette" class="hidden absolute right-0 top-12 bg-white border-[4px] border-[#5E4B8B] p-4 rounded-2xl w-[280px] shadow-xl z-50 max-h-[80vh] overflow-y-auto custom-scroll text-left">
+                        <h3 class="text-xs font-bold text-gray-400 mb-2">全局背景风格</h3>
+                        <div class="grid grid-cols-4 gap-2 mb-4" id="bodyBgGrid"></div>
+                        <h3 class="text-xs font-bold text-gray-400 mb-2 border-t border-gray-100 pt-2">卡片底色</h3>
+                        <div class="grid grid-cols-5 gap-2 mb-4" id="cardBgGrid"></div>
+                        <h3 class="text-xs font-bold text-gray-400 mb-2 border-t border-gray-100 pt-2">字体个性化</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-xs text-[#5E4B8B] font-bold"><i class="fa-solid fa-font mr-1"></i>中文字体</span>
+                                <select id="fontZhSelect" class="w-full text-sm border-2 border-[#5E4B8B] rounded-lg p-1 mt-1 bg-gray-50 cursor-pointer">
+                                    <option value="'Microsoft YaHei', sans-serif">默认 - 微软雅黑</option>
+                                    <option value="'ZCOOL KuaiLe', cursive">可爱 - 站酷快乐体</option>
+                                    <option value="'Ma Shan Zheng', cursive">古风 - 马善政毛笔</option>
+                                    <option value="'Noto Sans SC', sans-serif">现代 - 思源黑体</option>
+                                    <option value="'Noto Serif SC', serif">优雅 - 思源宋体</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span class="text-xs text-[#5E4B8B] font-bold"><i class="fa-solid fa-1 mr-1"></i>数字字体</span>
+                                <select id="fontNumSelect" class="w-full text-sm border-2 border-[#5E4B8B] rounded-lg p-1 mt-1 bg-gray-50 cursor-pointer">
+                                    <option value="'Fredoka'">圆润 - Fredoka</option>
+                                    <option value="'Rubik Bubbles'">趣味 - 泡泡体</option>
+                                    <option value="'Bangers'">漫画 - 爆炸体</option>
+                                    <option value="'Oswald'">硬朗 - Oswald</option>
+                                    <option value="'Roboto Mono'">极客 - 等宽</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span class="text-xs text-[#5E4B8B] font-bold"><i class="fa-solid fa-a mr-1"></i>英文字体</span>
+                                <select id="fontEnSelect" class="w-full text-sm border-2 border-[#5E4B8B] rounded-lg p-1 mt-1 bg-gray-50 cursor-pointer">
+                                    <option value="'Fredoka'">圆润 - Fredoka</option>
+                                    <option value="'Lobster'">艺术 - Lobster</option>
+                                    <option value="'Pacifico'">手写 - Pacifico</option>
+                                    <option value="sans-serif">系统默认</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-<!-- 【新增】区间展示模块 (图1) 像素级复刻版 -->
-        <section id="sessionFilterDisplay" class="mb-6 cursor-pointer transform transition-transform active:scale-95" onclick="openSessionModal()" style="order: 0;">
-            <!-- 去掉了底部投影，使其更贴合扁平贴纸风格 -->
-            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-full px-4 sm:px-6 py-2 flex justify-between items-center overflow-hidden">
-                
-                <!-- 左侧：日期与 ROUND及轮次 -->
-                <div class="flex flex-col justify-center -space-y-1 ml-0 sm:ml-1 shrink-0">
-                    <!-- 日期：紫字 + 白色描边 -->
-                    <span id="sfDate" class="font-black text-[11px] sm:text-sm tracking-widest relative z-10" style="color: #5E4B8B; text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff;">2026-03-07</span>
-                    <!-- ROUND 和 红色数字 -->
-                    <div class="flex items-baseline gap-1">
-                        <span class="font-black text-[#60A5FA] text-[2.2rem] sm:text-5xl leading-none tracking-tighter text-stroke">ROUND</span>
-                        <span id="sfSessionIndex" class="font-black text-[#E11D48] text-3xl sm:text-5xl leading-none tracking-tighter text-stroke drop-shadow-sm">1</span>
-                    </div>
-                </div>
+        <!-- 这个隐形的占位符是为了防止顶部固定横条挡住下面的第一张卡片 -->
+        <div class="h-[60px] sm:h-[70px] w-full shrink-0"></div>
 
-                <!-- 右侧：超大数字区间，防止撑破 -->
-                <div class="flex items-center justify-end pr-1 sm:pr-2 pt-1 flex-1 min-w-0 overflow-hidden">
-                    <span id="sfRange" class="font-black text-white smooth-outline tracking-wider leading-none text-right w-full">1~130</span>
-                </div>
-            </div>
-        </section>
+<!-- ==================================================================== -->
+<!-- 【图1全新复刻】详细数据：粘性控制台 (包含无限循环胶囊导航 + 局次选择) -->
+<!-- ==================================================================== -->
+<!-- 
+  【小白专属调节说明】：
+  1. sticky top-[65px] sm:top-[75px] : 这就是能让它死死固定在顶部的魔法！
+     如果你觉得它离最顶上那个动态标题太近或太远，可以修改这个数字。
+  2. z-[90] : 保证它漂浮在所有图表上方，绝不被遮挡。
+-->
+<div id="detailDataStickyHeader" class="sticky top-[65px] sm:top-[75px] z-[90] mb-4 w-full hidden transition-all duration-300" style="order: -1;">
+    
+    <!-- 最大的外部胶囊包裹器 -->
+    <!-- bg-[#c0ebe7] 控制底色，shadow-[0_4px_0_#5E4B8B] 控制厚重的紫色投影 -->
+    <div class="bg-[#c0ebe7] border-[4px] border-[#5E4B8B] rounded-[1.2rem] p-1.5 sm:p-2 shadow-[0_4px_0_#5E4B8B] w-full flex flex-col gap-2">
+        
+        <!-- 【功能1】：无限循环胶囊导航区 -->
+        <!-- 这个区专门监听手指滑动，高度固定 h-[30px] 防撑破 -->
+        <div id="detailNavSliderArea" class="flex items-center justify-between w-full h-[32px] sm:h-[38px] relative px-1">
+            <!-- 左侧未居中胶囊 (默认缩小至90%，透明度50%) -->
+            <div id="detailNavLeft" class="absolute left-0 w-[30%] origin-left opacity-50 scale-90 flex justify-start transition-all duration-300 cursor-pointer z-10"></div>
+            
+            <!-- 居中高亮胶囊 (完美尺寸，100%不透明) -->
+            <div id="detailNavCenter" class="absolute left-[35%] w-[30%] opacity-100 scale-100 flex justify-center transition-all duration-300 z-20 cursor-pointer"></div>
+            
+            <!-- 右侧未居中胶囊 (默认缩小至90%，透明度50%) -->
+            <div id="detailNavRight" class="absolute right-0 w-[30%] origin-right opacity-50 scale-90 flex justify-end transition-all duration-300 cursor-pointer z-10"></div>
+        </div>
+        
+        <!-- 【功能2】：选择局次区 -->
+        <!-- 白色底，独立厚重投影，点击呼出图2弹窗 -->
+        <div class="bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] p-1 flex gap-1 justify-between shadow-[0_3px_0_#5E4B8B] cursor-pointer active:translate-y-1 active:shadow-none transition-all" onclick="openSessionModal()">
+            
+            <!-- 容器1-1：显示局次 (红底白字) -->
+            <div id="ddRoundLabel" class="bg-[#fb2a53] border-[2.5px] border-[#5E4B8B] text-white rounded-[0.4rem] px-2 sm:px-3 py-0.5 text-[11px] sm:text-xs font-black shadow-sm flex items-center justify-center min-w-[45px] shrink-0">R-03</div>
+            
+            <!-- 容器1-2：显示日期 (蓝底白字) -->
+            <div id="ddDateLabel" class="bg-[#7ecef4] border-[2.5px] border-[#5E4B8B] text-white rounded-[0.4rem] px-2 sm:px-3 py-0.5 text-[11px] sm:text-xs font-black shadow-sm flex items-center justify-center min-w-[60px] shrink-0">260331</div>
+            
+            <!-- 容器1-3：显示具体局数 (白黄底紫字，flex-1让它自动填满剩下空间) -->
+            <div id="ddRangeLabel" class="bg-[#fefce8] border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-[0.4rem] px-1 py-0.5 text-[10px] sm:text-xs font-black shadow-sm flex-1 flex items-center justify-center text-center truncate">第121~145局</div>
+
+        </div>
+
+    </div>
+</div>
+<!-- ==================================================================== -->
 
 <!-- ======================================================== -->
 <!-- 【全新新增】时间记录区域 (图1与图2 像素级复刻) 开始 -->
@@ -1133,55 +1170,63 @@
             <button id="resetBtn" class="kawaii-btn bg-danger text-white py-3 text-lg"><i class="fa-solid fa-trash-can mr-2"></i>重置游戏</button>
         </div>
 
-<!-- 【新增】手机端底部 5 大导航栏 (像素级复刻) -->
+<!-- 【全新修复】手机端底部 5 大导航栏 (图3像素级复刻版) -->
         <!-- 
-          【小白调节区：导航栏整体大外框】
-          * fixed bottom-0 left-0 w-full: 绝对锁定在屏幕最底部
-          * bg-[#BBE2D6]: 导航栏的底色，默认调成图1的薄荷淡绿底色！
-          * border-t-[4px] border-[#5E4B8B]: 导航栏顶部的那条粗紫线
-          * pb-6 pt-2: 针对全面屏手机(如iPhone)底部横条的防挡留白
+          ========================================================
+          【小白调节区：导航栏整体大外框参数说明】
+          [控制代码] bg-[#BBE2D6]
+          [使用方法] 更改底色。图3要求是和顶部一样的薄荷绿。
+          [控制代码] pt-3 pb-6 px-2
+          [使用方法] pt控制顶部的内部留白(让按钮有空间呼吸)，pb控制底部的防挡留白。[控制代码] items-center
+          [使用方法] 极其关键！控制按钮垂直居中，这样它们就不会往上窜出边框了。
+          ========================================================
         -->
-        <nav class="fixed bottom-0 left-0 w-full bg-[#BBE2D6] border-t-[4px] border-[#5E4B8B] z-[999] px-2 sm:px-4 pt-2 pb-6 flex justify-between items-end shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
+        <nav class="fixed bottom-0 left-0 w-full bg-[#BBE2D6] border-t-[4px] border-[#5E4B8B] z-[999] px-2 sm:px-4 pt-3 pb-6 flex justify-between items-center shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
             
             <!-- 
-              【小白调节区：导航栏内的 5 个按钮】
-              * w-[65px] h-[65px]: 控制每个按钮的大小
-              * bg-[#...]: 每个按钮默认的底色
-              * -mt-6: 负边距魔法！让按钮向上凸起，突破导航栏的顶线，实现图1的立体效果！
+              ========================================================
+              【小白调节区：导航栏内部按钮参数说明】
+              [控制代码] w-[55px] h-[55px]
+              [使用方法] 控制按钮的整体大小。
+              [控制代码] rounded-[1rem]
+              [使用方法] 控制按钮的圆角弧度。图3中是圆角矩形，纯圆是 rounded-full。
+              [控制代码] shadow-[0_3px_0_#5E4B8B]
+              [使用方法] 按钮底部的厚重阴影，修改3px可改变厚度。
+              ========================================================
             -->
 
             <!-- 1. 成就奖杯 (黄) -->
-            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab1">
-                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#FDE047] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
-                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">成就<br>奖杯</span>
+            <div class="flex flex-col items-center justify-center w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab1">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#FDE047] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[11px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">成就<br>奖杯</span>
                 </div>
             </div>
 
             <!-- 2. 排行榜单 (绿) -->
-            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab2">
-                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#A3D977] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
-                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">排行<br>榜单</span>
+            <div class="flex flex-col items-center justify-center w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab2">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#A3D977] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[11px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">排行<br>榜单</span>
                 </div>
             </div>
 
             <!-- 3. 实时结算 (主C位，橙色) -->
-            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn active-tab" data-tab="tab3">
-                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#FCA5A5] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box transform scale-110">
-                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">实时<br>结算</span>
+            <div class="flex flex-col items-center justify-center w-1/5 relative cursor-pointer group mobile-tab-btn active-tab" data-tab="tab3">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#FCA5A5] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box transform scale-[1.05]">
+                    <span class="font-black text-[#5E4B8B] text-[11px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">实时<br>结算</span>
                 </div>
             </div>
 
             <!-- 4. 详细数据 (蓝) -->
-            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab4">
-                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#93C5FD] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
-                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">详细<br>数据</span>
+            <div class="flex flex-col items-center justify-center w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab4">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#93C5FD] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[11px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">详细<br>数据</span>
                 </div>
             </div>
 
             <!-- 5. 数据备份 (粉紫) -->
-            <div class="flex flex-col items-center justify-end w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab5">
-                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#F472B6] border-[3.5px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] flex flex-col items-center justify-center shadow-[0_4px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none -mt-4 relative z-10 tab-icon-box">
-                    <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[14px] leading-tight tracking-widest mt-1">数据<br>备份</span>
+            <div class="flex flex-col items-center justify-center w-1/5 relative cursor-pointer group mobile-tab-btn" data-tab="tab5">
+                <div class="w-[55px] h-[55px] sm:w-[65px] sm:h-[65px] bg-[#F472B6] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box">
+                    <span class="font-black text-[#5E4B8B] text-[11px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">数据<br>备份</span>
                 </div>
             </div>
 
@@ -1517,15 +1562,38 @@
             </div>
         </div>
 
-<!-- 【新增】轮次区间选择弹窗 (图2) -->
-    <div id="sessionFilterDialog" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-        <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 sm:p-6 max-w-[340px] w-full text-center relative mx-4 shadow-2xl flex flex-col max-h-[80vh]">
-            <button id="closeSessionFilterBtn" class="absolute top-4 right-4 text-gray-400 hover:text-danger text-2xl transition-colors z-10 leading-none"><i class="fa-solid fa-times"></i></button>
-            <div class="overflow-y-auto custom-scroll pr-1 flex-1 flex flex-col gap-3 mt-4" id="sessionFilterList">
-                <!-- JS动态填充 -->
-            </div>
+<!-- ==================================================================== -->
+<!-- 【图2全新复刻】选择局次 独立弹窗 -->
+<!-- ==================================================================== -->
+<!-- 
+  【小白专属调节说明】：
+  bg-[#e0ffc6] 这是图2背景的淡绿色。
+  max-h-[80vh] 保证弹窗最高只会占屏幕80%，多出来的会自己产生滚动条！
+-->
+<div id="sessionFilterDialog" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    
+    <!-- 弹窗大容器2 -->
+    <div class="bg-[#e0ffc6] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-3 sm:p-4 w-[92%] max-w-[340px] shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col gap-2 max-h-[80vh] relative mx-2">
+        
+        <!-- 右上角小关闭按钮，防呆设计 -->
+        <button id="closeSessionFilterBtn" class="absolute -top-3 -right-2 bg-white border-[3px] border-[#5E4B8B] text-[#5E4B8B] rounded-full w-8 h-8 flex items-center justify-center shadow-sm z-10 hover:bg-gray-100 active:scale-90 transition-transform"><i class="fa-solid fa-times"></i></button>
+
+        <!-- 特殊置顶按钮：全部局数 (ALL) -->
+        <!-- bg-[#fff100] 是包裹ALL的明黄色外衣 -->
+        <div class="bg-[#fff100] border-[4px] border-[#5E4B8B] rounded-[1rem] p-1.5 flex gap-1 shadow-[0_3px_0_#5E4B8B] shrink-0 cursor-pointer active:translate-y-1 active:shadow-none transition-all" onclick="selectSession(-1)">
+            <div class="bg-[#fb2a53] border-[2.5px] border-[#5E4B8B] text-white rounded-[0.4rem] px-2 sm:px-3 py-0.5 text-xs sm:text-sm font-black shadow-sm min-w-[45px] flex items-center justify-center">ALL</div>
+            <div id="sfAllDate" class="bg-[#7ecef4] border-[2.5px] border-[#5E4B8B] text-white rounded-[0.4rem] px-2 sm:px-3 py-0.5 text-xs sm:text-sm font-black shadow-sm min-w-[65px] flex items-center justify-center">260331</div>
+            <div id="sfAllRange" class="bg-white border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-[0.4rem] flex-1 text-center py-0.5 text-xs sm:text-sm font-black shadow-sm flex items-center justify-center truncate">第001~145局</div>
         </div>
-    </div>    
+
+        <!-- 滚动列表区 (JS会把底下的普通按钮全部画在这里面) -->
+        <div class="overflow-y-auto custom-scroll flex flex-col gap-2 pr-1 pb-1 mt-1" id="sessionFilterList">
+            <!-- JS 动态填充 -->
+        </div>
+
+    </div>
+</div>
+<!-- ==================================================================== -->   
     <!-- 导入成功遮罩 -->
     <div id="importResultDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
         <div class="kawaii-card p-8 max-w-[320px] w-full text-center shadow-2xl">
@@ -7066,6 +7134,31 @@ gameData.currentSessionIndex = -1;
             }
         });
         
+// =======================================================
+        // ★★★ 【全新插入】：对接详细数据的顶部独立控制台 ★★★
+        const stickyHeader = document.getElementById('detailDataStickyHeader');
+        if (stickyHeader) {
+            // 只有当点击了详细数据(tab4)时，才显示！
+            if (tabId === 'tab4') {
+                stickyHeader.classList.remove('hidden');
+                stickyHeader.style.display = 'block';
+                // 唤醒里面的滑动引擎，并隐藏该页面除选中模块外的其它所有模块
+                if(typeof window.renderDetailNav === 'function') window.renderDetailNav();
+            } else {
+                // 如果去了别的页面，赶紧把这个恶霸控制台隐藏！
+                stickyHeader.classList.add('hidden');
+                stickyHeader.style.display = 'none';
+                
+                // 同时极其暴力地把详细数据里挂名的那些图表强制隐藏，防止它们在别的页面冒出来
+                if(typeof window.detailModulesConfig !== 'undefined') {
+                    window.detailModulesConfig.forEach(mod => {
+                        const el = document.getElementById(mod.id);
+                        if (el) el.style.setProperty('display', 'none', 'important');
+                    });
+                }
+            }
+        }
+        // =======================================================
         window.dispatchEvent(new Event('resize'));
     };
 
@@ -8432,6 +8525,185 @@ window.renderLatestStatus = function() {
         };
     }
 })();
+// ====================================================================
+// ★★★ 图1/图2 完美复刻：详细数据独立滑动引擎 (教婴儿级算法) ★★★
+// ====================================================================
+(function() {
+    // 1. 【模块花名册】：在这里登记详细数据里的所有模块和马卡龙颜色！
+    // 颜色的顺序和排版严格遵循了图1里的效果！
+    window.detailModulesConfig =[
+        { id: 'eliminationOrderSection', name: '淘汰顺位', color: '#f4a7b9' },
+        { id: 'chartSection', name: '走势图', color: '#7ecef4' },
+        { id: 'radarSection', name: '个人能力', color: '#e0ffc6' },
+        { id: 'oneVsOneSection', name: '1V1擂台', color: '#ffb3a7' },
+        { id: 'penaltyStatsSection', name: '罚牌统计', color: '#f3d27b' },
+        { id: 'penaltySection', name: '罚牌记录', color: '#8da4d0' },
+        { id: 'methodStatSection', name: '结算统计', color: '#a0b0c4' },
+        { id: 'pieChartSection', name: '得分占比', color: '#a3d977' },
+        { id: 'sessionSection', name: '场次记录', color: '#fca5a5' },
+        { id: 'tableSection', name: '详细记录', color: '#93c5fd' }
+    ];
+    
+    // 默认进入详细数据时，显示第 2 个模块 (走势图, 下标为 1)
+    window.currentDetailIndex = 1;
+
+    // 2. 【核心画笔】：绘制顶部三个左右切换的胶囊
+    window.renderDetailNav = function() {
+        const len = window.detailModulesConfig.length;
+        
+        // 算出左、中、右分别该显示花名册里的第几号人物
+        const leftIdx = (window.currentDetailIndex - 1 + len) % len;
+        const centerIdx = window.currentDetailIndex;
+        const rightIdx = (window.currentDetailIndex + 1) % len;
+
+        // 生成胶囊 HTML 的小工具
+        const buildCap = (mod) => `<div class="border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-lg px-2 sm:px-4 py-0.5 sm:py-1 text-[11px] sm:text-sm font-black shadow-[0_3px_0_#5E4B8B] whitespace-nowrap overflow-hidden text-center w-full" style="background-color: ${mod.color};">${mod.name}</div>`;
+
+        // 填入到三个位置
+        document.getElementById('detailNavLeft').innerHTML = buildCap(window.detailModulesConfig[leftIdx]);
+        document.getElementById('detailNavCenter').innerHTML = buildCap(window.detailModulesConfig[centerIdx]);
+        document.getElementById('detailNavRight').innerHTML = buildCap(window.detailModulesConfig[rightIdx]);
+
+        // 重点：遍历花名册，隐藏除了当前居中的其它所有模块！
+        window.detailModulesConfig.forEach((mod, idx) => {
+            const el = document.getElementById(mod.id);
+            if (el) {
+                if (idx === window.currentDetailIndex) {
+                    el.style.setProperty('display', 'block', 'important');
+                } else {
+                    el.style.setProperty('display', 'none', 'important');
+                }
+            }
+        });
+    };
+
+    function attachSliderEvents() {
+        const leftBtn = document.getElementById('detailNavLeft');
+        const rightBtn = document.getElementById('detailNavRight');
+        const sliderArea = document.getElementById('detailNavSliderArea');
+        if(!leftBtn || !rightBtn || !sliderArea) return;
+
+        // 点击左边胶囊，往左切
+        leftBtn.onclick = () => {
+            window.currentDetailIndex = (window.currentDetailIndex - 1 + window.detailModulesConfig.length) % window.detailModulesConfig.length;
+            window.renderDetailNav();
+        };
+
+        // 点击右边胶囊，往右切
+        rightBtn.onclick = () => {
+            window.currentDetailIndex = (window.currentDetailIndex + 1) % window.detailModulesConfig.length;
+            window.renderDetailNav();
+        };
+
+        // 手机端手指滑动的灵魂：防误触顺滑滑动判断
+        let navStartX = 0;
+        sliderArea.addEventListener('touchstart', e => { 
+            navStartX = e.touches[0].clientX; 
+        }, {passive: true});
+
+        sliderArea.addEventListener('touchend', e => {
+            let navEndX = e.changedTouches[0].clientX;
+            let diff = navEndX - navStartX;
+            
+            // 向右滑，显示左边的
+            if (diff > 40) { 
+                window.currentDetailIndex = (window.currentDetailIndex - 1 + window.detailModulesConfig.length) % window.detailModulesConfig.length;
+                window.renderDetailNav();
+            } 
+            // 向左滑，显示右边的
+            else if (diff < -40) { 
+                window.currentDetailIndex = (window.currentDetailIndex + 1) % window.detailModulesConfig.length;
+                window.renderDetailNav();
+            }
+        }, {passive: true});
+    }
+
+    // 3. 【强行霸占局次相关函数】：彻底重写旧的选择逻辑
+    
+    // 打开图2的独立弹窗
+    window.openSessionModal = function() {
+        const list = document.getElementById('sessionFilterList');
+        
+        // 算出 ALL 按钮需要显示的数据
+        let allDate = "暂无";
+        let allRange = "第000~000局";
+        if (gameData.sessions && gameData.sessions.length > 0) {
+            allDate = gameData.sessions[gameData.sessions.length - 1].date;
+            allRange = `第001~${String(gameData.rounds.length).padStart(3, '0')}局`;
+        }
+        document.getElementById('sfAllDate').textContent = allDate;
+        document.getElementById('sfAllRange').textContent = allRange;
+
+        // 生成底下列表里的普通白色按钮
+        let html = '';
+        if(gameData.sessions && gameData.sessions.length > 0) {
+            // 倒序展示，最新的排上面
+            for (let i = gameData.sessions.length - 1; i >= 0; i--) {
+                let s = gameData.sessions[i];
+                let rLabel = `R-${String(i + 1).padStart(2, '0')}`;
+                let dateLabel = s.date;
+                let rangeLabel = `第${String(s.start).padStart(3, '0')}~${String(s.end).padStart(3, '0')}局`;
+                
+                html += `
+                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-1.5 flex gap-1 shadow-sm shrink-0 cursor-pointer active:scale-95 transition-all" onclick="selectSession(${i})">
+                    <div class="bg-[#fb2a53] border-[2.5px] border-[#5E4B8B] text-white rounded-[0.4rem] px-2 sm:px-3 py-0.5 text-xs sm:text-sm font-black shadow-sm min-w-[45px] flex items-center justify-center">${rLabel}</div>
+                    <div class="bg-[#7ecef4] border-[2.5px] border-[#5E4B8B] text-white rounded-[0.4rem] px-2 sm:px-3 py-0.5 text-xs sm:text-sm font-black shadow-sm min-w-[65px] flex items-center justify-center">${dateLabel}</div>
+                    <div class="bg-[#fefce8] border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-[0.4rem] flex-1 text-center py-0.5 text-xs sm:text-sm font-black shadow-sm flex items-center justify-center truncate">${rangeLabel}</div>
+                </div>`;
+            }
+        } else {
+            html = `<div class="text-center text-[#5E4B8B] font-bold py-4">暂无局次数据</div>`;
+        }
+        
+        list.innerHTML = html;
+        document.getElementById('sessionFilterDialog').classList.remove('hidden');
+    };
+
+    // 核心：点击任何一个弹窗选项，进行过滤
+    window.selectSession = function(index) {
+        gameData.currentSessionIndex = index;
+        document.getElementById('sessionFilterDialog').classList.add('hidden');
+        saveData(); 
+        updateViewRounds(); // 通知底层数据源切分
+        recalculateStats(); // 重新计算统计信息
+        updateAllUI(); // 刷新整个屏幕
+    };
+
+    // 绑定关闭按钮
+    const sfCloseBtn = document.getElementById('closeSessionFilterBtn');
+    if (sfCloseBtn) sfCloseBtn.onclick = () => document.getElementById('sessionFilterDialog').classList.add('hidden');
+
+    // 4. 【同步刷新文字】：当过滤后，把控制台的三个小胶囊文字改掉
+    window.renderSessionSelectorUI = function() {
+        const ddRound = document.getElementById('ddRoundLabel');
+        const ddDate = document.getElementById('ddDateLabel');
+        const ddRange = document.getElementById('ddRangeLabel');
+        if (!ddRound) return;
+
+        // 如果是 ALL 或者没数据
+        if (gameData.currentSessionIndex === undefined || gameData.currentSessionIndex === -1 || !gameData.sessions || gameData.sessions.length === 0) {
+            ddRound.textContent = "ALL";
+            if (gameData.sessions && gameData.sessions.length > 0) {
+                ddDate.textContent = gameData.sessions[gameData.sessions.length - 1].date;
+                ddRange.textContent = `第001~${String(gameData.rounds.length).padStart(3, '0')}局`;
+            } else {
+                ddDate.textContent = "暂无";
+                ddRange.textContent = "第000~000局";
+            }
+        } else {
+            // 取出精准的这一局数据
+            const idx = gameData.currentSessionIndex;
+            const session = gameData.sessions[idx];
+            ddRound.textContent = `R-${String(idx + 1).padStart(2, '0')}`;
+            ddDate.textContent = session.date;
+            ddRange.textContent = `第${String(session.start).padStart(3, '0')}~${String(session.end).padStart(3, '0')}局`;
+        }
+    };
+
+    // 初始化时绑定一下滑动事件
+    setTimeout(attachSliderEvents, 200);
+})();
+// ====================================================================
 </script>
 </body>
 </html>
