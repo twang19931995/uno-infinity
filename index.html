@@ -315,17 +315,18 @@
     <!-- bg-[#c0ebe7] 控制底色，shadow-[0_4px_0_#5E4B8B] 控制厚重的紫色投影 -->
     <div class="bg-[#c0ebe7] border-[4px] border-[#5E4B8B] rounded-[1.2rem] p-1.5 sm:p-2 shadow-[0_4px_0_#5E4B8B] w-full flex flex-col gap-2">
         
-        <!-- 【功能1】：无限循环胶囊导航区 -->
-        <!-- 这个区专门监听手指滑动，高度固定 h-[30px] 防撑破 -->
-        <div id="detailNavSliderArea" class="flex items-center justify-between w-full h-[32px] sm:h-[38px] relative px-1">
-            <!-- 左侧未居中胶囊 (默认缩小至90%，透明度50%) -->
-            <div id="detailNavLeft" class="absolute left-0 w-[30%] origin-left opacity-50 scale-90 flex justify-start transition-all duration-300 cursor-pointer z-10"></div>
-            
-            <!-- 居中高亮胶囊 (完美尺寸，100%不透明) -->
-            <div id="detailNavCenter" class="absolute left-[35%] w-[30%] opacity-100 scale-100 flex justify-center transition-all duration-300 z-20 cursor-pointer"></div>
-            
-            <!-- 右侧未居中胶囊 (默认缩小至90%，透明度50%) -->
-            <div id="detailNavRight" class="absolute right-0 w-[30%] origin-right opacity-50 scale-90 flex justify-end transition-all duration-300 cursor-pointer z-10"></div>
+<!-- 【功能1】：顺滑滑动胶囊导航区 -->
+        <!-- 
+          ========================================================
+          【小白调节区：导航胶囊轨道】
+          [控制代码] gap-2
+          [使用方法] 修改数字可以改变胶囊之间的间距。
+          [控制代码] overflow-x-auto scrollbar-hide scroll-smooth
+          [使用方法] 这是实现像德芙一样丝滑左右滑动的魔法，绝对不要删去！
+          ========================================================
+        -->
+        <div id="detailNavSliderArea" class="flex items-center gap-2 w-full h-[36px] sm:h-[42px] px-2 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory">
+            <!-- JS会自动把所有胶囊塞到这里 -->
         </div>
         
         <!-- 【功能2】：选择局次区 -->
@@ -458,7 +459,7 @@
                     <!-- 中间局数显示 (点击弹窗) -->
                     <!-- 调参备注：w-[55%]控制宽度; text-lg控制字体大小 -->
                     <button id="statusRoundSelectBtn" class="bg-[#99b7db] border-[3px] border-[#5E4B8B] rounded-full w-[55%] max-w-[200px] py-1 shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all text-center shrink-0">
-                        <span class="font-black text-white text-lg tracking-widest " id="statusCurrentRoundText" style="-webkit-text-stroke-color: #5E4B8B;">第0局</span>
+                        <span class="font-black text-white text-lg tracking-widest " id="statusCurrentRoundText" style="-webkit-text-stroke-color: #5E4B8B;">最新局</span>
                     </button>
 
                     <!-- 右侧切换按钮 -->
@@ -838,7 +839,7 @@
                     胜利方式统计
                 </div>
                 <!-- 列表容器：限制高度，最多显示5个，超出显示特定滚动条 -->
-                <div id="newWinStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 overflow-y-auto max-h-[385px] sm:max-h-[430px] method-scroll relative"></div>
+<div id="newWinStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 relative"></div>
             </div>
 
             <!-- 右半边：淘汰侧 -->
@@ -847,7 +848,7 @@
                     淘汰方式统计
                 </div>
                 <!-- 列表容器 -->
-                <div id="newLoseStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 overflow-y-auto max-h-[385px] sm:max-h-[430px] method-scroll relative"></div>
+<div id="newLoseStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 relative"></div>
             </div>
 
         </div>
@@ -891,19 +892,9 @@
                 </button>
             </div>
 
-            <!-- 详细轮次视图 (容器3：表格大外框) -->
-            <!--[小白调节区] max-h-[380px]：控制最大高度。
-                 【修复缝隙Bug】：去掉了容易产生底部横杠的 padding，使用 overflow-auto 配合完美贴合 -->
-            <div id="elimOrderView2" class="overflow-auto scrollbar-hide border-[3px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl shadow-[0_4px_0_#5E4B8B] max-h-[380px] sm:max-h-[450px] w-full relative bg-[#5E4B8B]">
+<!-- 详细轮次视图 (无限延伸版) -->
+            <div id="elimOrderView2" class="overflow-x-auto scrollbar-hide border-[3px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl shadow-[0_4px_0_#5E4B8B] w-full relative bg-[#5E4B8B]">
                 <table class="w-full text-center border-collapse min-w-max bg-white" id="elimRoundTable">
-                    <!-- JS动态填充 -->
-                </table>
-            </div>
-
-            <!-- 详细轮次视图 (默认显示) -->
-            <div id="elimOrderView2" class="overflow-hidden border-[3px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl shadow-sm">
-                <!-- 我们给table加上 table-fixed 使其宽度均分，不出现滚动条 -->
-                <table class="w-full min-w-full text-center text-[10px] sm:text-sm font-bold bg-white table-fixed border-collapse" id="elimRoundTable">
                     <!-- JS动态填充 -->
                 </table>
             </div>
@@ -1112,7 +1103,13 @@
      overflow-y-auto: 允许上下滚动
      custom-scroll: 调用我们之前写好的好看的滚动条样式
 -->
-<div class="overflow-x-auto overflow-y-auto custom-scroll max-h-[440px] border-[4px] border-[#5E4B8B] rounded-[1.5rem]">
+<!-- 
+  ========================================================
+  【小白调节区：详细记录外框】
+  [特效备份] 如果想加一点阴影，可以在最后加上 shadow-[0_4px_0_#5E4B8B]
+  ========================================================
+-->
+<div class="overflow-x-auto border-[4px] border-[#5E4B8B] rounded-[1.5rem]">
     <table id="detailedRecords" class="min-w-full bg-white text-center text-sm relative">
                     <thead><tr class="bg-[#F8FAFC] border-b-4 border-[#5E4B8B]"><th class="py-3 px-2 whitespace-nowrap">局</th></tr></thead>
                     <tbody></tbody>
@@ -1128,47 +1125,82 @@
             <div class="flex gap-2">
                 <button id="importBtn" class="kawaii-btn !py-1.5 !px-3 sm:!px-4 text-xs sm:text-sm bg-primary text-white shadow-sm">导入Excel</button>
                 <button id="exportBtn" class="kawaii-btn !py-1.5 !px-3 sm:!px-4 text-xs sm:text-sm bg-secondary text-white shadow-sm">导出Excel</button>
+<button id="resetBtn" class="kawaii-btn !py-1.5 !px-3 sm:!px-4 text-xs sm:text-sm bg-danger text-white shadow-sm"><i class="fa-solid fa-trash-can mr-1"></i>重置</button>
                 <input type="file" id="excelFile" class="hidden" accept=".xlsx, .xls">
             </div>
         </section>
 <!-- 【完美复刻版】淘汰方式/胜利方式 条目管理区 -->
-        <section id="methodManagerSection" class="kawaii-card p-4 sm:p-6 mb-6 bg-[#FEFCE8]">
-            <!-- 头部标题区 -->
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="methodManagerTitle" class="text-xl sm:text-2xl font-bold text-[#5E4B8B] flex items-center tracking-widest">
-                    淘汰方式条目管理区
-                </h2>
-                <div class="flex gap-3">
-                    <button id="mmSpecialSettingBtn" class="bg-[#FDE047] border-[3px] border-[#5E4B8B] rounded-full px-5 py-1.5 font-bold text-[#5E4B8B] text-sm shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all">特殊设置</button>
-                    <button id="mmToggleTabBtn" class="bg-white border-[3px] border-[#5E4B8B] rounded-full px-5 py-1.5 font-bold text-[#5E4B8B] text-sm shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all">切换</button>
-                </div>
-            </div>
-
-            <!-- 添加按钮区 (白底圆角框) -->
-            <div class="bg-white border-[3px] border-[#5E4B8B] rounded-[2rem] p-3 mb-10 flex justify-center gap-6 mx-2">
-                <button id="mmAddCategoryBtn" class="flex-1 max-w-[200px] bg-[#E9D5FF] border-[3px] border-[#5E4B8B] rounded-full py-2 font-black text-[#5E4B8B] text-lg shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest">添加分类</button>
-                <button id="mmAddItemBtn" class="flex-1 max-w-[200px] bg-[#FED7AA] border-[3px] border-[#5E4B8B] rounded-full py-2 font-black text-[#5E4B8B] text-lg shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest">添加条目</button>
-            </div>
-
-            <!-- 动态生成的分类与条目渲染区 -->
-            <div id="methodManagerContent" class="flex flex-col gap-10 pb-4">
-                <!-- JS 动态注入 -->
-            </div>
-
-            <!-- 底部导出导入区 -->
-            <div class="mt-8 pt-6 flex flex-col items-center gap-4">
-                <div class="flex justify-center gap-6">
-                    <button id="mmExportBtn" class="bg-[#84CC16] border-[3px] border-[#5E4B8B] rounded-xl px-5 py-2 font-black text-white text-base shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-wider">导出配置文件</button>
-                    <button id="mmImportBtn" class="bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl px-5 py-2 font-black text-white text-base shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-wider">导入配置文件</button>
-                    <input type="file" id="mmFileInput" class="hidden" accept=".xlsx, .xls">
-                </div>
-                <button id="mmClearBtn" class="bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-2xl px-12 py-2 font-black text-white text-xl shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest mt-2">清空数据</button>
-            </div>
-        </section>
-
-        <div class="grid grid-cols-1 gap-4 mb-10" style="order: 99;">
-            <button id="resetBtn" class="kawaii-btn bg-danger text-white py-3 text-lg"><i class="fa-solid fa-trash-can mr-2"></i>重置游戏</button>
+<!-- 
+  ========================================================
+  【小白调节区：外围大卡片样式】
+  [控制代码] bg-[#FEFCE8] 
+  [使用方法] 控制整个管理区的底色。你可以改成白底 bg-white
+  [特效备份] 如果想加外发光呼吸灯特效，可以在 class 里加上 glow-effect 
+  ========================================================
+-->
+<section id="methodManagerSection" class="kawaii-card p-4 sm:p-6 mb-6 bg-[#FEFCE8]">
+    
+    <!-- 头部标题区：包含标题、特殊设置、切换按钮、折叠箭头 -->
+    <div class="flex justify-between items-center mb-6">
+        
+        <!-- 左侧：标题与折叠控制 -->
+        <div class="flex items-center gap-2 cursor-pointer" onclick="document.getElementById('mmFoldContent').classList.toggle('hidden'); document.getElementById('mmTitleIcon').classList.toggle('rotate-180');">
+            <!-- 
+              ========================================================
+              【小白调节区：主标题样式】
+              [控制代码] text-xl sm:text-2xl
+              [使用方法] 控制标题文字大小。[控制代码] text-[#5E4B8B]
+              [使用方法] 控制文字颜色（深紫色）。
+              [特效备份] 如果想要文字带描边，可以加上 class="text-stroke"
+              ========================================================
+            -->
+            <h2 id="methodManagerTitle" class="text-xl sm:text-2xl font-bold text-[#5E4B8B] flex items-center tracking-widest">
+                淘汰方式条目管理区
+            </h2>
+            <i id="mmTitleIcon" class="fa-solid fa-chevron-down text-2xl text-[#5E4B8B] transition-transform rotate-180"></i>
         </div>
+
+        <!-- 右侧：功能按钮 -->
+        <!-- 
+          ========================================================
+          【小白调节区：右侧功能按钮】
+          [控制代码] bg-[#FDE047] (黄色) 和 bg-white (白色)
+          [使用方法] 更改按钮底色。
+          [特效备份] class里有 hover:brightness-110 可以在手指触摸时变亮。
+          ========================================================
+        -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button id="mmSpecialSettingBtn" class="bg-[#FDE047] border-[3px] border-[#5E4B8B] rounded-full px-3 sm:px-5 py-1 sm:py-1.5 font-bold text-[#5E4B8B] text-xs sm:text-sm shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all">特殊设置</button>
+            <button id="mmToggleTabBtn" class="bg-white border-[3px] border-[#5E4B8B] rounded-full px-3 sm:px-5 py-1 sm:py-1.5 font-bold text-[#5E4B8B] text-xs sm:text-sm shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all">切换</button>
+        </div>
+    </div>
+
+    <!-- 内容区的外层包裹（默认隐藏 hidden） -->
+    <div id="mmFoldContent" class="hidden">
+        
+        <!-- 添加按钮区 (白底圆角框) -->
+        <div class="bg-white border-[3px] border-[#5E4B8B] rounded-[2rem] p-3 mb-10 flex justify-center gap-6 mx-2">
+            <button id="mmAddCategoryBtn" class="flex-1 max-w-[200px] bg-[#E9D5FF] border-[3px] border-[#5E4B8B] rounded-full py-2 font-black text-[#5E4B8B] text-lg shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest">添加分类</button>
+            <button id="mmAddItemBtn" class="flex-1 max-w-[200px] bg-[#FED7AA] border-[3px] border-[#5E4B8B] rounded-full py-2 font-black text-[#5E4B8B] text-lg shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest">添加条目</button>
+        </div>
+
+        <!-- 动态生成的分类与条目渲染区 -->
+        <div id="methodManagerContent" class="flex flex-col gap-10 pb-4">
+            <!-- JS 动态注入 -->
+        </div>
+
+        <!-- 底部导出导入区 -->
+        <div class="mt-8 pt-6 flex flex-col items-center gap-4">
+            <div class="flex justify-center gap-6">
+                <button id="mmExportBtn" class="bg-[#84CC16] border-[3px] border-[#5E4B8B] rounded-xl px-5 py-2 font-black text-white text-base shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-wider">导出配置</button>
+                <button id="mmImportBtn" class="bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl px-5 py-2 font-black text-white text-base shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-wider">导入配置</button>
+                <input type="file" id="mmFileInput" class="hidden" accept=".xlsx, .xls">
+            </div>
+            <button id="mmClearBtn" class="bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-2xl px-12 py-2 font-black text-white text-xl shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest mt-2">清空数据</button>
+        </div>
+        
+    </div> <!-- 闭合折叠容器 -->
+</section>
 
 <!-- 【全新修复】手机端底部 5 大导航栏 (图3像素级复刻版) -->
         <!-- 
@@ -3251,7 +3283,7 @@ initAchievements();
 
         gameData.methodStats = { win: {}, lose: {} }; // 【V2新增】清空旧统计，重新算
 
-        viewRounds.forEach((r, idx) => {
+        viewRounds.reverse().forEach((r, idx) => {
             // 【V2新增】如果这局有V2记录，就把胜利和淘汰次数+1
             if(r.v2Stats) {
                 if(r.v2Stats.winMethod) {
@@ -3575,152 +3607,127 @@ window.renderOneVsOneArena = function() {
         </div>`;
     };
 
+// ========================================================
+    // ★ 1V1擂台 终极合体渲染 (主信息 -> 对局信息 -> 轮次信息)
+    // ========================================================
     let html = '';
 
-    // ==========================================
-    // 视图 0：主信息 (图1：独立标签，有间距，动态排版)
-    // ==========================================
-    if (ovoState.viewIndex === 0) {
-        let colsHtml = active.map(p => buildStatsCol(p, ovoMatches, p.color)).join('');
-        html = `
-        <div class="p-1 sm:p-2 w-full flex justify-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B]">
-            <!-- 内部使用 gap 隔开各个玩家标签，使用 overflow-x-auto 确保不撑破 -->
-            <div class="flex gap-1.5 sm:gap-2.5 w-full max-w-full justify-around items-stretch overflow-x-auto scrollbar-hide py-1">
-                ${colsHtml}
-            </div>
-        </div>`;
-    } 
-    
-    // ==========================================
-    // 视图 1：轮次信息 (图2：限制5局，有间距，带垂直滑块)
-    // ==========================================
-    else if (ovoState.viewIndex === 1) {
-        let reversedMatches = [...ovoMatches].reverse();
-        
-        // 外围容器，固定高度出现滚动条 (图2右侧的蓝灰色滚动条已通过 custom-scroll 控制)
-        html = `<div class="p-1.5 sm:p-2.5 flex flex-col gap-2 sm:gap-3 max-h-[260px] sm:max-h-[320px] overflow-y-auto custom-scroll w-full bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B]">`;
-        
-        reversedMatches.forEach(m => {
-            let wp = active.find(p=>p.id===m.winner); let lp = active.find(p=>p.id===m.loser);
-            if(!wp || !lp) return;
+    // 【1. 主信息视图】
+    let colsHtml = active.map(p => buildStatsCol(p, ovoMatches, p.color)).join('');
+    html += `
+    <!-- 小白调节区：主信息白色大底框 -->
+    <!-- border-[3px] 边框粗细, rounded-xl 圆角弧度, shadow-[0_4px_0_#5E4B8B] 底部投影厚度 -->
+    <div class="mb-4 p-1 sm:p-2 w-full flex justify-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B]">
+        <div class="flex gap-1.5 sm:gap-2.5 w-full max-w-full justify-around items-stretch overflow-x-auto scrollbar-hide py-1">
+            ${colsHtml}
+        </div>
+    </div>`;
 
-            let timeStr = m.time > 0 ? `${Math.floor(m.time/60)}:${String(m.time%60).padStart(2,'0')}` : '耗尽';
-            let timeBg = m.time > 0 ? 'bg-white' : 'bg-[#E11D48]';
-            let timeText = m.time > 0 ? 'text-[#5E4B8B]' : 'text-white stroke-xs'; // 耗尽时带白描边
-
-            let methodUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
-            if (gameData.customMethods) {
-                let mItem = null;
-                if (gameData.customMethods.win) mItem = gameData.customMethods.win.items.find(i => i.name === m.method);
-                if (!mItem && gameData.customMethods.lose) mItem = gameData.customMethods.lose.items.find(i => i.name === m.method);
-                if (mItem && mItem.url) methodUrl = mItem.url;
-            }
-
-            // 每个对局是一条独立的横幅，带阴影和间距
-            html += `
-            <div class="flex w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md bg-white h-[42px] sm:h-[40px] overflow-hidden shrink-0 shadow-[0_4px_0_#5E4B8B]">
-                <!-- 第X局 -->
-                <div class="w-11 sm:w-14 flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] bg-[#E2E8F0] shrink-0">
-                    <span class="font-bold text-[#5E4B8B] text-[20px] sm:text-xs">${m.round}</span>
-                </div>
-                <!-- 详情区 -->
-                <div class="flex-1 flex min-w-0">
-                    <!-- WIN -->
-                    <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
-                        <div class="w-[30%] bg-[#84CC16] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
-                            <span class="text-white font-black text-[20px] sm:text-[20px] stroke-xs">胜</span>
-                        </div>
-                        <div class="flex-1 flex items-center justify-center" style="background-color: ${wp.color};">
-                            <span class="text-white font-black text-[25px] sm:text-stroke stroke-xs">${getShort(wp.name)}</span>
-                        </div>
-                    </div>
-                    <!-- PK -->
-                    <div class="w-7 sm:w-9 flex items-center justify-center bg-white border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] shrink-0">
-                        <span class="text-[#E11D48] font-black text-[13px] sm:text-[16px] stroke-xs" style="color:#E11D48; -webkit-text-stroke-color: #5E4B8B;">PK</span>
-                    </div>
-                    <!-- LOSE -->
-                    <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
-                        <div class="w-[30%] bg-[#E11D48] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
-                            <span class="text-white font-black text-[20px] sm:text-[20px] stroke-xs">负</span>
-                        </div>
-                        <div class="flex-1 flex items-center justify-center" style="background-color: ${lp.color};">
-                            <span class="text-white font-black text-[25px] sm:text-stroke stroke-xs">${getShort(lp.name)}</span>
-                        </div>
-                    </div>
-                    <!-- 时间 -->
-                    <div class="w-[50px] sm:w-[65px] flex flex-col shrink-0 border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
-                        <div class="h-1/2 bg-[#FDE047] flex items-center justify-center border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B]">
-                            <span class="text-[#5E4B8B] font-bold text-[8px] sm:text-[9px] leading-none transform scale-90 sm:scale-100">剩余时间</span>
-                        </div>
-                        <div class="h-1/2 ${timeBg} flex items-center justify-center">
-                            <span class="${timeText} font-bold text-[10px] sm:text-xs leading-none">${timeStr}</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- 终结技图片区 -->
-                <div class="w-[42px] sm:w-[50px] h-full bg-[#111111] flex items-center justify-center p-[1px] shrink-0">
-                    <img src="${methodUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
-                </div>
-            </div>`;
+    // 【2. 对局信息视图】
+    if(ovoState.subjectIndex === undefined || ovoState.subjectIndex >= active.length) ovoState.subjectIndex = 0;
+    let subject = active[ovoState.subjectIndex];
+    let opponents = active.filter(p => p.id !== subject.id);
+    let subjectMatches = ovoMatches.filter(m => m.winner === subject.id || m.loser === subject.id);
+    let oppColsHtml = opponents.map(opp => {
+        let mockMatches =[];
+        subjectMatches.forEach(m => {
+            if (m.winner === subject.id && m.loser === opp.id) mockMatches.push({ winner: opp.id, loser: null }); 
+            else if (m.loser === subject.id && m.winner === opp.id) mockMatches.push({ winner: null, loser: opp.id }); 
         });
-        html += `</div>`;
-    }
+        let headerBg = hexToRgba(opp.color, 0.5); 
+        return buildStatsCol(opp, mockMatches, headerBg);
+    }).join('');
 
-    // ==========================================
-    // 视图 2：对局信息 (图3：主视角玩家置于上方，下方为对手卡片)
-    // ==========================================
-    else if (ovoState.viewIndex === 2) {
-        if(ovoState.subjectIndex === undefined || ovoState.subjectIndex >= active.length) ovoState.subjectIndex = 0;
-        
-        let subject = active[ovoState.subjectIndex];
-        let opponents = active.filter(p => p.id !== subject.id);
-        let subjectMatches = ovoMatches.filter(m => m.winner === subject.id || m.loser === subject.id);
-        
-        let oppColsHtml = opponents.map(opp => {
-            let mockMatches =[];
-            subjectMatches.forEach(m => {
-                if (m.winner === subject.id && m.loser === opp.id) mockMatches.push({ winner: opp.id, loser: null }); 
-                else if (m.loser === subject.id && m.winner === opp.id) mockMatches.push({ winner: null, loser: opp.id }); 
-            });
-            // 浅色半透明表头，突出对手
-            let headerBg = hexToRgba(opp.color, 0.5); 
-            return buildStatsCol(opp, mockMatches, headerBg);
-        }).join('');
-
-        html = `
-        <div class="p-2 sm:p-3 w-full flex flex-col items-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B] relative">
-            <!-- 玩家切换控制器 -->
-            <div class="flex items-center justify-center gap-3 mb-1 w-full relative z-10">
-                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-[0_4px_0_#5E4B8B] shrink-0 transition-transform" onclick="window.changeOvoSubject(-1)">
-                    <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i>
-                </button>
-                
-                <!-- 主视角玩家标签 -->
-                <div class="border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-4 sm:pr-6 py-0.5 sm:py-1 flex items-center gap-2 shadow-[0_4px_0_#5E4B8B] shrink-0" style="background-color: ${subject.color};">
-                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-[6px] sm:rounded-md border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
-                        <img src="${subject.avatar}" class="w-full h-full object-cover">
-                    </div>
-                    <span class="font-black text-white stroke-sm tracking-widest text-sm sm:text-base">${getShort(subject.name)}</span>
+    html += `
+    <!-- 小白调节区：对局信息白色大底框 -->
+    <div class="mb-4 p-2 sm:p-3 w-full flex flex-col items-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B] relative">
+        <div class="flex items-center justify-center gap-3 mb-1 w-full relative z-10">
+            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] active:scale-90 shadow-[0_4px_0_#5E4B8B] shrink-0 transition-transform" onclick="window.changeOvoSubject(-1)">
+                <i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i>
+            </button>
+            <div class="border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-4 sm:pr-6 py-0.5 sm:py-1 flex items-center gap-2 shadow-[0_4px_0_#5E4B8B] shrink-0" style="background-color: ${subject.color};">
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-[6px] sm:rounded-md border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
+                    <img src="${subject.avatar}" class="w-full h-full object-cover">
                 </div>
+                <span class="font-black text-white stroke-sm tracking-widest text-sm sm:text-base">${getShort(subject.name)}</span>
+            </div>
+            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] active:scale-90 shadow-[0_4px_0_#5E4B8B] shrink-0 transition-transform" onclick="window.changeOvoSubject(1)">
+                <i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i>
+            </button>
+        </div>
+        <div class="flex justify-center w-full mb-1 sm:mb-2 relative z-0 -mt-1 sm:-mt-2">
+            <span class="font-black text-[28px] sm:text-[36px] tracking-tighter stroke-md" style="color: #E11D48; -webkit-text-stroke-color: #5E4B8B;">PK</span>
+        </div>
+        <div class="flex gap-1.5 sm:gap-2.5 w-full justify-around items-stretch overflow-x-auto scrollbar-hide py-1">
+            ${oppColsHtml}
+        </div>
+    </div>`;
 
-                <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] bg-white flex items-center justify-center text-[#5E4B8B] hover:bg-gray-100 active:scale-90 shadow-[0_4px_0_#5E4B8B] shrink-0 transition-transform" onclick="window.changeOvoSubject(1)">
-                    <i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i>
-                </button>
+    // 【3. 轮次信息视图 (无限延伸)】
+    let reversedMatches = [...ovoMatches].reverse();
+    // 去掉了 max-h 限制，变成无限延伸！
+    html += `<div class="p-1.5 sm:p-2.5 flex flex-col gap-2 sm:gap-3 w-full bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B]">`;
+    
+    reversedMatches.forEach(m => {
+        let wp = active.find(p=>p.id===m.winner); let lp = active.find(p=>p.id===m.loser);
+        if(!wp || !lp) return;
+
+        let timeStr = m.time > 0 ? `${Math.floor(m.time/60)}:${String(m.time%60).padStart(2,'0')}` : '耗尽';
+        let timeBg = m.time > 0 ? 'bg-white' : 'bg-[#E11D48]';
+        let timeText = m.time > 0 ? 'text-[#5E4B8B]' : 'text-white stroke-xs';
+
+        let methodUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+        if (gameData.customMethods) {
+            let mItem = null;
+            if (gameData.customMethods.win) mItem = gameData.customMethods.win.items.find(i => i.name === m.method);
+            if (!mItem && gameData.customMethods.lose) mItem = gameData.customMethods.lose.items.find(i => i.name === m.method);
+            if (mItem && mItem.url) methodUrl = mItem.url;
+        }
+
+        html += `
+        <!-- 小白调节区：对战轮次横条 -->
+        <div class="flex w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[4px] sm:rounded-md bg-white h-[42px] sm:h-[40px] overflow-hidden shrink-0 shadow-sm">
+            <div class="w-11 sm:w-14 flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] bg-[#E2E8F0] shrink-0">
+                <span class="font-bold text-[#5E4B8B] text-[20px] sm:text-xs">${m.round}</span>
             </div>
-            
-            <!-- PK 字样 (超大字，白底紫描边，外层红色填充) -->
-            <div class="flex justify-center w-full mb-1 sm:mb-2 relative z-0 -mt-1 sm:-mt-2">
-                <span class="font-black text-[28px] sm:text-[36px] tracking-tighter stroke-md" style="color: #E11D48; -webkit-text-stroke-color: #5E4B8B; text-shadow: none;">PK</span>
+            <div class="flex-1 flex min-w-0">
+                <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                    <div class="w-[30%] bg-[#84CC16] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                        <span class="text-white font-black text-[20px] sm:text-[20px] stroke-xs">胜</span>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center" style="background-color: ${wp.color};">
+                        <span class="text-white font-black text-[25px] sm:text-stroke stroke-xs">${getShort(wp.name)}</span>
+                    </div>
+                </div>
+                <div class="w-7 sm:w-9 flex items-center justify-center bg-white border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B] shrink-0">
+                    <span class="text-[#E11D48] font-black text-[13px] sm:text-[16px] stroke-xs" style="color:#E11D48; -webkit-text-stroke-color: #5E4B8B;">PK</span>
+                </div>
+                <div class="flex-1 flex items-stretch border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                    <div class="w-[30%] bg-[#E11D48] flex items-center justify-center border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                        <span class="text-white font-black text-[20px] sm:text-[20px] stroke-xs">负</span>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center" style="background-color: ${lp.color};">
+                        <span class="text-white font-black text-[25px] sm:text-stroke stroke-xs">${getShort(lp.name)}</span>
+                    </div>
+                </div>
+                <div class="w-[50px] sm:w-[65px] flex flex-col shrink-0 border-r-[2.5px] sm:border-r-[3px] border-[#5E4B8B]">
+                    <div class="h-1/2 bg-[#FDE047] flex items-center justify-center border-b-[2.5px] sm:border-b-[3px] border-[#5E4B8B]">
+                        <span class="text-[#5E4B8B] font-bold text-[8px] sm:text-[9px] leading-none transform scale-90 sm:scale-100">剩余时间</span>
+                    </div>
+                    <div class="h-1/2 ${timeBg} flex items-center justify-center">
+                        <span class="${timeText} font-bold text-[10px] sm:text-xs leading-none">${timeStr}</span>
+                    </div>
+                </div>
             </div>
-            
-            <!-- 对手列表容器 (图3同款，含间距独立卡片) -->
-            <div class="flex gap-1.5 sm:gap-2.5 w-full justify-around items-stretch overflow-x-auto scrollbar-hide py-1">
-                ${oppColsHtml}
+            <div class="w-[42px] sm:w-[50px] h-full bg-[#111111] flex items-center justify-center p-[1px] shrink-0">
+                <img src="${methodUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
             </div>
         </div>`;
-    }
+    });
+    html += `</div>`;
 
     content.innerHTML = html;
+
 };
 
 // 绑定左右切换全局函数 (供 HTML 内联 onClick 调用)
@@ -5386,7 +5393,7 @@ function renderDetailedRecords() {
                 tfoot.appendChild(td);
             });
 
-            viewRounds.forEach((r, idx) => {
+        viewRounds.forEach((r, idx) => {
                 const tr = document.createElement('tr');
                 tr.className = 'border-b hover:bg-gray-50';
                 
@@ -6190,7 +6197,7 @@ function checkResetTimer() {
 // 6. 渲染统计表格 (双视图完美整合版)
 // ==========================================
 // 控制视图的全局变量 (2 = 全新像素级复刻视图, 1 = 卡片视图, 0 = 列表视图)
-window.methodStatViewMode = 2;
+window.methodStatViewMode = 1;
 
 // 绑定给 HTML 按钮的切换视图函数 (3种视图循环切换)
 window.toggleMethodStatView = function() {
@@ -7082,9 +7089,9 @@ gameData.currentSessionIndex = -1;
     const mobileTabs = {
         'tab1': { name: '成就奖杯', color: '#FDE047', modules:['achievementsSection', 'badgeSection'] },
         'tab2': { name: '排行榜单', color: '#A3D977', modules:['championSectionWrapper', 'leaderboardSection', 'barSection'] },
-        'tab3': { name: '实时结算', color: '#FCA5A5', modules:['playerSection', 'timeRecordSection', 'timerSection', 'randomSelectorSection', 'latestStatusSection'] },
-        'tab4': { name: '详细数据', color: '#93C5FD', modules:['oneVsOneSection', 'penaltyStatsSection', 'penaltySection', 'sessionFilterDisplay', 'methodStatSection', 'eliminationOrderSection', 'chartSection', 'pieChartSection', 'radarSection', 'sessionSection'] },
-        'tab5': { name: '数据备份', color: '#F472B6', modules: ['cloudShareSection', 'dataIOSection', 'tableSection', 'methodManagerSection'] }
+'tab3': { name: '实时结算', color: '#FCA5A5', modules:['playerSection', 'latestStatusSection', 'timeRecordSection', 'timerSection', 'randomSelectorSection', 'penaltySection', 'penaltyStatsSection'] },
+        'tab4': { name: '详细数据', color: '#93C5FD', modules:['oneVsOneSection', 'sessionFilterDisplay', 'methodStatSection', 'eliminationOrderSection', 'chartSection', 'pieChartSection', 'radarSection', 'sessionSection'] },
+        'tab5': { name: '数据备份', color: '#F472B6', modules: ['cloudShareSection', 'methodManagerSection', 'dataIOSection', 'tableSection'] }
     };
 
     let currentMobileTab = 'tab3';
@@ -8547,24 +8554,26 @@ window.renderLatestStatus = function() {
     // 默认进入详细数据时，显示第 2 个模块 (走势图, 下标为 1)
     window.currentDetailIndex = 1;
 
-    // 2. 【核心画笔】：绘制顶部三个左右切换的胶囊
+// 2. 【全新原生滑动引擎】
     window.renderDetailNav = function() {
-        const len = window.detailModulesConfig.length;
+        const sliderArea = document.getElementById('detailNavSliderArea');
+        if (!sliderArea) return;
         
-        // 算出左、中、右分别该显示花名册里的第几号人物
-        const leftIdx = (window.currentDetailIndex - 1 + len) % len;
-        const centerIdx = window.currentDetailIndex;
-        const rightIdx = (window.currentDetailIndex + 1) % len;
+        sliderArea.innerHTML = window.detailModulesConfig.map((mod, idx) => {
+            // 被选中的高亮且稍微放大，没选中的半透明
+            const isActive = idx === window.currentDetailIndex;
+            const opacityClass = isActive ? 'opacity-100 scale-100' : 'opacity-50 scale-90';
+            
+            return `
+            <!-- 小白调节区：单个导航胶囊 -->
+            <div class="snap-center shrink-0 transition-all duration-300 cursor-pointer nav-cap-btn ${opacityClass}" data-idx="${idx}" style="width: 30%;">
+                <div class="border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-lg px-2 sm:px-4 py-0.5 sm:py-1 text-[11px] sm:text-sm font-black shadow-[0_3px_0_#5E4B8B] whitespace-nowrap overflow-hidden text-center w-full" style="background-color: ${mod.color};">
+                    ${mod.name}
+                </div>
+            </div>`;
+        }).join('');
 
-        // 生成胶囊 HTML 的小工具
-        const buildCap = (mod) => `<div class="border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-lg px-2 sm:px-4 py-0.5 sm:py-1 text-[11px] sm:text-sm font-black shadow-[0_3px_0_#5E4B8B] whitespace-nowrap overflow-hidden text-center w-full" style="background-color: ${mod.color};">${mod.name}</div>`;
-
-        // 填入到三个位置
-        document.getElementById('detailNavLeft').innerHTML = buildCap(window.detailModulesConfig[leftIdx]);
-        document.getElementById('detailNavCenter').innerHTML = buildCap(window.detailModulesConfig[centerIdx]);
-        document.getElementById('detailNavRight').innerHTML = buildCap(window.detailModulesConfig[rightIdx]);
-
-        // 重点：遍历花名册，隐藏除了当前居中的其它所有模块！
+        // 遍历隐藏/显示模块
         window.detailModulesConfig.forEach((mod, idx) => {
             const el = document.getElementById(mod.id);
             if (el) {
@@ -8575,47 +8584,28 @@ window.renderLatestStatus = function() {
                 }
             }
         });
+        
+        // 自动把选中的胶囊滚动到屏幕正中间
+        setTimeout(() => {
+            const activeCap = sliderArea.children[window.currentDetailIndex];
+            if (activeCap) {
+                const scrollLeft = activeCap.offsetLeft - (sliderArea.clientWidth / 2) + (activeCap.clientWidth / 2);
+                sliderArea.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+            }
+        }, 50);
     };
 
     function attachSliderEvents() {
-        const leftBtn = document.getElementById('detailNavLeft');
-        const rightBtn = document.getElementById('detailNavRight');
         const sliderArea = document.getElementById('detailNavSliderArea');
-        if(!leftBtn || !rightBtn || !sliderArea) return;
-
-        // 点击左边胶囊，往左切
-        leftBtn.onclick = () => {
-            window.currentDetailIndex = (window.currentDetailIndex - 1 + window.detailModulesConfig.length) % window.detailModulesConfig.length;
-            window.renderDetailNav();
-        };
-
-        // 点击右边胶囊，往右切
-        rightBtn.onclick = () => {
-            window.currentDetailIndex = (window.currentDetailIndex + 1) % window.detailModulesConfig.length;
-            window.renderDetailNav();
-        };
-
-        // 手机端手指滑动的灵魂：防误触顺滑滑动判断
-        let navStartX = 0;
-        sliderArea.addEventListener('touchstart', e => { 
-            navStartX = e.touches[0].clientX; 
-        }, {passive: true});
-
-        sliderArea.addEventListener('touchend', e => {
-            let navEndX = e.changedTouches[0].clientX;
-            let diff = navEndX - navStartX;
-            
-            // 向右滑，显示左边的
-            if (diff > 40) { 
-                window.currentDetailIndex = (window.currentDetailIndex - 1 + window.detailModulesConfig.length) % window.detailModulesConfig.length;
-                window.renderDetailNav();
-            } 
-            // 向左滑，显示右边的
-            else if (diff < -40) { 
-                window.currentDetailIndex = (window.currentDetailIndex + 1) % window.detailModulesConfig.length;
+        if(!sliderArea) return;
+        // 点击胶囊直接切换
+        sliderArea.addEventListener('click', e => {
+            const cap = e.target.closest('.nav-cap-btn');
+            if (cap) {
+                window.currentDetailIndex = parseInt(cap.dataset.idx);
                 window.renderDetailNav();
             }
-        }, {passive: true});
+        });
     }
 
     // 3. 【强行霸占局次相关函数】：彻底重写旧的选择逻辑
