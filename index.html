@@ -114,6 +114,23 @@
             .kawaii-btn { @apply border-4 border-[#5E4B8B] rounded-full font-bold transition-all active:translate-y-1 shadow-[0_4px_0_#5E4B8B]; }
             .kawaii-input { @apply bg-[#F1F5F9] border-4 border-[#5E4B8B] rounded-2xl focus:outline-none; }
             
+/* 
+             * ========================================================
+             * 【小白调节区：模块切换平滑淡入动画】
+             * [控制代码] translateY(15px) -> translateY(0)
+             * [使用方法] 控制模块是从下往上浮现的。15px是移动距离，改大就是从更低的地方飘上来。
+             * [控制代码] 0.4s
+             * [使用方法] 控制动画时间。如果觉得太慢，改成 0.2s，觉得快就改 0.6s。
+             * ========================================================
+             */
+            @keyframes fadeInModule {
+                from { opacity: 0; transform: translateY(15px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .fade-in-module {
+                animation: fadeInModule 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            }
+
 /* 【全新优化】真正的平滑外描边：利用 paint-order 先向外画描边再填色 */
             .smooth-outline {
                 color: white;
@@ -346,7 +363,7 @@
      如果你觉得它离最顶上那个动态标题太近或太远，可以修改这个数字。
   2. z-[90] : 保证它漂浮在所有图表上方，绝不被遮挡。
 -->
-<div id="detailDataStickyHeader" class="sticky top-[65px] sm:top-[75px] z-[90] mb-4 w-full hidden transition-all duration-300" style="order: -1;">
+<div id="detailDataStickyHeader" class="sticky top-[65px] sm:top-[75px] z-[90] mb-4 w-[calc(100%+16px)] -ml-2 sm:-ml-2 hidden transition-all duration-300" style="order: -1;">
     
     <!-- 【小白调节区：全宽外衣】去掉了阴影和圆角，改为了#BBFFC2 -->
     <div class="bg-[#BBFFC2] border-y-[4px] border-[#5E4B8B] py-2 w-full flex flex-col gap-2">
@@ -354,7 +371,7 @@
         <!-- 【全新环形滑动引擎容器】 -->
         <div class="relative w-full h-[36px] sm:h-[42px] flex items-center justify-center overflow-hidden">
             <!-- 居中红框指示器（表示选中位置） -->
-            <div class="absolute w-[30%] sm:w-[25%] h-full border-[3px] border-[#E11D48] rounded-lg z-20 pointer-events-none shadow-[0_0_8px_rgba(225,29,72,0.4)]"></div>
+            <div class="absolute w-[35%] sm:w-[20%] h-full border-[3px] border-[#E11D48] rounded-lg z-20 pointer-events-none shadow-[0_0_8px_rgba(225,29,72,0.4)] opacity-0"></div>
             <!-- 真实的滑动轨道 -->
             <div id="detailNavSliderArea" class="flex items-center h-full w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory px-[35%] sm:px-[37.5%]">
                 <!-- JS动态填充 -->
@@ -8773,13 +8790,14 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
         };
     }
 })();
+
+
+
 // ====================================================================
-// ★★★ 图1/图2 完美复刻：详细数据独立滑动引擎 (教婴儿级算法) ★★★
+// ★★★ 图1/图2 完美复刻：详细数据独立滑动引擎 (全新智能平滑版) ★★★
 // ====================================================================
 (function() {
     // 1. 【模块花名册】：在这里登记详细数据里的所有模块和马卡龙颜色！
-    // 颜色的顺序和排版严格遵循了图1里的效果！
-// 【修改：加入了 动态Round条 和 奖杯墙，并分配了马卡龙配色】
     window.detailModulesConfig =[
         { id: 'timeDataSection', name: '时间数据', color: '#a6bde2' },
         { id: 'eliminationOrderSection', name: '淘汰顺位', color: '#f4a7b9' },
@@ -8788,42 +8806,52 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
         { id: 'oneVsOneSection', name: '1V1擂台', color: '#ffb3a7' },
         { id: 'penaltyStatsSection', name: '罚牌统计', color: '#f3d27b' },
         { id: 'methodStatSection', name: '结算统计', color: '#a0b0c4' },
-        { id: 'barSection', name: 'ROUND进度', color: '#ffb3a7' }, // 新来的
+        { id: 'barSection', name: 'ROUND进度', color: '#ffb3a7' },
         { id: 'pieChartSection', name: '得分占比', color: '#a3d977' },
         { id: 'sessionSection', name: '场次记录', color: '#fca5a5' },
         { id: 'tableSection', name: '局次得分详情', color: '#93c5fd' },
-        { id: 'badgeSection', name: '全场奖杯', color: '#FDE047' } // 新来的
+        { id: 'badgeSection', name: '全场奖杯', color: '#FDE047' } 
     ];
     
     // 默认进入详细数据时，显示第 2 个模块 (走势图, 下标为 1)
     window.currentDetailIndex = 1;
 
-// 2. 【全新原生滑动引擎 (丝滑无限环版本)】
+    // 2. 【全新定宽直线滑动引擎】
     window.renderDetailNav = function() {
         const sliderArea = document.getElementById('detailNavSliderArea');
         if (!sliderArea) return;
         
-        // 魔法：把数据复制5份，拼接成长长的无限履带
         const configs = window.detailModulesConfig;
-        const copies = 5;
-        let html = '';
         
-        for(let i = 0; i < copies; i++) {
-            configs.forEach((mod, idx) => {
-                html += `
-                <div class="snap-center shrink-0 flex justify-center nav-cap-btn" style="width: 32%;" data-real-idx="${idx}">
-                    <div class="border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-lg px-2 sm:px-4 py-0.5 sm:py-1 text-[11px] sm:text-sm font-black shadow-[0_2px_0_#5E4B8B] whitespace-nowrap overflow-hidden text-center w-[90%] transition-all duration-300" style="background-color: ${mod.color};">
-                        ${mod.name}
-                    </div>
-                </div>`;
-            });
-        }
+        // 左侧魔法占位块：保证第一个胶囊能正好停在屏幕中央
+        let html = '<div class="shrink-0 w-[50vw] sm:w-[50%] pointer-events-none"></div>';
+        
+        configs.forEach((mod, idx) => {
+            html += `
+            <div class="snap-center shrink-0 flex justify-center nav-cap-btn px-1 sm:px-[6px]" data-real-idx="${idx}">
+                <!-- 
+                  ========================================================
+                  【小白调节区：单个胶囊按钮参数】
+                  [宽度控制] w-[65px] sm:w-[80px]：控制胶囊的固定宽度！现在它们一样宽了，绝对不会受文字影响！
+                  [字号控制] text-[11px] sm:text-[13px]：文字大小，保证能显示完整。
+                  [边框与阴影] border-[2.5px] shadow-[0_3px_0_#5E4B8B]：深紫色描边与立体投影厚度。
+                  [特效备份] 如果想让选中的胶囊发光，可以尝试加 shadow-[0_0_10px_rgba(255,255,255,0.8)]
+                  ========================================================
+                -->
+                <div class="border-[2.5px] sm:border-[3px] border-[#5E4B8B] text-[#5E4B8B] rounded-[0.5rem] py-1 text-[11px] sm:text-[13px] font-black shadow-[0_3px_0_#5E4B8B] whitespace-nowrap overflow-hidden text-center w-[65px] sm:w-[80px] transition-all duration-200" style="background-color: ${mod.color};">
+                    ${mod.name}
+                </div>
+            </div>`;
+        });
+        
+        // 右侧魔法占位块：保证最后一个胶囊能正好停在屏幕中央
+        html += '<div class="shrink-0 w-[50vw] sm:w-[50%] pointer-events-none"></div>'; 
+        
         sliderArea.innerHTML = html;
 
-        // 初始定位到履带最中间的那一份，防止边缘穿帮
+        // 初始自动滚动到对应位置
         setTimeout(() => {
-            const centerGroupStart = Math.floor(copies / 2) * configs.length;
-            const targetChild = sliderArea.children[centerGroupStart + window.currentDetailIndex];
+            const targetChild = sliderArea.children[window.currentDetailIndex + 1]; // +1是因为有占位块
             if (targetChild) {
                 const scrollPos = targetChild.offsetLeft - (sliderArea.clientWidth / 2) + (targetChild.clientWidth / 2);
                 sliderArea.scrollLeft = scrollPos;
@@ -8837,20 +8865,17 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
             const el = document.getElementById(mod.id);
             if (el) {
                 if (idx === window.currentDetailIndex) {
-                    el.style.setProperty('display', 'block', 'important');
+                    if (el.style.display === 'none') {
+                        el.style.setProperty('display', 'block', 'important');
+                        // 触发神级平滑重绘魔法：重新绑定 CSS 动画，绝不硬切！
+                        el.classList.remove('fade-in-module');
+                        void el.offsetWidth; 
+                        el.classList.add('fade-in-module');
+                    }
                 } else {
                     el.style.setProperty('display', 'none', 'important');
+                    el.classList.remove('fade-in-module');
                 }
-            }
-        });
-        
-        // 视觉反馈：放大居中被选中的胶囊
-        const caps = document.querySelectorAll('.nav-cap-btn > div');
-        caps.forEach(cap => {
-            if(parseInt(cap.parentElement.dataset.realIdx) === window.currentDetailIndex) {
-                cap.classList.add('scale-110'); cap.classList.remove('opacity-50');
-            } else {
-                cap.classList.remove('scale-110'); cap.classList.add('opacity-50');
             }
         });
     };
@@ -8859,47 +8884,118 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
         const sliderArea = document.getElementById('detailNavSliderArea');
         if(!sliderArea) return;
         
-        // 滑动监听：谁停在中间，谁就触发显示！
         sliderArea.addEventListener('scroll', () => {
             const center = sliderArea.scrollLeft + sliderArea.clientWidth / 2;
             let closestItem = null;
             let minDiff = Infinity;
             
-            // 找准距离屏幕中心点最近的胶囊
+            // 【核心算法：透明度逐渐衰减引擎】
             Array.from(sliderArea.children).forEach(child => {
+                if(!child.classList.contains('nav-cap-btn')) return; // 忽略占位块
+                
                 const childCenter = child.offsetLeft + child.clientWidth / 2;
                 const diff = Math.abs(childCenter - center);
+                const cap = child.querySelector('div');
+                
+                if (cap) {
+                    // 距离中心点越近，透明度越高，大小越正常
+                    if (diff < 25) {
+                        cap.style.opacity = '1';
+                        cap.style.transform = 'scale(1.05)';
+                        cap.style.boxShadow = '0 3px 0 #5E4B8B'; // 恢复厚重阴影
+                    } else if (diff < 85) {
+                        cap.style.opacity = '0.8';
+                        cap.style.transform = 'scale(0.95)';
+                        cap.style.boxShadow = '0 2px 0 #5E4B8B'; // 阴影变薄
+                    } else if (diff < 155) {
+                        cap.style.opacity = '0.6';
+                        cap.style.transform = 'scale(0.9)';
+                        cap.style.boxShadow = '0 1px 0 #5E4B8B';
+                    } else {
+                        cap.style.opacity = '0.4';
+                        cap.style.transform = 'scale(0.85)';
+                        cap.style.boxShadow = 'none';
+                    }
+                }
+
+                // 寻找最靠近中心的胶囊作为激活目标
                 if (diff < minDiff) {
                     minDiff = diff;
                     closestItem = child;
                 }
             });
             
-            if (closestItem) {
+            // 只有当最中心的胶囊确确实实滑到了中心区域（偏差小于30），才触发内容更换
+            if (closestItem && minDiff < 30) { 
                 const newIdx = parseInt(closestItem.dataset.realIdx);
                 if (newIdx !== window.currentDetailIndex) {
                     window.currentDetailIndex = newIdx;
-                    window.updateDetailModulesDisplay(); // 触发下方模块切换
+                    window.updateDetailModulesDisplay(); 
                 }
-            }
-            
-            // 无限循环魔法：手指滑到太前或太后，瞬间悄悄传送到中间！
-            const trackWidth = sliderArea.children[0].clientWidth * window.detailModulesConfig.length;
-            if (sliderArea.scrollLeft < trackWidth * 1.5) {
-                sliderArea.scrollLeft += trackWidth * 2;
-            } else if (sliderArea.scrollLeft > sliderArea.scrollWidth - trackWidth * 2.5) {
-                sliderArea.scrollLeft -= trackWidth * 2;
             }
         });
     }
 
-    // 3. 【强行霸占局次相关函数】：彻底重写旧的选择逻辑
+    // =================================================================
+    // 3. 【全新：屏幕全局横向滑动切换引擎】(如你所愿，功能全量回归！)
+    // =================================================================
+    let touchStartX = 0;
+    let touchStartY = 0;
     
-    // 打开图2的独立弹窗
+    document.addEventListener('touchstart', e => {
+        // 只有在“详细数据”页面，且存在粘性控制台才触发
+        const stickyHeader = document.getElementById('detailDataStickyHeader');
+        if(!stickyHeader || stickyHeader.classList.contains('hidden')) return;
+        
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, {passive: true});
+
+    document.addEventListener('touchend', e => {
+        const stickyHeader = document.getElementById('detailDataStickyHeader');
+        if(!stickyHeader || stickyHeader.classList.contains('hidden')) return;
+        
+        const touchEndX = e.changedTouches[0].screenX;
+        const touchEndY = e.changedTouches[0].screenY;
+        
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        
+        // 判断：如果横向滑动距离大于60，且上下位移小于40，则认定为有意横滑！
+        if (Math.abs(deltaX) > 60 && Math.abs(deltaY) < 40) {
+            
+            // 【防误触判定系统】：如果用户的手指是在滑动图表、表格、或内部横滑区，决不拦截！
+            const target = e.target;
+            const isCanvas = target.tagName.toLowerCase() === 'canvas';
+            const isScrollable = target.closest('.overflow-x-auto') || target.closest('.marquee-wrapper');
+            if (isCanvas || isScrollable) return; 
+
+            // 执行切换：向右滑为上一页，向左滑为下一页
+            if (deltaX > 0) {
+                window.currentDetailIndex--;
+                if(window.currentDetailIndex < 0) window.currentDetailIndex = 0;
+            } else {
+                window.currentDetailIndex++;
+                if(window.currentDetailIndex >= window.detailModulesConfig.length) window.currentDetailIndex = window.detailModulesConfig.length - 1;
+            }
+            
+            // 联动魔法：通知顶部轨道的胶囊也自动滚到对应的位置，丝滑同步！
+            const sliderArea = document.getElementById('detailNavSliderArea');
+            if (sliderArea) {
+                const targetChild = sliderArea.children[window.currentDetailIndex + 1]; 
+                if (targetChild) {
+                    const scrollPos = targetChild.offsetLeft - (sliderArea.clientWidth / 2) + (targetChild.clientWidth / 2);
+                    sliderArea.scrollTo({ left: scrollPos, behavior: 'smooth' }); 
+                }
+            }
+            window.updateDetailModulesDisplay();
+        }
+    }, {passive: true});
+
+    // 4. 【强行霸占局次相关函数】：彻底重写旧的选择逻辑
     window.openSessionModal = function() {
         const list = document.getElementById('sessionFilterList');
         
-        // 算出 ALL 按钮需要显示的数据
         let allDate = "暂无";
         let allRange = "第000~000局";
         if (gameData.sessions && gameData.sessions.length > 0) {
@@ -8909,10 +9005,8 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
         document.getElementById('sfAllDate').textContent = allDate;
         document.getElementById('sfAllRange').textContent = allRange;
 
-        // 生成底下列表里的普通白色按钮
         let html = '';
         if(gameData.sessions && gameData.sessions.length > 0) {
-            // 倒序展示，最新的排上面
             for (let i = gameData.sessions.length - 1; i >= 0; i--) {
                 let s = gameData.sessions[i];
                 let rLabel = `R-${String(i + 1).padStart(2, '0')}`;
@@ -8934,28 +9028,24 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
         document.getElementById('sessionFilterDialog').classList.remove('hidden');
     };
 
-    // 核心：点击任何一个弹窗选项，进行过滤
     window.selectSession = function(index) {
         gameData.currentSessionIndex = index;
         document.getElementById('sessionFilterDialog').classList.add('hidden');
         saveData(); 
-        updateViewRounds(); // 通知底层数据源切分
-        recalculateStats(); // 重新计算统计信息
-        updateAllUI(); // 刷新整个屏幕
+        updateViewRounds(); 
+        recalculateStats(); 
+        updateAllUI(); 
     };
 
-    // 绑定关闭按钮
     const sfCloseBtn = document.getElementById('closeSessionFilterBtn');
     if (sfCloseBtn) sfCloseBtn.onclick = () => document.getElementById('sessionFilterDialog').classList.add('hidden');
 
-    // 4. 【同步刷新文字】：当过滤后，把控制台的三个小胶囊文字改掉
     window.renderSessionSelectorUI = function() {
         const ddRound = document.getElementById('ddRoundLabel');
         const ddDate = document.getElementById('ddDateLabel');
         const ddRange = document.getElementById('ddRangeLabel');
         if (!ddRound) return;
 
-        // 如果是 ALL 或者没数据
         if (gameData.currentSessionIndex === undefined || gameData.currentSessionIndex === -1 || !gameData.sessions || gameData.sessions.length === 0) {
             ddRound.textContent = "ALL";
             if (gameData.sessions && gameData.sessions.length > 0) {
@@ -8966,7 +9056,6 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
                 ddRange.textContent = "第000~000局";
             }
         } else {
-            // 取出精准的这一局数据
             const idx = gameData.currentSessionIndex;
             const session = gameData.sessions[idx];
             ddRound.textContent = `R-${String(idx + 1).padStart(2, '0')}`;
