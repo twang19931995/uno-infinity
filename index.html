@@ -16,9 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- 【新增】：引入全球免费的实时推送通讯库，用来实现 0 额度消耗的更新通知 -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -627,20 +624,24 @@
             </div>
 
 <div id="hostSharePanel" class="flex flex-col gap-3 transition-all w-full">
-    <!-- 分享链接按钮 -->
-    <button id="generateShareLinkBtn" class="w-full bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-sm sm:text-base shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest">
-        <i class="fa-solid fa-link mr-1"></i>分享链接
-    </button>
-    <!-- 自动传输开关 -->
-    <div class="flex gap-2 w-full">
-        <button id="enableAutoSyncBtn" class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-sm shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest opacity-50">
-            <i class="fa-solid fa-wifi mr-1"></i>打开自动传输
-        </button>
-        <button id="disableAutoSyncBtn" class="flex-1 bg-[#F87171] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-sm shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest">
-            <i class="fa-solid fa-plane-slash mr-1"></i>关闭自动传输
-        </button>
-    </div>
-</div>
+                
+                <button id="generateShareLinkBtn" class="w-full bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl py-3 font-black text-white text-base sm:text-lg shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
+                    <i class="fa-solid fa-link mr-2"></i>生成分享链接
+                </button>
+
+                <div class="flex gap-2 w-full mt-1">
+                    <button id="enableAutoSyncBtn" class="flex-1 bg-white text-[#5E4B8B] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
+                        <i class="fa-solid fa-satellite-dish mr-1"></i>打开自动传输
+                    </button>
+
+                    <button id="disableAutoSyncBtn" class="flex-1 bg-[#F87171] text-white border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
+                        <i class="fa-solid fa-power-off mr-1"></i>关闭自动传输
+                    </button>
+                </div>
+            </div>
+                
+
+            </div>
 
 <div id="audienceSharePanel" class="hidden flex-col gap-3 transition-all">
                 <button id="audienceUpdateDataBtn" class="w-full bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-2xl py-3 font-black text-white text-lg sm:text-xl shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
@@ -2309,6 +2310,32 @@ function checkAudienceMode() {
             }
         }
         checkAudienceMode(); // 页面一加载，第一时间先验明正身
+// ==========================================
+        // 📡 全新引擎：免费公共无线电接收器
+        // ==========================================
+        let autoSyncEnabled = false; // 记录主机是否开启了自动传输
+
+        function connectAudienceRadio() {
+            if (!cloudBinId) return;
+            // ntfy.sh 是一个完全免费的开源无线电频道，频道名必须全球唯一，所以我们加上你的 BinID！
+            const topicName = "unoinfinity_v2_" + cloudBinId;
+            
+            console.log("📡 观众端已连接公共频道：等待主机信号...");
+            
+            // 建立长连接监听 (SSE技术，完全免费无消耗)
+            const eventSource = new EventSource(`https://ntfy.sh/${topicName}/sse`);
+            eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                // 只要听到频道里有人喊 "update"，立刻静默拉取最新数据！
+                if (data.event === "message" && data.message === "update") {
+                    console.log("🔥 收到主机无线电信号：数据更新，开始拉取！");
+                    fetchDataFromCloud(true); // 传入 true 代表直接拉取并覆盖刷新
+                }
+            };
+            eventSource.onerror = () => {
+                console.log("📡 无线电信号微弱，正在自动重连...");
+            };
+        }
 // 核心功能3：将当前所有数据打包，上传到云端
         async function uploadDataToCloud() {
             if (!CLOUD_API_KEY) {
@@ -2354,12 +2381,19 @@ const payload = {
                 });
 
                 const result = await response.json();
-                if (response.ok) {
+if (response.ok) {
                     if (!cloudBinId) cloudBinId = result.metadata.id;
                     statusBadge.textContent = "同步成功";
                     statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
+                    
+                    // 【无线电发射核心】主机成功上传到云端后，向公共频道大喊一声："update"！
+                    fetch(`https://ntfy.sh/unoinfinity_v2_${cloudBinId}`, {
+                        method: 'POST',
+                        body: 'update'
+                    }).catch(err => console.log("广播发送失败", err));
+
                     return true;
-                } else {
+                }else {
                     throw new Error(result.message);
                 }
             } catch (error) {
@@ -2456,9 +2490,18 @@ const payload = {
             
             if (!hostPanel || !audPanel || !statusBadge) return;
 
-            if (isAudienceMode) {
+if (isAudienceMode) {
+                // 【核心修改】观众端彻底隐藏“云端同步与分享”和“数据备份”模块，眼不见心不烦！
+                const cloudSec = document.getElementById('cloudShareSection');
+                const dataIOSec = document.getElementById('dataIOSection');
+                if (cloudSec) cloudSec.classList.add('hidden', '!hidden');
+                if (dataIOSec) dataIOSec.classList.add('hidden', '!hidden');
+
+                // 悄悄启动免费的无线电接收器
+                connectAudienceRadio();
+                
+                // ... (后面原本禁用的那些代码不用动它，留着当双保险)
                 hostPanel.classList.add('hidden'); hostPanel.classList.remove('flex');
-                audPanel.classList.remove('hidden'); audPanel.classList.add('flex');
                 
                 statusBadge.textContent = "观众模式 (只读)";
                 statusBadge.classList.replace('text-gray-400', 'text-[#F43F5E]');
@@ -2483,6 +2526,34 @@ const payload = {
 
 function init() {
             initCloudUI(); 
+// 【新增】自动传输开关的电源线
+            const enableSyncBtn = document.getElementById('enableAutoSyncBtn');
+            const disableSyncBtn = document.getElementById('disableAutoSyncBtn');
+            
+            if (enableSyncBtn && disableSyncBtn) {
+                enableSyncBtn.onclick = () => {
+                    window.autoSyncEnabled = true;
+                    // 按钮变绿，开启状态
+                    enableSyncBtn.classList.replace('bg-white', 'bg-[#4ADE80]');
+                    enableSyncBtn.classList.replace('text-[#5E4B8B]', 'text-white');
+                    // 关闭按钮变灰白
+                    disableSyncBtn.classList.replace('bg-[#F87171]', 'bg-white');
+                    disableSyncBtn.classList.replace('text-white', 'text-[#5E4B8B]');
+                    alert("✅ 自动传输已开启！以后每次【确认结算】都会自动无感同步给所有观众啦！");
+                    uploadDataToCloud(); // 开启瞬间，先主动往云端推一次数据保底
+                };
+                
+                disableSyncBtn.onclick = () => {
+                    window.autoSyncEnabled = false;
+                    // 关闭按钮变回红色
+                    disableSyncBtn.classList.replace('bg-white', 'bg-[#F87171]');
+                    disableSyncBtn.classList.replace('text-[#5E4B8B]', 'text-white');
+                    // 开启按钮变回灰白
+                    enableSyncBtn.classList.replace('bg-[#4ADE80]', 'bg-white');
+                    enableSyncBtn.classList.replace('text-white', 'text-[#5E4B8B]');
+                    alert("❌ 自动传输已关闭！");
+                };
+            }
             const genBtn = document.getElementById('generateShareLinkBtn');
             if (genBtn) {
                 genBtn.onclick = async () => {
@@ -8997,106 +9068,6 @@ if(btnSelRevive && btnSelUndo && btnConfirmUI) {
             }
         }
     });
-}
-// ========================================================
-// --- 全新黑科技：基于免费 MQTT 频道的零损耗实时推送引擎 ---
-// ========================================================
-window.autoSyncMode = false;
-window.syncChannel = null; // 我们的专属对讲机频道
-
-// 1. 初始化免费公共对讲机频道 (使用 EMQX 全球免费公共节点)
-function initRealtimeChannel() {
-    if (!cloudBinId) return; // 必须有房间号才能连频道
-    
-    // 连接到免费的公共 WebSocket 服务器
-    const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
-    const topicName = `uno_infinity_pro_room_${cloudBinId}`;
-
-    client.on('connect', () => {
-        console.log("实时通讯频道已连接，随时待命！");
-        window.syncChannel = client;
-        
-        // 如果是观众端，连接成功后立刻订阅这个频道，开始监听主机的指令
-        if (isAudienceMode) {
-            client.subscribe(topicName);
-            const badge = document.getElementById('shareStatusBadge');
-            if (badge) badge.textContent = "已连接实时推送";
-            
-            const audUpBtn = document.getElementById('audienceUpdateDataBtn');
-            if(audUpBtn) {
-                audUpBtn.innerHTML = '<i class="fa-solid fa-satellite-dish mr-2"></i>实时监听更新中...';
-                audUpBtn.classList.add('opacity-80', 'pointer-events-none');
-            }
-        }
-    });
-
-    // 观众端专属：听到主机喊话时的反应
-    client.on('message', (topic, message) => {
-        if (isAudienceMode && topic === topicName && message.toString() === 'UPDATE_NOW') {
-            console.log("收到主机更新指令，正在拉取最新数据！");
-            const badge = document.getElementById('shareStatusBadge');
-            if (badge) badge.textContent = "收到更新，同步中...";
-            
-            // 只有收到广播的这一瞬间，才去消耗 1 次 JSONBin 额度拉取数据！
-            fetchDataFromCloud(false);
-        }
-    });
-}
-
-// 在页面加载完毕后，启动对讲机
-window.addEventListener('load', () => {
-    setTimeout(initRealtimeChannel, 2000);
-});
-
-// 2. 主机端开关绑定
-const btnEnableSync = document.getElementById('enableAutoSyncBtn');
-const btnDisableSync = document.getElementById('disableAutoSyncBtn');
-
-if(btnEnableSync && btnDisableSync) {
-    btnEnableSync.onclick = () => {
-        window.autoSyncMode = true;
-        btnEnableSync.classList.remove('opacity-50');
-        btnDisableSync.classList.add('opacity-50');
-        document.getElementById('shareStatusBadge').textContent = "自动传输已开";
-        
-        // 打开瞬间不仅上传数据，还要初始化自己的对讲机（为了等会能喊话）
-        uploadDataToCloud().then(success => {
-            if (success && !window.syncChannel) initRealtimeChannel();
-        });
-    };
-    btnDisableSync.onclick = () => {
-        window.autoSyncMode = false;
-        btnDisableSync.classList.remove('opacity-50');
-        btnEnableSync.classList.add('opacity-50');
-        document.getElementById('shareStatusBadge').textContent = "传输已关";
-    };
-}
-
-// 3. 主机端劫持结算按钮：结算完 -> 上传 JSONBin -> 上传成功后用对讲机喊话
-const realCalcBtn = document.getElementById('v2CalculateBtn');
-if (realCalcBtn) {
-    const originalCalc = realCalcBtn.onclick;
-    realCalcBtn.onclick = (e) => {
-        originalCalc(e); // 执行原有的结算核心逻辑
-        
-        // 如果开了自动同步，就开始工作
-        if(window.autoSyncMode && typeof uploadDataToCloud === 'function') {
-            const badge = document.getElementById('shareStatusBadge');
-            if (badge) badge.textContent = "自动上传中...";
-            
-            setTimeout(() => {
-                uploadDataToCloud().then(success => {
-                    // JSONBin 数据真的上传成功了！现在开始拿对讲机喊话！
-                    if (success && window.syncChannel && cloudBinId) {
-                        const topicName = `uno_infinity_pro_room_${cloudBinId}`;
-                        // 向频道发送更新指令，触发所有观众端去下载
-                        window.syncChannel.publish(topicName, 'UPDATE_NOW');
-                        console.log("数据已上传，并已广播通知所有观众！");
-                    }
-                });
-            }, 500); 
-        }
-    };
 }
 </script>
 </body>
