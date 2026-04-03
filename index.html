@@ -190,6 +190,16 @@
             .scrollbar-hide::-webkit-scrollbar { display: none; }
             .bar { transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
             .rank-row { transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1); }
+            
+            /* 【新增：奖杯墙专属流光溢彩特效】 */
+            .shiny-gold {
+                background: linear-gradient(120deg, #FFD700 0%, #FFF8DC 50%, #FFD700 100%);
+                background-size: 200% auto;
+                animation: shineAnim 2.5s linear infinite;
+            }
+            @keyframes shineAnim {
+                to { background-position: 200% center; }
+            }
         }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
@@ -338,27 +348,21 @@
 -->
 <div id="detailDataStickyHeader" class="sticky top-[65px] sm:top-[75px] z-[90] mb-4 w-full hidden transition-all duration-300" style="order: -1;">
     
-    <!-- 最大的外部胶囊包裹器 -->
-    <!-- bg-[#c0ebe7] 控制底色，shadow-[0_4px_0_#5E4B8B] 控制厚重的紫色投影 -->
-    <div class="bg-[#c0ebe7] border-[4px] border-[#5E4B8B] rounded-[1.2rem] p-1.5 sm:p-2 shadow-[0_4px_0_#5E4B8B] w-full flex flex-col gap-2">
+    <!-- 【小白调节区：全宽外衣】去掉了阴影和圆角，改为了#BBFFC2 -->
+    <div class="bg-[#BBFFC2] border-y-[4px] border-[#5E4B8B] py-2 w-full flex flex-col gap-2">
         
-<!-- 【功能1】：顺滑滑动胶囊导航区 -->
-        <!-- 
-          ========================================================
-          【小白调节区：导航胶囊轨道】
-          [控制代码] gap-2
-          [使用方法] 修改数字可以改变胶囊之间的间距。
-          [控制代码] overflow-x-auto scrollbar-hide scroll-smooth
-          [使用方法] 这是实现像德芙一样丝滑左右滑动的魔法，绝对不要删去！
-          ========================================================
-        -->
-        <div id="detailNavSliderArea" class="flex items-center gap-2 w-full h-[36px] sm:h-[42px] px-2 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory">
-            <!-- JS会自动把所有胶囊塞到这里 -->
+        <!-- 【全新环形滑动引擎容器】 -->
+        <div class="relative w-full h-[36px] sm:h-[42px] flex items-center justify-center overflow-hidden">
+            <!-- 居中红框指示器（表示选中位置） -->
+            <div class="absolute w-[30%] sm:w-[25%] h-full border-[3px] border-[#E11D48] rounded-lg z-20 pointer-events-none shadow-[0_0_8px_rgba(225,29,72,0.4)]"></div>
+            <!-- 真实的滑动轨道 -->
+            <div id="detailNavSliderArea" class="flex items-center h-full w-full overflow-x-auto scrollbar-hide snap-x snap-mandatory px-[35%] sm:px-[37.5%]">
+                <!-- JS动态填充 -->
+            </div>
         </div>
         
-        <!-- 【功能2】：选择局次区 -->
-        <!-- 白色底，独立厚重投影，点击呼出图2弹窗 -->
-        <div class="bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] p-1 flex gap-1 justify-between shadow-[0_3px_0_#5E4B8B] cursor-pointer active:translate-y-1 active:shadow-none transition-all" onclick="openSessionModal()">
+        <!-- 【功能2】：选择局次区 (去阴影，底色改为 #BBFFC2) -->
+        <div class="bg-[#BBFFC2] border-[3px] border-[#5E4B8B] rounded-[0.8rem] p-1 mx-1.5 sm:mx-2 flex gap-1 justify-between cursor-pointer active:scale-95 transition-all" onclick="openSessionModal()">
             
             <!-- 容器1-1：显示局次 (红底白字) -->
             <div id="ddRoundLabel" class="bg-[#fb2a53] border-[2.5px] border-[#5E4B8B] text-white rounded-[0.4rem] px-2 sm:px-3 py-0.5 text-[11px] sm:text-xs font-black shadow-sm flex items-center justify-center min-w-[45px] shrink-0">R-03</div>
@@ -969,7 +973,7 @@
 <!-- 【像素级复刻】淘汰顺位统计模块 结束          -->
 <!-- ======================================= -->
 
-<div id="championSectionWrapper" class="mb-6">
+<div id="championSectionWrapper" class="mb-6 hidden">
             <section id="championSection" class="kawaii-card p-1 flex flex-col">
                 <div class="text-center py-2 font-bold text-accent text-xl tracking-widest"><i class="fa-solid fa-trophy mr-2"></i>冠军<i class="fa-solid fa-trophy ml-2"></i></div>
                 <div class="bg-[#F0F9FF] border-4 border-[#5E4B8B] rounded-3xl m-2 p-3 relative overflow-hidden">
@@ -1005,9 +1009,10 @@
 <!-- 【图1像素级复刻】奖杯荣誉墙 -->
         <section id="badgeSection" class="bg-[#FDFCE6] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 sm:p-5 mb-8 flex flex-col items-center shadow-[0_4px_0_#5E4B8B]">
             
-            <!-- 【修复红框】顶部标题胶囊，现在乖乖呆在框内了 -->
-            <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-10 py-1.5 shadow-[0_3px_0_#5E4B8B] mb-3 mt-1">
-                <h2 class="text-lg sm:text-xl font-black text-[#5E4B8B] tracking-widest ">奖杯墙</h2>
+<!-- 【修复红框】顶部标题胶囊，缩窄居中 + 金光特效 -->
+            <!-- 小白调节区：px-8 控制胶囊长短，shiny-gold 呼叫了刚刚写的金光特效 -->
+            <div class="shiny-gold border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-[0_3px_0_#5E4B8B] mb-3 mt-1 w-fit mx-auto text-center">
+                <h2 class="text-lg sm:text-xl font-black text-[#5E4B8B] tracking-widest">奖杯墙</h2>
             </div>
             
             <!-- 分割线文字 -->
@@ -1044,33 +1049,40 @@
     
         </section>
 
-        <section id="chartSection" class="kawaii-card p-5 mb-6">
-            <h2 class="text-xl font-bold mb-4 flex items-center"><i class="fa-solid fa-chart-line text-primary mr-2"></i>得分走势</h2>
-            <div class="bg-white border-4 border-[#5E4B8B] rounded-3xl p-2 h-[300px]">
+<section id="chartSection" class="kawaii-card p-3 sm:p-5 mb-6">
+            <h2 class="text-lg sm:text-xl font-bold mb-2 flex items-center"><i class="fa-solid fa-chart-line text-primary mr-2"></i>得分走势</h2>
+            <!-- ★ 小白调节区：调整走势图高度落差 ★ -->
+            <!-- 这里把 h-[300px] 改成了 h-[400px]，如果你觉得落差还不够，可以改成 h-[550px] 或更高！ -->
+            <div class="bg-white border-[3px] sm:border-4 border-[#5E4B8B] rounded-2xl sm:rounded-3xl p-1 sm:p-2 h-[400px] relative">
+                <!-- 放置曲线的画布 -->
                 <canvas id="scoreChart"></canvas>
+                <!-- 专门用来漂浮“末端玩家胶囊”的无形图层 -->
+                <div id="chartCapsulesContainer" class="absolute inset-0 pointer-events-none z-10 overflow-visible"></div>
             </div>
         </section>
 
-<section id="pieChartSection" class="kawaii-card p-3 sm:p-5 mb-6">
-         <h2 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center"><i class="fa-solid fa-chart-pie text-secondary mr-2"></i>得分占比 (活跃玩家)</h2>
-         <div class="grid grid-cols-2 gap-2 sm:gap-6">
+<section id="pieChartSection" class="kawaii-card p-2 sm:p-5 mb-6">
+         <h2 class="text-lg sm:text-xl font-bold mb-2 sm:mb-4 flex items-center px-2"><i class="fa-solid fa-chart-pie text-secondary mr-2"></i>得分占比 (活跃玩家)</h2>
+         <div class="grid grid-cols-2 gap-1.5 sm:gap-6">
              <!-- 赢家框 -->
-             <div class="bg-white border-[3px] sm:border-4 border-[#5E4B8B] rounded-[1.5rem] sm:rounded-3xl flex flex-col items-center overflow-hidden shadow-sm">
-                 <div class="w-full bg-[#7bc365] text-white text-center py-1.5 sm:py-2 font-black text-base sm:text-2xl border-b-[3px] sm:border-b-4 border-[#5E4B8B] tracking-widest text-stroke">赢家</div>
-                 <div class="relative w-full flex-1 min-h-[140px] sm:min-h-[220px] p-2 sm:p-4">
+             <div class="bg-white border-[3px] sm:border-4 border-[#5E4B8B] rounded-[1.2rem] sm:rounded-3xl flex flex-col items-center overflow-hidden shadow-sm">
+                 <div class="w-full bg-[#7bc365] text-white text-center py-1 font-black text-sm sm:text-2xl border-b-[3px] sm:border-b-4 border-[#5E4B8B] tracking-widest text-stroke shrink-0">赢家</div>
+                 <!-- 强行锁死高度 h-[110px]，并去掉 flex-1，保证左右两边饼图绝对一样大！ -->
+                 <div class="relative w-full h-[110px] sm:h-[180px] p-1 shrink-0">
                      <canvas id="posPieChart"></canvas>
                  </div>
                  <div id="posPieEmpty" class="hidden text-center text-gray-400 text-xs sm:text-sm mb-4 font-bold">暂无数据</div>
-                 <div id="posPieLegend" class="w-full px-2 sm:px-6 pb-3 sm:pb-4 flex flex-col gap-1 sm:gap-2"></div>
+                 <!-- 底部列表区设为 flex-1，填满剩余空间 -->
+                 <div id="posPieLegend" class="w-full flex-1 px-1 sm:px-6 pb-2 sm:pb-4 flex flex-col gap-1 sm:gap-2 justify-start"></div>
              </div>
              <!-- 输家框 -->
-             <div class="bg-white border-[3px] sm:border-4 border-[#5E4B8B] rounded-[1.5rem] sm:rounded-3xl flex flex-col items-center overflow-hidden shadow-sm">
-                 <div class="w-full bg-[#d9534f] text-white text-center py-1.5 sm:py-2 font-black text-base sm:text-2xl border-b-[3px] sm:border-b-4 border-[#5E4B8B] tracking-widest text-stroke">输家</div>
-                 <div class="relative w-full flex-1 min-h-[140px] sm:min-h-[220px] p-2 sm:p-4">
+             <div class="bg-white border-[3px] sm:border-4 border-[#5E4B8B] rounded-[1.2rem] sm:rounded-3xl flex flex-col items-center overflow-hidden shadow-sm">
+                 <div class="w-full bg-[#d9534f] text-white text-center py-1 font-black text-sm sm:text-2xl border-b-[3px] sm:border-b-4 border-[#5E4B8B] tracking-widest text-stroke shrink-0">输家</div>
+                 <div class="relative w-full h-[110px] sm:h-[180px] p-1 shrink-0">
                      <canvas id="negPieChart"></canvas>
                  </div>
                  <div id="negPieEmpty" class="hidden text-center text-gray-400 text-xs sm:text-sm mb-4 font-bold">暂无数据</div>
-                 <div id="negPieLegend" class="w-full px-2 sm:px-6 pb-3 sm:pb-4 flex flex-col gap-1 sm:gap-2"></div>
+                 <div id="negPieLegend" class="w-full flex-1 px-1 sm:px-6 pb-2 sm:pb-4 flex flex-col gap-1 sm:gap-2 justify-start"></div>
              </div>
          </div>
      </section>
@@ -3694,22 +3706,7 @@ window.renderOneVsOneArena = function() {
 
     const getShort = (name) => name ? name.slice(-1) : '?';
 
-    // 1. 动态生成头部 (完美居中标题 + 切换按钮)
-    headerContainer.innerHTML = `
-    <div class="flex flex-col items-center mb-3 sm:mb-4 gap-1.5 sm:gap-2 w-full">
-        <!-- 大标题 (套用 stroke-md 真描边) -->
-        <div class="bg-[#FFD93D] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-[0_4px_0_#5E4B8B]">
-            <span class="font-black text-[#5E4B8B] text-xl sm:text-2xl tracking-widest stroke-md">终极一对一PK！</span>
-        </div>
-        <!-- 切换视图按钮组 -->
-        <div class="flex items-center gap-2">
-            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-[0_4px_0_#5E4B8B] active:scale-90 transition-transform" onclick="window.changeOvoView(-1)"><i class="fa-solid fa-chevron-left text-[10px] sm:text-xs pointer-events-none"></i></button>
-            
-            <div class="bg-[#06B6D4] border-[2.5px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest shadow-[0_4px_0_#5E4B8B] min-w-[80px] sm:min-w-[100px] text-center transition-colors stroke-sm">${ovoViewNames[ovoState.viewIndex]}</div>
-            
-            <button class="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-white text-[#5E4B8B] flex items-center justify-center font-black shadow-[0_4px_0_#5E4B8B] active:scale-90 transition-transform" onclick="window.changeOvoView(1)"><i class="fa-solid fa-chevron-right text-[10px] sm:text-xs pointer-events-none"></i></button>
-        </div>
-    </div>`;
+headerContainer.innerHTML = '';
 
     // 2. 辅助函数：绘制图1和图3中的单个玩家卡牌
     const buildStatsCol = (p, matchesInfo, headerBgColor) => {
@@ -3757,8 +3754,14 @@ window.renderOneVsOneArena = function() {
     // ========================================================
     let html = '';
 
-    // 【1. 主信息视图】
+// 【1. 主信息视图】
     let colsHtml = active.map(p => buildStatsCol(p, ovoMatches, p.color)).join('');
+    html += `
+    <div class="flex justify-center mb-3">
+        <div class="bg-[#06B6D4] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-[0_3px_0_#5E4B8B]">
+            <span class="font-black text-white text-lg tracking-widest">主信息</span>
+        </div>
+    </div>`;
     html += `
     <!-- 小白调节区：主信息白色大底框 -->
     <!-- border-[3px] 边框粗细, rounded-xl 圆角弧度, shadow-[0_4px_0_#5E4B8B] 底部投影厚度 -->
@@ -3784,6 +3787,12 @@ window.renderOneVsOneArena = function() {
     }).join('');
 
     html += `
+    <div class="flex justify-center mt-4 mb-3">
+        <div class="bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-[0_3px_0_#5E4B8B]">
+            <span class="font-black text-white text-lg tracking-widest">对局信息</span>
+        </div>
+    </div>`;
+    html += `
     <!-- 小白调节区：对局信息白色大底框 -->
     <div class="mb-4 p-2 sm:p-3 w-full flex flex-col items-center bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B] relative">
         <div class="flex items-center justify-center gap-3 mb-1 w-full relative z-10">
@@ -3808,9 +3817,15 @@ window.renderOneVsOneArena = function() {
         </div>
     </div>`;
 
-    // 【3. 轮次信息视图 (无限延伸)】
+// 【3. 轮次信息视图 (无限延伸)】
     let reversedMatches = [...ovoMatches].reverse();
-    // 去掉了 max-h 限制，变成无限延伸！
+    
+    html += `
+    <div class="flex justify-center mt-4 mb-3">
+        <div class="bg-[#EAB308] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-[0_3px_0_#5E4B8B]">
+            <span class="font-black text-white text-lg tracking-widest text-stroke">轮次信息</span>
+        </div>
+    </div>`;
     html += `<div class="p-1.5 sm:p-2.5 flex flex-col gap-2 sm:gap-3 w-full bg-white border-[3px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl shadow-[0_4px_0_#5E4B8B]">`;
     
     reversedMatches.forEach(m => {
@@ -4359,9 +4374,15 @@ function renderBadgeWall() {
                 // 清除之前的马达动画
                 if (window.badgeScrollTimer) cancelAnimationFrame(window.badgeScrollTimer);
                 
+let scrollAccumulator = 0; // 【新增】用来积攒小数，实现慢速滚动 马达速度
                 const playScroll = () => {
                     if (!window.isBadgeInteracting) { 
-                        wrapper.scrollLeft += 1; 
+                        /* 小白调节区：0.4 是速度，如果想更慢就改成 0.2，想快点就改成 0.8 */
+                        scrollAccumulator += 0.4; 
+                        if (scrollAccumulator >= 1) {
+                            wrapper.scrollLeft += 1; 
+                            scrollAccumulator -= 1;
+                        }
                         if (wrapper.scrollLeft >= grid1.offsetWidth + 6) { 
                             wrapper.scrollLeft = 0;
                         }
@@ -5558,11 +5579,14 @@ window.renderDetailedRecords = function() {
 
     targetContainer.innerHTML = html;
 };
-        function renderChart() {
+function renderChart() {
             const active = gameData.players.filter(p => p.isActive);
             const ctx = els.scoreChart.getContext('2d');
             if (chartInstance) chartInstance.destroy();
-            const labels =['Start', ...viewRounds.map(r => r.round)];
+            
+            const labels = ['Start', ...viewRounds.map(r => r.round)];
+            const capContainer = document.getElementById('chartCapsulesContainer');
+            if(capContainer) capContainer.innerHTML = ''; // 清空旧胶囊
             
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -5582,13 +5606,58 @@ window.renderDetailedRecords = function() {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    // 【关键】：给右边留出 60px 的空白，防止胶囊被切掉！
+                    layout: { padding: { right: 65, top: 15, bottom: 15 } },
                     interaction: { mode: 'index', intersect: false },
                     scales: { x: { grid: { display: false } }, y: { border: { display: false } } },
                     plugins: { 
-                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: {family: gameData.fonts.zh} } },
+                        legend: { display: false }, // 关掉默认的图例，用我们酷炫的胶囊代替
                         datalabels: { display: false }
                     }
-                }
+                },
+                plugins: [{
+                    id: 'endCapsulesPlugin',
+                    afterDraw: (chart) => {
+                        if (!capContainer) return;
+                        
+                        // 1. 获取每条线最后一个点的坐标
+                        let positions = active.map((p, i) => {
+                            const meta = chart.getDatasetMeta(i);
+                            if(!meta.data || meta.data.length === 0) return null;
+                            const lastPoint = meta.data[meta.data.length - 1];
+                            return { p: p, y: lastPoint.y, x: lastPoint.x };
+                        }).filter(x => x !== null);
+
+                        // 2. 按 Y 坐标从上到下排序（因为 Y=0 在画布最上面）
+                        positions.sort((a, b) => a.y - b.y);
+
+                        // 3. 【防重叠核心引擎】：如果挨得太近，就把下面那个往下挤！
+                        const capsuleHeight = 24; // 每个胶囊占据的安全高度
+                        for (let i = 1; i < positions.length; i++) {
+                            if (positions[i].y - positions[i-1].y < capsuleHeight) {
+                                positions[i].y = positions[i-1].y + capsuleHeight;
+                            }
+                        }
+
+                        // 4. 生成胶囊 HTML 并挂载
+                        let html = '';
+                        positions.forEach(item => {
+                            const p = item.p;
+                            // 分数文字颜色：正绿、负红、0白
+                            const scoreColor = p.total > 0 ? 'text-[#4ADE80]' : (p.total < 0 ? 'text-[#F87171]' : 'text-white');
+                            const scoreStr = p.total > 0 ? `+${p.total}` : p.total;
+                            
+                            html += `
+                            <div class="absolute flex items-center justify-center gap-1 border-[2px] border-[#5c4c8b] rounded-full px-1.5 py-0.5 shadow-sm transition-all duration-300 z-10" 
+                                 style="background-color: ${p.color}; left: ${item.x + 4}px; top: ${item.y}px; transform: translateY(-50%);">
+                                <img src="${p.avatar}" class="w-4 h-4 rounded-full border-[1.5px] border-[#5c4c8b] bg-white object-cover" crossorigin="anonymous">
+                                <span class="text-white font-black text-[10px] leading-none" style="-webkit-text-stroke: 1.5px #5c4c8b; paint-order: stroke fill;">${p.name.slice(-1)}</span>
+                                <span class="font-black text-[11px] leading-none ${scoreColor}" style="-webkit-text-stroke: 1.5px #5c4c8b; paint-order: stroke fill;">${scoreStr}</span>
+                            </div>`;
+                        });
+                        capContainer.innerHTML = html;
+                    }
+                }]
             });
         }
 
@@ -7240,13 +7309,19 @@ gameData.currentSessionIndex = -1;
 // ★★★ 手机端专属：底部导航与 5大分类引擎 ★★★
 // ==========================================================
 (function() {
-    const mobileTabs = {
-        'tab1': { name: '成就奖杯', color: '#FDE047', modules:['achievementsSection', 'badgeSection'] },
-        'tab2': { name: '排行榜单', color: '#A3D977', modules:['championSectionWrapper', 'leaderboardSection', 'barSection'] },
-'tab3': { name: '实时结算', color: '#FCA5A5', modules:['playerSection', 'latestStatusSection', 'timeRecordSection', 'timerSection', 'randomSelectorSection', 'penaltySection', 'penaltyStatsSection'] },
-'tab4': { name: '详细数据', color: '#93C5FD', modules:['timeDataSection', 'oneVsOneSection', 'sessionFilterDisplay', 'methodStatSection', 'eliminationOrderSection', 'chartSection', 'pieChartSection', 'radarSection', 'sessionSection', 'tableSection'] },
+const mobileTabs = {
+        'tab1': { name: '成就奖杯', color: '#FDE047', modules:['achievementsSection'] }, // 移除了奖杯墙
+        'tab2': { name: '排行榜单', color: '#A3D977', modules:['championSectionWrapper', 'leaderboardSection'] }, // 移除了Round动态条
+        'tab3': { name: '实时结算', color: '#FCA5A5', modules:['playerSection', 'latestStatusSection', 'timeRecordSection', 'timerSection', 'randomSelectorSection', 'penaltySection', 'penaltyStatsSection'] },
+        // 下面把 barSection (Round动态条) 和 badgeSection (奖杯墙) 塞进去了，排在饼图前面和最后面
+        'tab4': { name: '详细数据', color: '#93C5FD', modules:['timeDataSection', 'oneVsOneSection', 'sessionFilterDisplay', 'methodStatSection', 'eliminationOrderSection', 'chartSection', 'barSection', 'pieChartSection', 'radarSection', 'sessionSection', 'tableSection', 'badgeSection'] },
         'tab5': { name: '数据备份', color: '#F472B6', modules: ['cloudShareSection', 'methodManagerSection', 'dataIOSection', 'tableSection'] }
     };
+
+    // 【新增：如果是观众模式，实时结算只显示两个区域】
+    if (typeof isAudienceMode !== 'undefined' && isAudienceMode) {
+        mobileTabs['tab3'].modules = ['latestStatusSection', 'randomSelectorSection'];
+    }
 
     let currentMobileTab = 'tab3';
 
@@ -8704,42 +8779,60 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
 (function() {
     // 1. 【模块花名册】：在这里登记详细数据里的所有模块和马卡龙颜色！
     // 颜色的顺序和排版严格遵循了图1里的效果！
+// 【修改：加入了 动态Round条 和 奖杯墙，并分配了马卡龙配色】
     window.detailModulesConfig =[
-{ id: 'timeDataSection', name: '时间数据', color: '#a6bde2' },
+        { id: 'timeDataSection', name: '时间数据', color: '#a6bde2' },
         { id: 'eliminationOrderSection', name: '淘汰顺位', color: '#f4a7b9' },
         { id: 'chartSection', name: '走势图', color: '#7ecef4' },
         { id: 'radarSection', name: '个人能力', color: '#e0ffc6' },
         { id: 'oneVsOneSection', name: '1V1擂台', color: '#ffb3a7' },
         { id: 'penaltyStatsSection', name: '罚牌统计', color: '#f3d27b' },
         { id: 'methodStatSection', name: '结算统计', color: '#a0b0c4' },
+        { id: 'barSection', name: 'ROUND进度', color: '#ffb3a7' }, // 新来的
         { id: 'pieChartSection', name: '得分占比', color: '#a3d977' },
         { id: 'sessionSection', name: '场次记录', color: '#fca5a5' },
-        { id: 'tableSection', name: '局次得分详情', color: '#93c5fd' }
+        { id: 'tableSection', name: '局次得分详情', color: '#93c5fd' },
+        { id: 'badgeSection', name: '全场奖杯', color: '#FDE047' } // 新来的
     ];
     
     // 默认进入详细数据时，显示第 2 个模块 (走势图, 下标为 1)
     window.currentDetailIndex = 1;
 
-// 2. 【全新原生滑动引擎】
+// 2. 【全新原生滑动引擎 (丝滑无限环版本)】
     window.renderDetailNav = function() {
         const sliderArea = document.getElementById('detailNavSliderArea');
         if (!sliderArea) return;
         
-        sliderArea.innerHTML = window.detailModulesConfig.map((mod, idx) => {
-            // 被选中的高亮且稍微放大，没选中的半透明
-            const isActive = idx === window.currentDetailIndex;
-            const opacityClass = isActive ? 'opacity-100 scale-100' : 'opacity-50 scale-90';
-            
-            return `
-            <!-- 小白调节区：单个导航胶囊 -->
-            <div class="snap-center shrink-0 transition-all duration-300 cursor-pointer nav-cap-btn ${opacityClass}" data-idx="${idx}" style="width: 30%;">
-                <div class="border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-lg px-2 sm:px-4 py-0.5 sm:py-1 text-[11px] sm:text-sm font-black shadow-[0_3px_0_#5E4B8B] whitespace-nowrap overflow-hidden text-center w-full" style="background-color: ${mod.color};">
-                    ${mod.name}
-                </div>
-            </div>`;
-        }).join('');
+        // 魔法：把数据复制5份，拼接成长长的无限履带
+        const configs = window.detailModulesConfig;
+        const copies = 5;
+        let html = '';
+        
+        for(let i = 0; i < copies; i++) {
+            configs.forEach((mod, idx) => {
+                html += `
+                <div class="snap-center shrink-0 flex justify-center nav-cap-btn" style="width: 32%;" data-real-idx="${idx}">
+                    <div class="border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-lg px-2 sm:px-4 py-0.5 sm:py-1 text-[11px] sm:text-sm font-black shadow-[0_2px_0_#5E4B8B] whitespace-nowrap overflow-hidden text-center w-[90%] transition-all duration-300" style="background-color: ${mod.color};">
+                        ${mod.name}
+                    </div>
+                </div>`;
+            });
+        }
+        sliderArea.innerHTML = html;
 
-        // 遍历隐藏/显示模块
+        // 初始定位到履带最中间的那一份，防止边缘穿帮
+        setTimeout(() => {
+            const centerGroupStart = Math.floor(copies / 2) * configs.length;
+            const targetChild = sliderArea.children[centerGroupStart + window.currentDetailIndex];
+            if (targetChild) {
+                const scrollPos = targetChild.offsetLeft - (sliderArea.clientWidth / 2) + (targetChild.clientWidth / 2);
+                sliderArea.scrollLeft = scrollPos;
+            }
+            window.updateDetailModulesDisplay();
+        }, 50);
+    };
+
+    window.updateDetailModulesDisplay = function() {
         window.detailModulesConfig.forEach((mod, idx) => {
             const el = document.getElementById(mod.id);
             if (el) {
@@ -8751,82 +8844,53 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
             }
         });
         
-        // 自动把选中的胶囊滚动到屏幕正中间
-        setTimeout(() => {
-            const activeCap = sliderArea.children[window.currentDetailIndex];
-            if (activeCap) {
-                const scrollLeft = activeCap.offsetLeft - (sliderArea.clientWidth / 2) + (activeCap.clientWidth / 2);
-                sliderArea.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-            }
-        }, 50);
-    };
-
-function attachSliderEvents() {
-        const sliderArea = document.getElementById('detailNavSliderArea');
-        if(!sliderArea) return;
-        // 点击胶囊直接切换
-        sliderArea.addEventListener('click', e => {
-            const cap = e.target.closest('.nav-cap-btn');
-            if (cap) {
-                window.currentDetailIndex = parseInt(cap.dataset.idx);
-                window.renderDetailNav();
+        // 视觉反馈：放大居中被选中的胶囊
+        const caps = document.querySelectorAll('.nav-cap-btn > div');
+        caps.forEach(cap => {
+            if(parseInt(cap.parentElement.dataset.realIdx) === window.currentDetailIndex) {
+                cap.classList.add('scale-110'); cap.classList.remove('opacity-50');
+            } else {
+                cap.classList.remove('scale-110'); cap.classList.add('opacity-50');
             }
         });
+    };
 
-        /* 
-          ========================================================
-          【小白调节区：详细数据页 - 全屏左右滑动无限循环切换引擎】
-          [控制代码] swipeThreshold = 60
-          [使用方法] 这个数字控制“手指导航的灵敏度”。
-                     60代表手指必须至少划过60个像素才算成功切换。
-                     如果你觉得太难划动，改成 30（轻轻一碰就切）。
-                     如果你觉得太容易误触，改成 100（需要用力划长一点）。
-          [特效备份] 在底下判断中，有个 Math.abs(diffY) > Math.abs(diffX) 
-                     这是防呆保护机制：如果系统发现你是在“往下刷表”，
-                     它会智能阻止左右切换，防止页面乱跑！
-          ========================================================
-        */
-        let touchStartX = 0;
-        let touchStartY = 0; // 记录Y轴，防止和上下滑动冲突
-        const swipeThreshold = 60; // 灵敏度阈值
-
-        document.addEventListener('touchstart', e => {
-            // 安全锁：只有当前在“详细数据”(tab4)分页才生效
-            if (typeof currentMobileTab !== 'undefined' && currentMobileTab !== 'tab4') return;
+    function attachSliderEvents() {
+        const sliderArea = document.getElementById('detailNavSliderArea');
+        if(!sliderArea) return;
+        
+        // 滑动监听：谁停在中间，谁就触发显示！
+        sliderArea.addEventListener('scroll', () => {
+            const center = sliderArea.scrollLeft + sliderArea.clientWidth / 2;
+            let closestItem = null;
+            let minDiff = Infinity;
             
-            // 避让机制：如果手指点在可以自己横向滑动的地方（比如各种表格），就不要抢它的滑动权！
-            if (e.target.closest('.overflow-x-auto') || e.target.closest('.marquee-wrapper')) return;
+            // 找准距离屏幕中心点最近的胶囊
+            Array.from(sliderArea.children).forEach(child => {
+                const childCenter = child.offsetLeft + child.clientWidth / 2;
+                const diff = Math.abs(childCenter - center);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closestItem = child;
+                }
+            });
             
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        }, {passive: true});
-
-        document.addEventListener('touchend', e => {
-            if (typeof currentMobileTab !== 'undefined' && currentMobileTab !== 'tab4') return;
-            if (e.target.closest('.overflow-x-auto') || e.target.closest('.marquee-wrapper')) return;
-            
-            let touchEndX = e.changedTouches[0].screenX;
-            let touchEndY = e.changedTouches[0].screenY;
-            
-            // 计算 X 和 Y 的移动距离
-            let diffX = touchEndX - touchStartX;
-            let diffY = touchEndY - touchStartY;
-            
-            // 智能防呆：如果上下滑动的距离大于左右滑动，说明用户是在看下面的内容，不要切换页面！
-            if (Math.abs(diffY) > Math.abs(diffX)) return;
-
-            // 无限循环魔法引擎：
-            // 向左滑 (diffX 为负，且超过阈值) -> 进入下一个区域
-            if (diffX < -swipeThreshold) {
-                window.currentDetailIndex = (window.currentDetailIndex + 1) % window.detailModulesConfig.length;
-                window.renderDetailNav();
+            if (closestItem) {
+                const newIdx = parseInt(closestItem.dataset.realIdx);
+                if (newIdx !== window.currentDetailIndex) {
+                    window.currentDetailIndex = newIdx;
+                    window.updateDetailModulesDisplay(); // 触发下方模块切换
+                }
             }
-            // 向右滑 (diffX 为正，且超过阈值) -> 回到上一个区域
-            if (diffX > swipeThreshold) {
-                window.currentDetailIndex = (window.currentDetailIndex - 1 + window.detailModulesConfig.length) % window.detailModulesConfig.length;
-                window.renderDetailNav();
+            
+            // 无限循环魔法：手指滑到太前或太后，瞬间悄悄传送到中间！
+            const trackWidth = sliderArea.children[0].clientWidth * window.detailModulesConfig.length;
+            if (sliderArea.scrollLeft < trackWidth * 1.5) {
+                sliderArea.scrollLeft += trackWidth * 2;
+            } else if (sliderArea.scrollLeft > sliderArea.scrollWidth - trackWidth * 2.5) {
+                sliderArea.scrollLeft -= trackWidth * 2;
             }
-        }, {passive: true});
+        });
     }
 
     // 3. 【强行霸占局次相关函数】：彻底重写旧的选择逻辑
