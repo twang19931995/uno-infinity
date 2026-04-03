@@ -228,7 +228,33 @@
           ========================================================
         -->
         <div class="fixed top-0 left-0 w-full z-[100] bg-[#BBE2D6] border-b-[4px] border-[#5E4B8B] py-2.5 sm:py-3 flex justify-center items-center shadow-md">
-            
+         
+<!-- 【新增】左侧：云端同步快捷按钮 -->
+            <!--
+              ========================================================
+              【小白调节区：左上角云端快捷按钮参数说明】
+              [控制代码] w-8 h-8 sm:w-10 sm:h-10 
+              [使用方法] 控制按钮的大小。w-8是手机端宽度，sm:w-10是电脑端宽度。嫌小可以改成 w-10 sm:w-12。
+              [控制代码] bg-[#5FA4FA] (主机端蓝色) / bg-[#A3D977] (观众端绿色)
+              [使用方法] 更改按钮的底色，已按要求1比1复刻图1图2颜色。
+              [控制代码] border-[3px] sm:border-[4px] border-[#5E4B8B]
+              [使用方法] 控制外面深紫色边框的粗细和颜色。
+              [控制代码] shadow-[0_3px_0_#5E4B8B]
+              [使用方法] 控制底部厚重的立体投影，数字3px代表厚度。
+              [特效备份] 如果想让按钮自带上下浮动的呼吸灯特效，请在 class 双引号里加上 float-anim
+              ========================================================
+            -->
+            <div class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 flex gap-2">
+                <!-- 主机端：更新云端数据按钮 (图1蓝色) -->
+                <button id="quickHostUploadBtn" class="hidden w-8 h-8 sm:w-10 sm:h-10 bg-[#5FA4FA] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="if(typeof uploadDataToCloud === 'function') uploadDataToCloud()">
+                    <i class="fa-solid fa-cloud-arrow-up text-white text-xs sm:text-base"></i>
+                </button>
+                <!-- 观众端：抓取云端数据按钮 (图2绿色) -->
+                <button id="quickAudienceFetchBtn" class="hidden w-8 h-8 sm:w-10 sm:h-10 bg-[#A3D977] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="if(typeof fetchDataFromCloud === 'function') fetchDataFromCloud(false)">
+                    <i class="fa-solid fa-download text-white text-xs sm:text-base"></i>
+                </button>
+            </div>
+   
             <!-- 中间：动态胶囊标题 -->
             <!-- 
               ========================================================
@@ -623,22 +649,15 @@
                 </div>
             </div>
 
-<div id="hostSharePanel" class="flex flex-col gap-3 transition-all w-full">
-                
-                <button id="generateShareLinkBtn" class="w-full bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl py-3 font-black text-white text-base sm:text-lg shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
-                    <i class="fa-solid fa-link mr-2"></i>生成分享链接
-                </button>
-
-                <div class="flex gap-2 w-full mt-1">
-                    <button id="enableAutoSyncBtn" class="flex-1 bg-white text-[#5E4B8B] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
-                        <i class="fa-solid fa-satellite-dish mr-1"></i>打开自动传输
+            <div id="hostSharePanel" class="flex flex-col gap-3 transition-all">
+                <div class="flex flex-wrap gap-2">
+                    <button id="generateShareLinkBtn" class="flex-1 min-w-[140px] bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest">
+                        <i class="fa-solid fa-link mr-1"></i>生成分享链接
                     </button>
-
-                    <button id="disableAutoSyncBtn" class="flex-1 bg-[#F87171] text-white border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest flex justify-center items-center">
-                        <i class="fa-solid fa-power-off mr-1"></i>关闭自动传输
+                    <button id="hostUpdateDataBtn" class="flex-1 min-w-[140px] bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all tracking-widest">
+                        <i class="fa-solid fa-cloud-arrow-up mr-1"></i>更新云端数据
                     </button>
                 </div>
-            </div>
                 
 
             </div>
@@ -2310,32 +2329,6 @@ function checkAudienceMode() {
             }
         }
         checkAudienceMode(); // 页面一加载，第一时间先验明正身
-// ==========================================
-        // 📡 全新引擎：免费公共无线电接收器
-        // ==========================================
-        let autoSyncEnabled = false; // 记录主机是否开启了自动传输
-
-        function connectAudienceRadio() {
-            if (!cloudBinId) return;
-            // ntfy.sh 是一个完全免费的开源无线电频道，频道名必须全球唯一，所以我们加上你的 BinID！
-            const topicName = "unoinfinity_v2_" + cloudBinId;
-            
-            console.log("📡 观众端已连接公共频道：等待主机信号...");
-            
-            // 建立长连接监听 (SSE技术，完全免费无消耗)
-            const eventSource = new EventSource(`https://ntfy.sh/${topicName}/sse`);
-            eventSource.onmessage = (e) => {
-                const data = JSON.parse(e.data);
-                // 只要听到频道里有人喊 "update"，立刻静默拉取最新数据！
-                if (data.event === "message" && data.message === "update") {
-                    console.log("🔥 收到主机无线电信号：数据更新，开始拉取！");
-                    fetchDataFromCloud(true); // 传入 true 代表直接拉取并覆盖刷新
-                }
-            };
-            eventSource.onerror = () => {
-                console.log("📡 无线电信号微弱，正在自动重连...");
-            };
-        }
 // 核心功能3：将当前所有数据打包，上传到云端
         async function uploadDataToCloud() {
             if (!CLOUD_API_KEY) {
@@ -2381,19 +2374,12 @@ const payload = {
                 });
 
                 const result = await response.json();
-if (response.ok) {
+                if (response.ok) {
                     if (!cloudBinId) cloudBinId = result.metadata.id;
                     statusBadge.textContent = "同步成功";
                     statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
-                    
-                    // 【无线电发射核心】主机成功上传到云端后，向公共频道大喊一声："update"！
-                    fetch(`https://ntfy.sh/unoinfinity_v2_${cloudBinId}`, {
-                        method: 'POST',
-                        body: 'update'
-                    }).catch(err => console.log("广播发送失败", err));
-
                     return true;
-                }else {
+                } else {
                     throw new Error(result.message);
                 }
             } catch (error) {
@@ -2483,30 +2469,40 @@ if (response.ok) {
             });
         }
 
-        function initCloudUI() {
+function initCloudUI() {
             const hostPanel = document.getElementById('hostSharePanel');
             const audPanel = document.getElementById('audienceSharePanel');
             const statusBadge = document.getElementById('shareStatusBadge');
             
+            // 【新增】获取我们刚加的左上角快捷按钮
+            const quickHostBtn = document.getElementById('quickHostUploadBtn');
+            const quickAudBtn = document.getElementById('quickAudienceFetchBtn');
+            
+            // 【新增】获取底部导航栏的按钮
+            const navTabs = document.querySelectorAll('.mobile-tab-btn');
+            const tab5 = document.querySelector('.mobile-tab-btn[data-tab="tab5"]'); // 第五个：数据备份
+
             if (!hostPanel || !audPanel || !statusBadge) return;
 
-if (isAudienceMode) {
-                // 【核心修改】观众端彻底隐藏“云端同步与分享”和“数据备份”模块，眼不见心不烦！
-                const cloudSec = document.getElementById('cloudShareSection');
-                const dataIOSec = document.getElementById('dataIOSection');
-                if (cloudSec) cloudSec.classList.add('hidden', '!hidden');
-                if (dataIOSec) dataIOSec.classList.add('hidden', '!hidden');
-
-                // 悄悄启动免费的无线电接收器
-                connectAudienceRadio();
-                
-                // ... (后面原本禁用的那些代码不用动它，留着当双保险)
+            if (isAudienceMode) {
                 hostPanel.classList.add('hidden'); hostPanel.classList.remove('flex');
+                audPanel.classList.remove('hidden'); audPanel.classList.add('flex');
                 
                 statusBadge.textContent = "观众模式 (只读)";
                 statusBadge.classList.replace('text-gray-400', 'text-[#F43F5E]');
                 statusBadge.classList.add('border-[#F43F5E]');
                 
+                // 【核心逻辑：左上角按钮切换】观众端：隐藏蓝色上传，显示绿色下载
+                if(quickHostBtn) { quickHostBtn.classList.add('hidden'); quickHostBtn.classList.remove('flex'); }
+                if(quickAudBtn) { quickAudBtn.classList.remove('hidden'); quickAudBtn.classList.add('flex'); }
+
+                // 【核心逻辑：底部导航重排版】观众端隐藏第5个按钮，并把前4个变宽占满屏幕
+                if(tab5) tab5.style.setProperty('display', 'none', 'important');
+                navTabs.forEach(tab => {
+                    tab.classList.remove('w-1/5'); // 移除5等分
+                    if(tab.dataset.tab !== 'tab5') tab.classList.add('w-1/4'); // 赋予4等分
+                });
+
                 const disableBtnIds =['calculateBtn', 'undoBtn', 'redoBtn', 'resetBtn', 'importBtn', 'v2CalculateBtn', 'v2UndoBtn', 'v2RedoBtn', 'earlyWinBtn', 'addSessionBtn', 'penaltyAddBtn', 'penaltyUndoBtn', 'penaltyRedoBtn'];
                 disableBtnIds.forEach(id => {
                     const btn = document.getElementById(id);
@@ -2521,39 +2517,22 @@ if (isAudienceMode) {
                 statusBadge.textContent = "主机模式 (可写)";
                 statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
                 statusBadge.classList.add('border-[#4ADE80]');
+                
+                // 【核心逻辑：左上角按钮切换】主机端：显示蓝色上传，隐藏绿色下载
+                if(quickHostBtn) { quickHostBtn.classList.remove('hidden'); quickHostBtn.classList.add('flex'); }
+                if(quickAudBtn) { quickAudBtn.classList.add('hidden'); quickAudBtn.classList.remove('flex'); }
+
+                // 【核心逻辑：底部导航重排版】主机端恢复第5个按钮，并改回5等分
+                if(tab5) tab5.style.setProperty('display', 'flex', 'important');
+                navTabs.forEach(tab => {
+                    tab.classList.remove('w-1/4');
+                    tab.classList.add('w-1/5');
+                });
             }
         }
 
 function init() {
             initCloudUI(); 
-// 【新增】自动传输开关的电源线
-            const enableSyncBtn = document.getElementById('enableAutoSyncBtn');
-            const disableSyncBtn = document.getElementById('disableAutoSyncBtn');
-            
-            if (enableSyncBtn && disableSyncBtn) {
-                enableSyncBtn.onclick = () => {
-                    window.autoSyncEnabled = true;
-                    // 按钮变绿，开启状态
-                    enableSyncBtn.classList.replace('bg-white', 'bg-[#4ADE80]');
-                    enableSyncBtn.classList.replace('text-[#5E4B8B]', 'text-white');
-                    // 关闭按钮变灰白
-                    disableSyncBtn.classList.replace('bg-[#F87171]', 'bg-white');
-                    disableSyncBtn.classList.replace('text-white', 'text-[#5E4B8B]');
-                    alert("✅ 自动传输已开启！以后每次【确认结算】都会自动无感同步给所有观众啦！");
-                    uploadDataToCloud(); // 开启瞬间，先主动往云端推一次数据保底
-                };
-                
-                disableSyncBtn.onclick = () => {
-                    window.autoSyncEnabled = false;
-                    // 关闭按钮变回红色
-                    disableSyncBtn.classList.replace('bg-white', 'bg-[#F87171]');
-                    disableSyncBtn.classList.replace('text-[#5E4B8B]', 'text-white');
-                    // 开启按钮变回灰白
-                    enableSyncBtn.classList.replace('bg-[#4ADE80]', 'bg-white');
-                    enableSyncBtn.classList.replace('text-white', 'text-[#5E4B8B]');
-                    alert("❌ 自动传输已关闭！");
-                };
-            }
             const genBtn = document.getElementById('generateShareLinkBtn');
             if (genBtn) {
                 genBtn.onclick = async () => {
