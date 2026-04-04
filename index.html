@@ -7346,10 +7346,9 @@ const mobileTabs = {
         currentMobileTab = tabId;
         const config = mobileTabs[tabId];
 
-        // 1. 隐藏所有模块
-        const allModules =[...mobileTabs.tab1.modules, ...mobileTabs.tab2.modules, ...mobileTabs.tab3.modules, ...mobileTabs.tab4.modules, ...mobileTabs.tab5.modules];
-        allModules.forEach(id => {
-            const el = document.getElementById(id);
+// 1. 隐藏所有模块 (修复观众端幽灵模块bug：直接遍历配置总表，一个都跑不掉)
+        modulesConfig.forEach(mod => {
+            const el = document.getElementById(mod.id);
             if (el) el.style.setProperty('display', 'none', 'important');
         });
 
