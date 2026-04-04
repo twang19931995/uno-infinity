@@ -61,6 +61,40 @@
 }
 /* -------------------------------------- */
 
+/* --- 【小白专属：成就胶囊全场特效库】 --- */
+@layer utilities {
+    /* 特效1：边缘跑马灯扫光 (像剑光一样刷过去) */
+    .sweep-light {
+        position: relative;
+        overflow: hidden;
+    }
+    .sweep-light::after {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 50%; height: 100%;
+        /* rgba(255,255,255,0.6) 控制这道光的亮度和颜色 */
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+        transform: skewX(-20deg); /* 光倾斜的角度 */
+        animation: sweepAnim 3s infinite; /* 3s 控制光扫过去的速度，越小越快 */
+    }
+    @keyframes sweepAnim {
+        0% { left: -100%; }
+        20% { left: 200%; }
+        100% { left: 200%; }
+    }
+
+    /* 特效2：呼吸外发光 (忽明忽暗的仙气效果) */
+    .magic-glow {
+        animation: glowPulse 2s infinite alternate; /* 2s 是呼吸一次的时间 */
+    }
+    @keyframes glowPulse {
+        0% { filter: drop-shadow(0 0 2px rgba(255,255,255,0.3)); }
+        100% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.8)); } /* 10px 控制光晕大小 */
+    }
+}
+/* --------------------------------------- */
+
 /* --- 【新增】时间记录模块：电子屏字体与专属样式 --- */
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -1001,10 +1035,16 @@
             <div id="leaderboard" class="space-y-6"></div>
         </section>
 
-        <section id="achievementsSection" class="kawaii-card p-5 mb-6">
-            <h2 class="text-xl font-bold mb-4 flex items-center"><i class="fa-solid fa-award text-secondary mr-2"></i>全场奖杯</h2>
-            <div class="grid grid-cols-1 gap-3" id="achievementsGrid"></div>
-        </section>
+<!-- 【图2 1比1像素级复刻：全场成就展示区】 -->
+<!-- 小白调节区：bg-[#FDFCE6] 完美复原图2淡黄纸张底色，border-[4px] 保持极粗外框 -->
+<section id="achievementsSection" class="relative rounded-[2rem] pt-[30px] pb-6 px-6 sm:px-3 mb-6 bg-[#FDFCE6] border-[4px] border-[#5E4B8B]" style="order: 0; margin-top: 10px;">
+    
+
+    
+    <!-- 核心渲染画板：交给 JS 把 15个紧凑小卡牌画在这里 -->
+    <div class="flex flex-col w-full" id="achievementsGrid"></div>
+
+</section>
 
 <!-- 【图1像素级复刻】奖杯荣誉墙 -->
         <section id="badgeSection" class="bg-[#FDFCE6] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 sm:p-5 mb-8 flex flex-col items-center shadow-[0_4px_0_#5E4B8B]">
@@ -1051,7 +1091,7 @@
 
 <section id="chartSection" class="kawaii-card p-3 sm:p-5 mb-6 bg-[#FEFCE8]">
     <!-- 【核心画板：去掉内部留白，全屏延展，留给JS引擎作画】 -->
-    <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.5rem] p-0 h-[500px] relative shadow-[0_4px_0_#5E4B8B]">
+    <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.5rem] p-0 h-[600px] relative shadow-[0_4px_0_#5E4B8B]">
         <!-- 画布将紧贴上下左右 -->
         <canvas id="scoreChart"></canvas>
         <div id="chartCapsulesContainer" class="absolute inset-0 pointer-events-none z-10 overflow-visible"></div>
@@ -2024,7 +2064,8 @@ badgeInfoRarityText: document.getElementById('badgeInfoRarityText'),
             methodDetailRoundTable: document.getElementById('methodDetailRoundTable')
         };
 
-        let chartInstance = null;
+let chartInstance = null;
+        let chartHighlightedPlayerId = null; // <--- 【新增】图表高亮玩家记忆助手
         let posPieChartInstance = null;
         let negPieChartInstance = null;
         let radarChartInstances =[];
@@ -5138,41 +5179,206 @@ ${elimDetailsHtml}
             '最长连输': { icon: 'fa-heart-crack', color: 'text-danger' }
         };
 
-        function renderAchievements() {
-            const ach = gameData.achievements;
-            const getP = (id) => gameData.players.find(p => p.id === id);
+function renderAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            if (!grid) return;
+            const active = gameData.players.filter(p => p.isActive);
+            if (active.length === 0 || gameData.rounds.length === 0) {
+                grid.innerHTML = '<div class="text-center text-gray-400 font-bold py-4">暂无成就数据</div>';
+                return;
+            }
+
+            // =================================================================
+            // 🤖 数据精准抓取系统
+            // =================================================================
+            let ach = gameData.achievements; 
+            const getP = (id) => gameData.players.find(p => p.id === parseInt(id));
+            const formatTime = (secs) => {
+                if (!secs || secs === Infinity || isNaN(secs)) return '--:--';
+                const m = String(Math.floor(secs / 60)).padStart(2, '0');
+                const s = String(secs % 60).padStart(2, '0');
+                return `${m}:${s}`;
+            };
+
+            let maxTrophyCount = 0; let trophyKing = null;
+            if (typeof unlockedBadges !== 'undefined') {
+                active.forEach(p => {
+                    let count = badgeDefs.filter(b => unlockedBadges[b.id] && unlockedBadges[b.id].has(p.id)).length;
+                    if (count > maxTrophyCount) { maxTrophyCount = count; trophyKing = p; }
+                });
+            }
+
+            let longestGame = { time: 0, rNum: '-', winner: null, score: 0 };
+            let shortestGame = { time: Infinity, rNum: '-', winner: null, score: 0 };
+            let fastestElim = { time: Infinity, rNum: '-', victim: null, score: 0 };
+            let highestPenalty = { cards: 0, rNum: '-', victim: null, method: '-', score: 0 };
             
-            const card = (title, data, isPos) => {
-                const p = getP(data.p);
-                const valColor = isPos ? 'text-[#4ADE80]' : 'text-[#F87171]';
-                const config = achConfig[title] || { icon: 'fa-star', color: 'text-gray-500' };
-                
+            let pStats = {};
+            active.forEach(p => pStats[p.id] = { firstBloods: 0, revives: 0, poisoned: 0, kills: 0 });
+
+            let poisonMethodName = typeof window.getSpecialMethodName === 'function' ? window.getSpecialMethodName('lose', 3) : '特殊淘汰3(未设置)';
+
+            viewRounds.forEach(r => {
+                if (!r.v2Stats) return;
+                let rTime = r.v2Stats.stopwatchTime || 0;
+                if (rTime > 0) {
+                    let winScore = r.winner ? (r.changes[r.winner] || 0) : 0;
+                    if (rTime > longestGame.time) longestGame = { time: rTime, rNum: r.round, winner: r.winner, score: winScore };
+                    if (rTime < shortestGame.time) shortestGame = { time: rTime, rNum: r.round, winner: r.winner, score: winScore };
+                }
+
+                if (r.v2Stats.revivedPlayerId && pStats[r.v2Stats.revivedPlayerId]) pStats[r.v2Stats.revivedPlayerId].revives++;
+                if (r.v2Stats.eliminationEvents && r.v2Stats.eliminationEvents.length > 0) {
+                    r.v2Stats.eliminationEvents[0].forEach(id => { if (pStats[id]) pStats[id].firstBloods++; });
+                }
+
+                if (r.v2Stats.eliminated && r.v2Stats.eliminationDetails) {
+                    for (let pid in r.v2Stats.eliminated) {
+                        let id = parseInt(pid);
+                        let method = r.v2Stats.eliminated[pid];
+                        let details = r.v2Stats.eliminationDetails[pid];
+                        let pScore = r.changes[id] !== undefined ? r.changes[id] : 0;
+
+                        let eTime = details.time !== undefined ? details.time : rTime;
+                        if (eTime > 0 && eTime < fastestElim.time) fastestElim = { time: eTime, rNum: r.round, victim: id, score: pScore };
+
+                        let c = parseInt(details.cards) || 0;
+                        if (c > highestPenalty.cards) highestPenalty = { cards: c, rNum: r.round, victim: id, method: method, score: pScore };
+                        if (method === poisonMethodName && pStats[id]) pStats[id].poisoned++;
+                        if (details.killerId && pStats[details.killerId] && details.killerId !== id) pStats[details.killerId].kills++;
+                    }
+                }
+            });
+
+            const getTop = (key) => {
+                let max = 0; let king = null;
+                active.forEach(p => { if (pStats[p.id][key] > max) { max = pStats[p.id][key]; king = p; } });
+                return { p: king, c: max };
+            };
+            let topFB = getTop('firstBloods');
+            let topRev = getTop('revives');
+            let topPoison = getTop('poisoned');
+            let topKill = getTop('kills');
+
+            // =================================================================
+            // 🎨 图纸级 HTML 生成器 (摒弃多余留白，撑大内部元素)
+            // =================================================================
+            
+            // 生成整条外框及标题 (完全贴合图2压线效果)
+            const makeCard = (title, themeColor, innerHTML, isCol = false) => {
                 return `
-                <div class="bg-white border-2 border-[#5E4B8B] rounded-2xl p-3 flex items-center justify-between shadow-sm">
-                    <div class="font-bold text-sm text-gray-600 w-28 whitespace-nowrap flex items-center">
-                        <i class="fa-solid ${config.icon} ${config.color} mr-2 text-lg w-5 text-center"></i>
-                        ${title}
-                    </div>
+                <!-- 小白调节区：单个成就大框 -->
+                <div class="relative w-full flex justify-center pt-[12px] sm:pt-[14px] mb-[12px] sm:mb-[15px]">
                     
-                    <div class="flex items-center gap-2 flex-1 justify-center min-w-0 mx-2">
-                        ${p ? `<div class="w-8 h-8 rounded-lg border-2 border-[#5E4B8B] bg-gray-100 overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous"></div>` : 
-                              `<div class="w-8 h-8 rounded-lg border-2 border-dashed border-gray-300"></div>`}
-                        <span class="font-bold text-lg truncate max-w-[80px]" style="color:${p ? p.color : '#5E4B8B'}">${p ? p.name : '无'}</span>
-                        <span class="font-black text-xl ${valColor} ml-1">${data.s !== undefined && data.s !== -Infinity && data.s !== Infinity ? data.s : (data.c||0)}</span>
+                    <!-- 胶囊标题：绝对定位，一半在外，一半在内，无底部阴影，有白字紫描边 -->
+                    <div class="absolute top-0 z-20 px-[18px] sm:px-[24px] py-[1.5px] sm:py-[2px] rounded-full border-[2px] sm:border-[2.5px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B]" style="background-color: ${themeColor};">
+                        <span class="text-white font-black text-[12px] sm:text-[14px] tracking-widest  leading-none">${title}</span>
                     </div>
 
-                    <div class="text-xs text-gray-400 font-bold w-12 text-right whitespace-nowrap">${data.r || '-'}</div>
+                    <!-- 白框内容区：紧凑排版，去掉多余高度，背景为极浅白色 -->
+                    <div class="w-full bg-[white] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[10px] shadow-[0_4px_0_#5E4B8B] sm:rounded-[12px] pt-[25px] sm:pt-[20px] pb-[8px] sm:pb-[4px] px-1.5 flex ${isCol ? 'flex-col gap-1.5' : 'flex-wrap justify-center gap-1 sm:gap-1.5'} items-center z-10">
+                        ${innerHTML}
+                    </div>
+
                 </div>`;
             };
-            
-            els.achievementsGrid.innerHTML = `
-                ${card('单局最高得分', ach.maxSingle, true)}
-                ${card('单局最低得分', ach.minSingle, false)}
-                ${card('累计最高得分', ach.maxTotal, true)}
-                ${card('累计最低得分', ach.minTotal, false)}
-                ${card('最长连胜', ach.maxStreak, true)}
-                ${card('最长连输', ach.maxLoseStreak, false)}
-            `;
+
+            // 图2同款 玩家专属胶囊 (方形带圆角头像 + 文字)
+            const uiPlayer = (p) => p ? `
+                <div class="flex items-center gap-[3px] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[6px] p-[2px] h-[26px] sm:h-[30px] shrink-0 shadow-[0_4px_0_#5E4B8B]" style="background-color: ${p.color};">
+                    <div class="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px] rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center">
+                        <img src="${p.avatar}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-black text-white text-[12px] sm:text-[14px] text-stroke tracking-widest leading-none px-1 pb-[1px]">${p.name.slice(-1)}</span>
+                </div>` : `<div class="bg-gray-200 border-[2px] border-[#5E4B8B] rounded-[6px] px-3 text-gray-400 font-bold text-[12px] h-[26px] flex items-center">无记录</div>`;
+
+            // 图2同款 宽体大数字胶囊
+            const uiVal = (val, textColor, bgColor='bg-white', extraClass='') => `
+                <div class="flex items-center justify-center ${bgColor} border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[6px] px-2.5 h-[26px] sm:h-[30px] shrink-0 min-w-[36px] shadow-[0_4px_0_#5E4B8B]">
+                    <span class="font-black text-[13px] sm:text-[16px] tracking-wide leading-none pb-[1px] ${extraClass}" style="color: ${textColor};">${val}</span>
+                </div>`;
+
+            // 图2同款 "第xx局" 小胶囊
+            const uiRound = (rNum) => `
+                <div class="flex items-center justify-center bg-white border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[6px] px-2 h-[26px] sm:h-[30px] shrink-0 shadow-[0_4px_0_#5E4B8B]">
+                    <span class="font-black text-[#5E4B8B] text-[11px] sm:text-[13px] leading-none pb-[1px]">第${rNum}局</span>
+                </div>`;
+
+            // =================================================================
+            // 🧱 开始拼装：严格对标图2色彩与数值表现
+            // =================================================================
+            let html = '';
+
+            // 1. 累计最高分 (绿 #84CC16) -> [玩家] [白底绿字+分] [白底紫字局数]
+            let p1 = getP(ach.maxTotal.p);
+            html += makeCard('累计最高分', '#84CC16', uiPlayer(p1) + (p1 ? uiVal('+'+ach.maxTotal.s, '#65A30D') + uiRound(ach.maxTotal.r) : ''));
+
+            // 2. 累计最低分 (红 #E11D48) -> [玩家] [红底白字-分] [白底紫字局数]
+            let p2 = getP(ach.minTotal.p);
+            html += makeCard('累计最低分', '#E11D48', uiPlayer(p2) + (p2 ? uiVal(ach.minTotal.s, 'white', 'bg-[#E11D48]') + uiRound(ach.minTotal.r) : ''));
+
+            // 3. 单局最高分 (绿 #84CC16)
+            let p3 = getP(ach.maxSingle.p);
+            html += makeCard('单局最高分', '#84CC16', uiPlayer(p3) + (p3 ? uiVal('+'+ach.maxSingle.s, '#65A30D') + uiRound(ach.maxSingle.r) : ''));
+
+            // 4. 单局最低分 (红 #E11D48)
+            let p4 = getP(ach.minSingle.p);
+            html += makeCard('单局最低分', '#E11D48', uiPlayer(p4) + (p4 ? uiVal(ach.minSingle.s, 'white', 'bg-[#E11D48]') + uiRound(ach.minSingle.r) : ''));
+
+            // 5. 最长连胜 (黄 #FDE047) -> [玩家] [黄底紫字数字] [白底紫字局数]
+            let p5 = getP(ach.maxStreak.p);
+            html += makeCard('最长连胜', '#FDE047', uiPlayer(p5) + (p5 ? uiVal(ach.maxStreak.s, '#5E4B8B', 'bg-[#FDE047]') + uiRound(ach.maxStreak.r) : ''));
+
+            // 6. 最长连输 (粉紫 #E879F9) -> [玩家] [粉底紫字数字] [白底紫字局数]
+            let p6 = getP(ach.maxLoseStreak.p);
+            html += makeCard('最长连输', '#E879F9', uiPlayer(p6) + (p6 ? uiVal(ach.maxLoseStreak.s, '#5E4B8B', 'bg-[#F472B6]') + uiRound(ach.maxLoseStreak.r) : ''));
+
+            // 7. 最多奖杯 (黄 #FDE047) -> [玩家] [白底紫字数字]
+            html += makeCard('最多奖杯', '#FDE047', uiPlayer(trophyKing) + (trophyKing ? uiVal(maxTrophyCount, '#5E4B8B') : ''));
+
+            // 8. 最长一局 (淡蓝 #93C5FD) -> [玩家] [白底紫字时间] [白底绿字分] [白底紫字局数]
+            let p8 = getP(longestGame.winner);
+            html += makeCard('最长一局', '#93C5FD', uiPlayer(p8) + (p8 ? uiVal(formatTime(longestGame.time), '#5E4B8B') + uiVal('+'+longestGame.score, '#65A30D') + uiRound(longestGame.rNum) : ''));
+
+            // 9. 最短一局 (浅紫 #D8B4E2)
+            let p9 = getP(shortestGame.winner);
+            html += makeCard('最短一局', '#D8B4E2', uiPlayer(p9) + (p9 ? uiVal(formatTime(shortestGame.time), '#5E4B8B') + uiVal('+'+shortestGame.score, '#65A30D') + uiRound(shortestGame.rNum) : ''));
+
+            // 10. 最快淘汰 (粉 #F472B6) -> [玩家] [白底紫字时间] [白底红/紫字分] [白底紫字局数]
+            let p10 = getP(fastestElim.victim);
+            html += makeCard('最快淘汰', '#F472B6', uiPlayer(p10) + (p10 ? uiVal(formatTime(fastestElim.time), '#5E4B8B') + uiVal(fastestElim.score, '#E11D48') + uiRound(fastestElim.rNum) : ''));
+
+            // 11. 最多一血 (红 #DC2626) -> [玩家] [白底红字数字]
+            html += makeCard('最多一血', '#DC2626', uiPlayer(topFB.p) + (topFB.p ? uiVal(topFB.c, '#E11D48') : ''));
+
+            // 12. 最高罚牌 (浅粉 #F9A8D4) -> 【特殊要求：分两排】
+            let p12 = getP(highestPenalty.victim);
+            let p12Html = '';
+            if (p12) {
+                p12Html += `<div class="flex justify-center w-full pb-0.5">${uiPlayer(p12)}</div>`;
+                p12Html += `<div class="flex flex-wrap justify-center items-center gap-1 sm:gap-1.5 w-full">`;
+                p12Html += uiVal(highestPenalty.method, 'white', 'bg-[#93C5FD]'); // 蓝底白字：小飞棍
+                p12Html += uiVal(highestPenalty.cards+'张', 'white', 'bg-[#E11D48]'); // 红底白字：135张
+                p12Html += uiVal(highestPenalty.score, '#5E4B8B'); // 白底紫字：-1256
+                p12Html += uiRound(highestPenalty.rNum); // 第125局
+                p12Html += `</div>`;
+            } else {
+                p12Html = `<div class="flex justify-center w-full">${uiPlayer(null)}</div>`;
+            }
+            // true 告诉它外层用 flex-col 包裹
+            html += makeCard('最高罚牌', '#F9A8D4', p12Html, true); 
+
+            // 13. 最多复活 (亮绿 #4ADE80) -> [玩家] [白底绿字数字]
+            html += makeCard('最多复活', '#4ADE80', uiPlayer(topRev.p) + (topRev.p ? uiVal(topRev.c, '#65A30D') : ''));
+
+            // 14. 最多被毒 (红 #EF4444) -> [玩家] [白底红字数字]
+            html += makeCard('最多被毒', '#EF4444', uiPlayer(topPoison.p) + (topPoison.p ? uiVal(topPoison.c, '#E11D48') : ''));
+
+            // 15. 淘汰别人最多次 (淡蓝 #93C5FD) -> [玩家] [白底紫字数字]
+            html += makeCard('淘汰别人最多次', '#93C5FD', uiPlayer(topKill.p) + (topKill.p ? uiVal(topKill.c, '#5E4B8B') : ''));
+
+            // 最终拼装输出！
+            grid.innerHTML = html;
         }
 
 // ==========================================
@@ -5586,9 +5792,10 @@ window.renderDetailedRecords = function() {
 function renderChart() {
             const active = gameData.players.filter(p => p.isActive);
             const ctx = els.scoreChart.getContext('2d');
+            
+            // 第一次加载时才需要创建图表，后续我们只做“平滑修改”，拒绝重绘闪烁！
             if (chartInstance) chartInstance.destroy();
             
-            // 【核心逻辑修复】：精准计算全场历史的绝对最高分和最低分！
             let exactMax = -Infinity;
             let exactMin = Infinity;
             active.forEach(p => {
@@ -5597,7 +5804,6 @@ function renderChart() {
                     if (score < exactMin) exactMin = score;
                 });
             });
-            // 兜底处理：如果刚开局没数据，给个默认区间防报错
             if (exactMax === -Infinity) exactMax = 100;
             if (exactMin === Infinity) exactMin = -100;
             if (exactMax === exactMin) { exactMax += 10; exactMin -= 10; }
@@ -5610,106 +5816,88 @@ function renderChart() {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: active.map(p => ({
-                        label: p.name,
-                        data: p.totalHistory,
-                        borderColor: p.color,
-                        borderWidth: 3,
-                        tension: 0.4, 
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        fill: false
-                    }))
+                    datasets: active.map(p => {
+                        const isHighlighted = chartHighlightedPlayerId === p.id;
+                        const isDimmed = chartHighlightedPlayerId !== null && !isHighlighted;
+                        
+                        return {
+                            label: p.name,
+                            data: p.totalHistory,
+                            // 颜色：平时正常色，别人高亮时自己变半透明
+                            borderColor: isDimmed ? hexToRgba(p.color, 0.15) : p.color,
+                            // 【修复】：遵循你的要求，统统保持原样粗细（3），绝不加粗！
+                            borderWidth: 3, 
+                            // 【覆盖逻辑算法】：负数代表越小越在上面。
+                            // 正常情况：赋予 -p.total，100分就是-100，排在最上层。
+                            // 高亮情况：赋予 -9999，强行霸占全场最顶层绝对置顶！
+                            order: isHighlighted ? -9999 : -p.total,
+                            tension: 0.4, 
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            fill: false
+                        };
+                    })
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    // 【调整】：增加上下和左侧的留白，让XY轴不要死死贴着大白框的边缘
                     layout: { padding: { right: 90, top: 25, bottom: 15, left: 10 } },
                     interaction: { mode: 'index', intersect: false },
                     scales: { 
                         x: { 
                             grid: { display: false },
-                            border: { display: true, color: '#5E4B8B', width: 2 }, // 紫色横向实线
-                            ticks: { 
-                                color: '#5E4B8B', // 下方轮次数字颜色
-                                font: { weight: 'bold', family: gameData.fonts.num }
-                            }
+                            border: { display: true, color: '#5E4B8B', width: 2 },
+                            ticks: { color: '#5E4B8B', font: { weight: 'bold', family: gameData.fonts.num } }
                         }, 
                         y: { 
-                            // ★★★ 【强制锁死引擎】★★★
-                            // 强行把Y轴的最高和最低点锁死在真实的分数极值上！拒绝图表插件自作主张的取整大跨度！
-                            max: exactMax,
-                            min: exactMin,
-                            border: { display: true, color: '#5E4B8B', width: 2 }, // 紫色纵向实线
+                            max: exactMax, min: exactMin,
+                            border: { display: true, color: '#5E4B8B', width: 2 },
                             beginAtZero: false, 
-                            // 【智能网格线变色】
                             grid: {
                                 color: (ctx) => {
-                                    if(ctx.tick.value === 0) return '#d7d3e3'; // 0分浅紫
-                                    if(ctx.tick.value > 0) return '#ecfce4';   // 正分浅绿
-                                    return '#ffe6e8';                          // 负分浅红
-                                },
-                                lineWidth: 2
+                                    if(ctx.tick.value === 0) return '#d7d3e3'; 
+                                    if(ctx.tick.value > 0) return '#ecfce4';   
+                                    return '#ffe6e8';                          
+                                }, lineWidth: 2
                             },
-                            // 【智能刻度数字变色】
                             ticks: {
                                 color: (ctx) => {
-                                    if(ctx.tick.value === 0) return '#5E4B8B'; // 0分深紫
-                                    if(ctx.tick.value > 0) return '#70bf30';   // 正分深绿
-                                    return '#ff2534';                          // 负分深红
-                                },
-                                font: { weight: 'bold', family: gameData.fonts.num }
+                                    if(ctx.tick.value === 0) return '#5E4B8B'; 
+                                    if(ctx.tick.value > 0) return '#70bf30';   
+                                    return '#ff2534';                          
+                                }, font: { weight: 'bold', family: gameData.fonts.num }
                             }
                         } 
                     },
-                    plugins: { 
-                        legend: { display: false }, 
-                        datalabels: { display: false }
-                    }
+                    plugins: { legend: { display: false }, datalabels: { display: false } }
                 },
                 plugins: [{
-                    // 【坐标级精准绘制XY轴箭头】
                     id: 'customAxesArrows',
                     afterDraw: (chart) => {
                         const ctx = chart.ctx;
                         const xAxis = chart.scales.x;
                         const yAxis = chart.scales.y;
-                        
-                        ctx.save();
-                        ctx.fillStyle = '#5E4B8B';
-                        
-                        // Y轴顶端的三角形箭头
-                        ctx.beginPath();
-                        ctx.moveTo(xAxis.left - 5, yAxis.top);
-                        ctx.lineTo(xAxis.left + 5, yAxis.top);
-                        ctx.lineTo(xAxis.left, yAxis.top - 10);
-                        ctx.fill();
-                        
-                        // X轴右端的三角形箭头
-                        ctx.beginPath();
-                        ctx.moveTo(xAxis.right, yAxis.bottom - 5);
-                        ctx.lineTo(xAxis.right, yAxis.bottom + 5);
-                        ctx.lineTo(xAxis.right + 10, yAxis.bottom);
-                        ctx.fill();
-                        
+                        ctx.save(); ctx.fillStyle = '#5E4B8B';
+                        ctx.beginPath(); ctx.moveTo(xAxis.left - 5, yAxis.top); ctx.lineTo(xAxis.left + 5, yAxis.top); ctx.lineTo(xAxis.left, yAxis.top - 10); ctx.fill();
+                        ctx.beginPath(); ctx.moveTo(xAxis.right, yAxis.bottom - 5); ctx.lineTo(xAxis.right, yAxis.bottom + 5); ctx.lineTo(xAxis.right + 10, yAxis.bottom); ctx.fill();
+                        ctx.restore();
+
+
+                        ctx.stroke();
                         ctx.restore();
                     }
                 }, {
                     id: 'endCapsulesPlugin',
                     afterDraw: (chart) => {
                         if (!capContainer) return;
-                        
                         let positions = active.map((p, i) => {
                             const meta = chart.getDatasetMeta(i);
                             if(!meta.data || meta.data.length === 0) return null;
                             const lastPoint = meta.data[meta.data.length - 1];
                             return { p: p, y: lastPoint.y, x: lastPoint.x };
                         }).filter(x => x !== null);
-
                         positions.sort((a, b) => a.y - b.y);
 
-                        // 【防重叠核心引擎】
                         const capsuleHeight = 24; 
                         for (let i = 1; i < positions.length; i++) {
                             if (positions[i].y - positions[i-1].y < capsuleHeight) {
@@ -5723,21 +5911,78 @@ function renderChart() {
                             const scoreColor = p.total > 0 ? 'text-[#4ADE80]' : (p.total < 0 ? 'text-[#F87171]' : 'text-[#5E4B8B]');
                             const scoreStr = p.total > 0 ? `+${p.total}` : p.total;
                             
-                            // 保持完美的 left: ${item.x}px 紧贴
+                            const isHighlighted = chartHighlightedPlayerId === p.id;
+                            const isDimmed = chartHighlightedPlayerId !== null && !isHighlighted;
+                            
+                            // 【平滑动画开关】：这里的 transition-all duration-500 保证了每次改变状态都像呼吸一样丝滑
+                            const baseClass = "absolute flex items-center justify-center gap-1 border-[2.5px] border-[#5E4B8B] rounded-full px-1.5 py-0.5 transition-all duration-500 cursor-pointer pointer-events-auto chart-capsule-btn";
+                            
+                            let stateClass = "";
+                            let extraStyle = `background-color: ${p.color}; left: ${item.x}px; top: ${item.y}px; transform: translateY(-50%); `;
+
+                            if (isHighlighted) {
+                                // 胶囊被点中时的特效：解除灰度，完全不透明，并且外围散发紫色光晕，微微放大！
+                                stateClass = "shadow-[0_0_15px_rgba(94,75,139,0.8)] scale-110 z-50";
+                                extraStyle += "opacity: 1; filter: none;";
+                            } else if (isDimmed) {
+                                // 别人被点中时自己的状态：失去阴影，变灰，大幅透明，缩小！
+                                stateClass = "shadow-none scale-[0.85] z-10";
+                                extraStyle += "opacity: 0.3; filter: grayscale(100%);";
+                            } else {
+                                // 平时的普通状态：带有厚重的底部阴影
+                                stateClass = "shadow-[0_3px_0_#5E4B8B] scale-100 hover:scale-105 z-20";
+                                extraStyle += "opacity: 1; filter: none;";
+                            }
+
                             html += `
-                            <div class="absolute flex items-center justify-center gap-1 border-[2.5px] border-[#5E4B8B] rounded-full px-1.5 py-0.5 shadow-[0_2px_0_#5E4B8B] transition-all duration-300 z-10" 
-                                 style="background-color: ${p.color}; left: ${item.x}px; top: ${item.y}px; transform: translateY(-50%);">
-                                <img src="${p.avatar}" class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[1.5px] border-[#5E4B8B] bg-white object-cover" crossorigin="anonymous">
-                                <!-- 白色姓名小胶囊 -->
-                                <span class="text-[#5E4B8B] font-black text-[10px] sm:text-xs leading-none bg-white px-1 py-0.5 rounded-full border-[1.5px] border-[#5E4B8B]">${p.name.slice(-1)}</span>
-                                <!-- 分数文字 -->
-                                <span class="font-black text-[11px] sm:text-xs leading-none ${scoreColor}" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${scoreStr}</span>
+                            <div class="${baseClass} ${stateClass}" 
+                                 data-pid="${p.id}"
+                                 style="${extraStyle}">
+                                <img src="${p.avatar}" class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[1.5px] border-[#5E4B8B] bg-white object-cover pointer-events-none" crossorigin="anonymous">
+                                <span class="text-[#5E4B8B] font-black text-[10px] sm:text-xs leading-none bg-white px-1 py-0.5 rounded-full border-[1.5px] border-[#5E4B8B] pointer-events-none">${p.name.slice(-1)}</span>
+                                <span class="font-black text-[11px] sm:text-xs leading-none ${scoreColor} pointer-events-none" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${scoreStr}</span>
                             </div>`;
                         });
                         capContainer.innerHTML = html;
                     }
                 }]
             });
+            
+            // ========================================================
+            // 【史诗级大平滑】：独立的点击高亮引擎
+            // 不再重绘画布，利用图表内部的 update 实现德芙般顺滑过渡！
+            // ========================================================
+            if (capContainer) {
+                capContainer.onclick = function(e) {
+                    const btn = e.target.closest('.chart-capsule-btn');
+                    // 逻辑要求：如果点击空白处，直接返回，不取消高亮效果！
+                    if (!btn) return; 
+                    
+                    const pid = parseInt(btn.dataset.pid);
+                    // 逻辑要求：如果再次点击已经被高亮的玩家，就取消高亮，归于平静
+                    if (chartHighlightedPlayerId === pid) {
+                        chartHighlightedPlayerId = null;
+                    } else {
+                        chartHighlightedPlayerId = pid;
+                    }
+                    
+                    // 【核心动画触发区】：不重新渲染整个 chart，只平滑修改透明度和层级！
+                    chartInstance.data.datasets.forEach((dataset, i) => {
+                        const p = active[i];
+                        const isHighlighted = chartHighlightedPlayerId === p.id;
+                        const isDimmed = chartHighlightedPlayerId !== null && !isHighlighted;
+
+                        // 设置半透明和层级
+                        dataset.borderColor = isDimmed ? hexToRgba(p.color, 0.15) : p.color;
+                        dataset.order = isHighlighted ? -9999 : -p.total;
+                    });
+                    
+                    // 呼唤 Chart.js 内置的平滑过渡动画
+                    chartInstance.update('default'); 
+                    // 由于 update 会重新绘制界面，上面的 endCapsulesPlugin 也会顺带被触发，胶囊也会跟着平滑变动！
+                };
+            }
+        
         }
 
         function saveData() {
