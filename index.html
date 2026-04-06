@@ -71,52 +71,6 @@
 }
 /* --------------------------------------- */
 
-/* 
-     * ========================================================
-     * [小白调节区：双向滑动表格与十字光标专属引擎] 
-     * ========================================================
-     */
-    /* 1. 完美平滑表格边框魔法：绝不重叠变粗 */
-    .v2-smooth-table {
-        border-collapse: separate;
-        border-spacing: 0;
-        width: 100%;
-    }
-    .v2-smooth-table th, .v2-smooth-table td {
-        border-bottom: 3px solid #5E4B8B;
-        border-right: 3px solid #5E4B8B;
-    }
-    .v2-smooth-table th:first-child, .v2-smooth-table td:first-child {
-        border-left: 3px solid #5E4B8B;
-    }
-    .v2-smooth-table tr:first-child th {
-        border-top: 3px solid #5E4B8B;
-    }
-    
-    /* 2. 表头与侧边栏钉子户（滑动时死死钉在原地） */
-    .pin-top { position: sticky; top: 0; z-index: 40; }
-    .pin-left { position: sticky; left: 0; z-index: 30; }
-    .pin-corner-tl { position: sticky; top: 0; left: 0; z-index: 50; }
-    .pin-right1 { position: sticky; right: 0; z-index: 30; }
-    .pin-right2 { position: sticky; right: var(--right-col-w, 60px); z-index: 30; }
-    .pin-corner-tr1 { position: sticky; top: 0; right: 0; z-index: 50; }
-    .pin-corner-tr2 { position: sticky; top: 0; right: var(--right-col-w, 60px); z-index: 50; }
-
-    /* 3. 十字光标高亮特效：模拟正片叠底加深 */
-    .cross-highlight {
-        position: relative;
-    }
-    .cross-highlight::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        /* var(--cross-bg) 由 JS 动态传入玩家的专属颜色，带有40%透明度 */
-        background-color: var(--cross-bg, rgba(0,0,0,0.1));
-        mix-blend-mode: multiply; /* 正片叠底魔法，完美加深底色 */
-        pointer-events: none;
-        z-index: 20;
-    }
-
 /* --- 【新增】时间记录模块：电子屏字体与专属样式 --- */
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -197,7 +151,7 @@
             .text-stroke {
                 -webkit-text-stroke: 4px #5E4B8B; /* ★修改这里的 3px 可以改变普通文字紫色描边宽度★ */
                 paint-order: stroke fill;
-   14:08 2026/3/16         }
+            }
 
 /* ==================================================================== */
 /* ★★★ 奖杯弹窗专属特效与样式区 (修复裁剪问题版) ★★★ */
@@ -270,8 +224,52 @@
                 background-size: 200% auto;
                 animation: shineAnim 2.5s linear infinite;
             }
-            @keyframes shineAnim {
+@keyframes shineAnim {
                 to { background-position: 200% center; }
+            }
+            
+            /* 
+             * ========================================================
+             * 【小白调节区：超级表格与十字光标魔法特效】
+             * ========================================================
+             */
+            /* 1. 解决滑动时边框断裂的终极魔法：放弃border，改用内发光阴影画线！ */
+            .super-table {
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+            /* 控制表格内部线条的粗细和颜色，1.5px是粗细，#5E4B8B是深紫色 */
+            .super-cell {
+                box-shadow: inset -1.5px -1.5px 0 #5E4B8B; 
+            }
+            .super-cell-top {
+                box-shadow: inset -1.5px -1.5px 0 #5E4B8B, inset 0 1.5px 0 #5E4B8B;
+            }
+            .super-cell-left {
+                box-shadow: inset -1.5px -1.5px 0 #5E4B8B, inset 1.5px 0 0 #5E4B8B;
+            }
+            .super-cell-top-left {
+                box-shadow: inset -1.5px -1.5px 0 #5E4B8B, inset 1.5px 1.5px 0 #5E4B8B;
+            }
+            
+            /* 2. 十字光标压暗特效 (完美复刻 Excel 体验) */
+            /* rgba(0,0,0,0.15) 控制压暗的透明度，0.15代表15%的黑色遮罩，改大变更黑 */
+            .crosshair-dimmed {
+                position: relative;
+            }
+            .crosshair-dimmed::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-color: rgba(0,0,0,0.15); 
+                pointer-events: none;
+                z-index: 5;
+            }
+            /* 点击时的凶手底色高亮层级保护 */
+            .crosshair-active {
+                position: relative;
+                z-index: 6;
+                box-shadow: inset 0 0 0 2px #fff !important; /* 点击后内圈加一道白光 */
             }
         }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
@@ -902,55 +900,47 @@
         </section>
 
 <!-- ======================================= -->
-<!-- 【全新优化】结算方式统计模块 开始      -->
+<!-- 【终极进化版】结算方式统计模块 开始 (图1复刻) -->
 <!-- ======================================= -->
-<section id="methodStatSection" class="kawaii-card p-3 sm:p-5 mb-6 bg-[#FEFCE8]">
+<section id="methodStatSection" class="kawaii-card p-3 sm:p-5 mb-6 bg-[#FEFCE8]" style="order: 0;">
     <div class="flex flex-col items-center w-full relative">
-        <!-- 顶部主标题 -->
-        <div class="bg-[#ffffff] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-6 py-1 sm:py-1.2 mb-2 shadow-[0_4px_0_#5E4B8B]">
-            <span class="font-black text-[#5E4B8B] text-base sm:text-xl tracking-widest " style="color: [#5E4B8B];">结算方式统计</span>
-        </div>
         
-        <!-- 切换视图按钮 -->
-        <button onclick="window.toggleMethodStatView()" class="bg-[#8DA4D0] border-[3px] border-[#5E4B8B] rounded-full px-5 py-0.5 text-white font-black text-xs sm:text-sm tracking-widest mb-4 hover:brightness-110 active:translate-y-1 transition-all shadow-[0_4px_0_#5E4B8B]">
-            切换视图
-        </button>
+        <!-- 顶部主标题 -->
+        <!-- 小白调节区：bg-[#ffffff]白底，border-[3px]紫边，shadow-[0_4px_0_#5E4B8B]底部投影 -->
+        <div class="bg-[#ffffff] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-6 py-1 sm:py-1.2 mb-4 shadow-[0_4px_0_#5E4B8B]">
+            <span class="font-black text-[#5E4B8B] text-base sm:text-xl tracking-widest">结算方式统计</span>
+        </div>
 
-        <!-- 内部白色大画框 (图1像素级复刻) -->
-        <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl w-full p-2 sm:p-4 flex gap-2 sm:gap-4 relative shadow-[0_4px_0_#5E4B8B]
-">
+        <!-- 内部大容器 (双列瀑布流) -->
+        <div class="w-full flex items-start gap-2 sm:gap-3">
             
-            <!-- 左半边：胜利侧 -->
-            <div class="flex-1 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl flex flex-col bg-[#D9F99D] shadow-sm overflow-hidden">
-                <div class="bg-[#65A30D] text-white text-center font-black py-1.5 sm:py-2 text-sm sm:text-lg border-b-[3px] sm:border-b-[4px] border-[#5E4B8B] tracking-widest " style="text-shadow: 0, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">
+            <!-- 【左半边：胜利侧容器】 -->
+            <!-- 小白调节区：bg-[#ddf89d] 完美复刻了图1中左侧的浅黄绿色底色 -->
+            <div class="flex-1 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl flex flex-col bg-[#ddf89d] shadow-sm overflow-hidden pb-2">
+                <!-- 胜利标题头 -->
+                <div class="bg-[#9fc336] text-white text-center font-black py-1.5 sm:py-2 text-sm sm:text-base border-b-[3px] sm:border-b-[4px] border-[#5E4B8B] tracking-widest shadow-sm">
                     胜利方式统计
                 </div>
-                <!-- 列表容器：限制高度，最多显示5个，超出显示特定滚动条 -->
-<div id="newWinStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 relative"></div>
+                <!-- 胜利条目存放区 (JS会自动把卡片塞到这里) -->
+                <div id="newWinStatsList" class="flex flex-col gap-1.5 sm:gap-2 p-1.5 sm:p-2"></div>
             </div>
 
-            <!-- 右半边：淘汰侧 -->
-            <div class="flex-1 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl flex flex-col bg-[#FECDD3] shadow-sm overflow-hidden">
-                <div class="bg-[#E11D48] text-white text-center font-black py-1.5 sm:py-2 text-sm sm:text-lg border-b-[3px] sm:border-b-[4px] border-[#5E4B8B] tracking-widest " style="text-shadow: 0, -1px -1px 0 #5E4B8B, 1px -1px 0 #5E4B8B, -1px 1px 0 #5E4B8B;">
+            <!-- 【右半边：淘汰侧容器】 -->
+            <!-- 小白调节区：bg-[#f9ccd3] 完美复刻了图1中右侧的淡粉红色底色 -->
+            <div class="flex-1 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] sm:rounded-xl flex flex-col bg-[#f9ccd3] shadow-sm overflow-hidden pb-2">
+                <!-- 淘汰标题头 -->
+                <div class="bg-[#e4002b] text-white text-center font-black py-1.5 sm:py-2 text-sm sm:text-base border-b-[3px] sm:border-b-[4px] border-[#5E4B8B] tracking-widest shadow-sm">
                     淘汰方式统计
                 </div>
-                <!-- 列表容器 -->
-<div id="newLoseStatsList" class="flex flex-col gap-2 p-1.5 sm:p-2 relative"></div>
+                <!-- 淘汰条目存放区 (JS会自动把卡片塞到这里) -->
+                <div id="newLoseStatsList" class="flex flex-col gap-1.5 sm:gap-2 p-1.5 sm:p-2"></div>
             </div>
 
         </div>
     </div>
 </section>
-
-<!-- 注入专属滚动条样式 (匹配图1右侧的粗宽可爱滚动条) -->
-<style>
-    .method-scroll::-webkit-scrollbar { width: 12px; }
-    @media (min-width: 640px) { .method-scroll::-webkit-scrollbar { width: 16px; } }
-    .method-scroll::-webkit-scrollbar-track { background: #8DA4D0; border-left: 3px solid #5E4B8B; }
-    .method-scroll::-webkit-scrollbar-thumb { background: #F8FAFC; border: 3px solid #5E4B8B; border-radius: 8px; }
-</style>
 <!-- ======================================= -->
-<!-- 【全新优化】结算方式统计模块 结束      -->
+<!-- 【终极进化版】结算方式统计模块 结束      -->
 <!-- ======================================= -->
 
         <section id="leaderboardSection" class="kawaii-card p-5 mb-6">
@@ -1112,6 +1102,107 @@
             </div>
         </section>
 
+
+<!-- ======================================================== -->
+<!-- 【图1 像素级复刻：时间数据大模块】 开始 -->
+<!-- ======================================================== -->
+<!-- 
+  【小白调节区：大容器 1 外围】
+  [动态高度] height: calc(100dvh - 240px);
+  这个极其重要！100dvh 是屏幕总高度，减去 240px(顶部和底部导航栏的厚度)。
+  如果你发现表格底部被导航栏挡住了，就把 240 改成 260 或者 280，表格就会变矮缩回来！
+  [外框底色] bg-[#d9f2e6] 这个是图1最外面那一圈淡淡的薄荷绿底色。
+-->
+<section id="timeDataSection" class="kawaii-card p-1.5 sm:p-2.5 mb-6 bg-[#d9f2e6] flex flex-col items-center hidden relative border-[3px] sm:border-[4px] border-[#5E4B8B]" style="height: calc(100dvh - 240px); min-height: 400px; order: 0;">
+    
+    <!-- 内部包裹大白/黄框 (容器1的核心背景) -->
+    <!-- bg-[#FEFCE8] 是图1内部那种淡淡的护眼纸张黄色 -->
+    <div class="bg-[#FEFCE8] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.5rem] w-full h-full flex flex-col items-center p-1.5 sm:p-2.5 shadow-inner overflow-hidden relative">
+
+        <!-- 容器 1-1：历史数据标题 -->
+        <!-- bg-[#6ca5eb] 图1要求的蓝色底色 -->
+        <div class="bg-[#6ca5eb] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 sm:py-1 shadow-[0_3px_0_#5E4B8B] mb-2 shrink-0 z-10">
+            <span class="font-black text-white text-[13px] sm:text-base tracking-widest text-stroke">历史数据</span>
+        </div>
+
+        <!-- 容器 1-2：历史数据表格区 -->
+        <div class="w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] sm:rounded-[0.8rem] overflow-hidden bg-white shadow-sm shrink-0 mb-3">
+            <div class="w-full overflow-x-auto scrollbar-hide">
+                <table class="super-table w-full text-center text-[10px] sm:text-[12px] font-black whitespace-nowrap" id="timeHistoryTable">
+                    <!-- JS 将在这里像画笔一样注入历史数据 -->
+                </table>
+            </div>
+        </div>
+
+        <!-- 容器 1-3：详细轮次标题 -->
+        <!-- bg-[#fb2a53] 图1要求的红色底色 -->
+        <div class="bg-[#fb2a53] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 sm:py-1 shadow-[0_3px_0_#5E4B8B] mb-2 shrink-0 z-10 mt-1">
+            <span class="font-black text-white text-[13px] sm:text-base tracking-widest text-stroke">详细轮次</span>
+        </div>
+
+        <!-- 容器 1-4：详细轮次表格区 (核心自适应双向滑动区) -->
+        <div class="w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] sm:rounded-[0.8rem] overflow-hidden bg-white shadow-sm flex-1 relative min-h-0">
+            <!-- 开启双向滑动，并隐藏难看的原生滚动条 -->
+            <div class="w-full h-full overflow-auto scrollbar-hide relative">
+                <!-- 注意：这里的 super-table 会触发我们在第一步写的绝不断裂魔法 -->
+                <table class="super-table w-full text-center text-[10px] sm:text-[12px] font-black whitespace-nowrap" id="timeDetailTable">
+                    <!-- JS 将在这里像画笔一样注入详细轮次 -->
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- ======================================================== -->
+<!-- 【时间数据大模块】 结束 -->
+<!-- ======================================================== -->
+
+<!-- ======================================================== -->
+<!-- 【图3 像素级复刻：淘汰顺位大模块】 开始 -->
+<!-- ======================================================== -->
+<!-- 
+  【小白调节区：大容器 2 外围】
+  [动态高度] 同样使用 calc(100dvh - 240px)，原理同上，被挡住就加大240这个数字。
+-->
+<section id="eliminationOrderSection" class="kawaii-card p-1.5 sm:p-2.5 mb-6 bg-[#d9f2e6] flex flex-col items-center hidden relative border-[3px] sm:border-[4px] border-[#5E4B8B]" style="height: calc(100dvh - 240px); min-height: 400px; order: 0;">
+    
+    <div class="bg-[#FEFCE8] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.5rem] w-full h-full flex flex-col items-center p-1.5 sm:p-2.5 shadow-inner overflow-hidden relative">
+
+        <!-- 容器 2-1：历史数据标题 -->
+        <div class="bg-[#6ca5eb] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 sm:py-1 shadow-[0_3px_0_#5E4B8B] mb-2 shrink-0 z-10">
+            <span class="font-black text-white text-[13px] sm:text-base tracking-widest text-stroke">历史数据</span>
+        </div>
+
+        <!-- 容器 2-2：历史数据表格区 -->
+        <div class="w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] sm:rounded-[0.8rem] overflow-hidden bg-white shadow-sm shrink-0 mb-3">
+            <div class="w-full overflow-x-auto scrollbar-hide">
+                <table class="super-table w-full text-center text-[10px] sm:text-[12px] font-black whitespace-nowrap" id="elimHistoryTable">
+                    <!-- JS 动态注入 -->
+                </table>
+            </div>
+        </div>
+
+        <!-- 容器 2-3：详细轮次标题 -->
+        <div class="bg-[#fb2a53] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-6 sm:px-8 py-0.5 sm:py-1 shadow-[0_3px_0_#5E4B8B] mb-2 shrink-0 z-10 mt-1">
+            <span class="font-black text-white text-[13px] sm:text-base tracking-widest text-stroke">详细轮次</span>
+        </div>
+
+        <!-- 容器 2-4：详细轮次表格区 (核心自适应双向滑动区) -->
+        <div class="w-full border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] sm:rounded-[0.8rem] overflow-hidden bg-white shadow-sm flex-1 relative min-h-0">
+            <div class="w-full h-full overflow-auto scrollbar-hide relative">
+                <table class="super-table w-full text-center text-[10px] sm:text-[12px] font-black whitespace-nowrap" id="elimDetailTable">
+                    <!-- JS 动态注入 -->
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- ======================================================== -->
+<!-- 【淘汰顺位大模块】 结束 -->
+<!-- ======================================================== -->
+
+
 <!-- ======================================= -->
 <!-- 【全新复刻】得分占比与ROUND进度合体模块 开始 -->
 <!-- ======================================= -->
@@ -1166,26 +1257,6 @@
 <!-- ======================================= -->
 <!-- 【全新复刻】得分占比与ROUND进度合体模块 结束 -->
 <!-- ======================================= -->
-
-<!-- ======================================================== -->
-<!-- 【图1/图2像素级复刻：时间数据区域】 -->
-<!-- ======================================================== -->
-<!-- 
-  【小白调节区：大外框高度适配魔法】
-  height: calc(100dvh - 210px) 是核心魔法，100dvh 代表手机屏幕真实高度。
-  210px 是留给顶部和底部导航栏呼吸的空间。如果觉得被底部导航栏遮挡了，把 210px 改大（比如 240px）；
-  如果觉得下方空了一大块白，把 210px 改小（比如 180px）。
--->
-<section id="timeDataSection" class="kawaii-card p-2 sm:p-3 mb-6 bg-[#BBE2D6] hidden w-full flex flex-col items-center" style="order: 0; height: calc(100dvh - 210px); min-height: 480px;">
-    <!-- JS 将会在这里用画笔画出时间数据的所有表格 -->
-</section>
-
-<!-- ======================================================== -->
-<!-- 【图3/图4像素级复刻：淘汰顺位区域】 -->
-<!-- ======================================================== -->
-<section id="eliminationOrderSection" class="kawaii-card p-2 sm:p-3 mb-6 bg-[#BBE2D6] hidden w-full flex flex-col items-center" style="order: 0; height: calc(100dvh - 210px); min-height: 480px;">
-    <!-- JS 将会在这里用画笔画出淘汰顺位的所有表格 -->
-</section>
 
 <!-- 【图1像素级复刻：局次得分详情模块】 -->
 <section id="tableSection" class="kawaii-card p-3 sm:p-5 mb-6 flex flex-col items-center relative" style="order: 0;">
@@ -1655,23 +1726,36 @@
     </div>
     <!-- ================================================================ -->
 
-<!-- 【新增】结算方式详细信息弹窗 (图1复刻版) -->
+<!-- ======================================================== -->
+<!-- 【图2像素级复刻】结算方式详细信息弹窗 (悬浮卡牌版) -->
+<!-- ======================================================== -->
 <div id="methodDetailDialog" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-    <div class="kawaii-card p-4 sm:p-6 max-w-[480px] w-full text-center relative shadow-2xl max-h-[90vh] flex flex-col mx-4 overflow-hidden bg-[#FEFCE8]">
-        <button id="closeMethodDetailBtn" class="absolute top-3 right-4 text-gray-400 hover:text-danger text-2xl transition-colors z-10"><i class="fa-solid fa-times"></i></button>
+    
+    <!-- 弹窗外框 (mt-16 是核心魔法！把白框往下压，给上方冒出去的半截卡牌留出空间) -->
+    <div class="relative bg-white border-[4px] border-[#5E4B8B] rounded-[1rem] p-3 sm:p-4 max-w-[340px] w-[92%] text-center mx-4 shadow-2xl mt-16 flex flex-col pb-4">
+        
+        <!-- 右上角关闭按钮 (悬浮在外面一点点) -->
+        <button id="closeMethodDetailBtn" class="absolute -top-4 -right-3 w-8 h-8 bg-white border-[3px] border-[#5E4B8B] rounded-full flex items-center justify-center text-[#5E4B8B] font-black shadow-sm z-50 hover:bg-gray-100 active:scale-90 transition-transform">X</button>
 
-        <div id="methodDetailTitle" class="bg-[#E11D48] border-[4px] border-[#5E4B8B] rounded-full px-8 py-2 text-white font-black text-xl tracking-widest shadow-sm mx-auto mb-4 w-fit min-w-[140px]">方法名称</div>
+        <!-- 【图2灵魂特效：顶部悬浮居中卡牌】 -->
+        <!-- 小白调节区：w-[70px]控制卡牌大小。-top-[45px]控制卡牌往上顶出框外的距离 -->
+        <div class="absolute -top-[80px] sm:-top-[50px] left-1/2 -translate-x-1/2 w-[70px] sm:w-[80px] aspect-[2/3] bg-[#111111] border-[3px] border-[#5E4B8B] rounded-[8px] shadow-[0_4px_0_#5E4B8B] flex items-center justify-center overflow-hidden z-20">
+            <img id="methodDetailImg" src="" class="w-full h-full object-contain" crossorigin="anonymous">
+        </div>
 
-        <div class="overflow-y-auto custom-scroll pr-1 flex-1">
-            <!-- 像素级复刻图1合并表格 -->
-            <div class="overflow-x-auto scrollbar-hide border-[4px] border-[#5E4B8B] rounded-[1.5rem] shadow-sm mb-2">
-                <table class="min-w-full text-center text-xs sm:text-sm font-bold bg-white border-collapse" id="methodDetailPlayerTable">
-                    <!-- JS会把整个表都画在这里 -->
-                </table>
+        <!-- 隐形占位符：给顶部的悬浮卡牌留出空隙，防止卡牌挡住下面的表格 -->
+        <div class="h-8 sm:h-10 w-full shrink-0 pointer-events-none"></div>
+
+        <!-- 内部玩家数据表格区 (滑动视窗) -->
+        <div class="w-full overflow-x-auto scrollbar-hide border-[3px] border-[#5E4B8B] rounded-[0.5rem] shadow-[0_3px_0_#5E4B8B] bg-white">
+            <!-- JS会在这里像画笔一样注入玩家数据网格 -->
+            <div class="flex items-stretch min-w-max" id="methodDetailPlayerGrid">
             </div>
         </div>
+
     </div>
 </div>
+<!-- ======================================================== -->
 
     <!-- 确认重置遮罩 -->
     <div id="confirmDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
@@ -1797,6 +1881,8 @@
 
 const modulesConfig =[
 { id: 'timeRecordSection', name: '时间记录区', icon: 'fa-stopwatch' }, // <--- 【新增】把时间记录区加到这里
+{ id: 'timeDataSection', name: '时间数据', icon: 'fa-clock' }, /* 【最新新增】时间数据区 */
+{ id: 'eliminationOrderSection', name: '淘汰顺位', icon: 'fa-list-ol' }, /* 【最新新增】淘汰顺位区 */
 { id: 'randomSelectorSection', name: '随机选择器', icon: 'fa-shuffle' }, // 【新增】随机选择器模块
             { id: 'latestStatusSection', name: '最新战况', icon: 'fa-tv' }, // <--- 这是新加的这一行
 { id: 'cloudShareSection', name: '云端同步与分享', icon: 'fa-cloud' },
@@ -3706,6 +3792,432 @@ function updateAllUI() {
             if(typeof window.renderLatestStatus === 'function') window.renderLatestStatus();
 if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSection();
         }
+
+// ====================================================================
+// ★★★ 【全新】时间数据与淘汰顺位 核心渲染引擎 (图1&图2 像素级复刻) ★★★
+// ====================================================================
+
+// 全局状态：记录当前被十字光标选中的单元格
+let currentCrosshair = null;
+
+// 工具函数：格式化秒数为 mm:ss
+function formatSecToMMSS(secs) {
+    if (secs === undefined || secs === null || isNaN(secs) || secs === Infinity) return '00:00';
+    let m = Math.floor(secs / 60).toString().padStart(2, '0');
+    let s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+}
+
+// 工具函数：点击单元格触发 Excel 十字光标与凶手切换
+window.handleSuperTableClick = function(cell, tableId) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    // 1. 如果点击的是同一个单元格，就取消高亮和切换
+    if (currentCrosshair && currentCrosshair.cell === cell) {
+        clearCrosshair(table);
+        toggleCellContent(cell, false);
+        currentCrosshair = null;
+        return;
+    }
+
+    // 2. 清除旧的高亮和还原旧的单元格内容
+    if (currentCrosshair) {
+        clearCrosshair(document.getElementById(currentCrosshair.tableId));
+        toggleCellContent(currentCrosshair.cell, false);
+    }
+
+    // 3. 只有带有 data-killer 属性的单元格才允许交互
+    if (!cell.hasAttribute('data-killer-name')) {
+        currentCrosshair = null;
+        return;
+    }
+
+    // 4. 设置新的高亮和内容切换
+    const tr = cell.parentElement;
+    const colIndex = Array.from(tr.children).indexOf(cell);
+    
+    // 给这一行所有单元格加压暗特效
+    Array.from(tr.children).forEach(td => td.classList.add('crosshair-dimmed'));
+    // 给这一列所有单元格加压暗特效
+    Array.from(table.querySelectorAll('tr')).forEach(row => {
+        if (row.children[colIndex]) row.children[colIndex].classList.add('crosshair-dimmed');
+    });
+
+    // 给自己加最高层级和白框保护
+    cell.classList.remove('crosshair-dimmed');
+    cell.classList.add('crosshair-active');
+    
+    toggleCellContent(cell, true);
+    currentCrosshair = { tableId, cell, colIndex };
+};
+
+// 工具函数：清除十字光标特效
+function clearCrosshair(table) {
+    if (!table) return;
+    table.querySelectorAll('.crosshair-dimmed, .crosshair-active').forEach(el => {
+        el.classList.remove('crosshair-dimmed', 'crosshair-active');
+    });
+}
+
+// 工具函数：切换单元格显示时间/几血 还是 显示凶手
+function toggleCellContent(cell, showKiller) {
+    if (!cell) return;
+    if (showKiller) {
+        cell.innerHTML = cell.getAttribute('data-killer-name');
+        cell.style.backgroundColor = cell.getAttribute('data-killer-color');
+        cell.style.color = '#ffffff'; // 凶手名字统一白色
+    } else {
+        cell.innerHTML = cell.getAttribute('data-orig-text');
+        cell.style.backgroundColor = cell.getAttribute('data-orig-bg');
+        cell.style.color = cell.getAttribute('data-orig-color');
+    }
+}
+
+// ----------------------------------------------------
+// 【核心画笔 1】时间数据大模块 (图1)
+// ----------------------------------------------------
+window.renderTimeDataSection = function() {
+    const sec = document.getElementById('timeDataSection');
+    const historyTable = document.getElementById('timeHistoryTable');
+    const detailTable = document.getElementById('timeDetailTable');
+    if (!sec || !historyTable || !detailTable) return;
+
+    const active = gameData.players.filter(p => p.isActive);
+    if (active.length === 0 || viewRounds.length === 0) {
+        sec.classList.add('hidden');
+        return;
+    }
+    sec.classList.remove('hidden');
+
+    // 1. 统计历史数据
+    let tStats = {};
+    active.forEach(p => {
+        tStats[p.id] = { 
+            fastestElim: Infinity, 
+            longestSurv: 0, 
+            totalSurv: 0, 
+            totalPart: 0 
+        };
+    });
+
+    viewRounds.forEach(r => {
+        let roundTime = (r.v2Stats && r.v2Stats.stopwatchTime) ? r.v2Stats.stopwatchTime : 0;
+        
+        active.forEach(p => {
+            // 如果分数存在，说明参与了本局
+            if (r.changes[p.id] !== undefined) {
+                tStats[p.id].totalPart += roundTime;
+                
+                let survTime = roundTime; // 默认存活时间等于本局总时间
+                // 如果被淘汰了，提取精准秒表时间
+                if (r.v2Stats && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]) {
+                    survTime = r.v2Stats.eliminationDetails[p.id].time || roundTime;
+                    if (survTime < tStats[p.id].fastestElim) tStats[p.id].fastestElim = survTime;
+                }
+                
+                tStats[p.id].totalSurv += survTime;
+                if (survTime > tStats[p.id].longestSurv) tStats[p.id].longestSurv = survTime;
+            }
+        });
+    });
+
+    // 统一样式类 (防断裂魔法边框)
+    const baseCell = "px-3 py-2 sm:py-3 border-r-[2px] sm:border-r-[2.5px] border-b-[2px] sm:border-b-[2.5px] border-[#5E4B8B]";
+    const stickyLeft = "sticky left-0 z-[30] bg-[#a7e6ce] text-[#5c4c8b]";
+    
+    // ================= 绘制历史数据表 =================
+    let hHtml = `
+    <thead class="sticky top-0 z-[40]">
+        <tr>
+            <th class="${baseCell} ${stickyLeft} shadow-[2px_0_0_#5E4B8B]"></th>
+            ${active.map(p => `<th class="${baseCell} text-white tracking-widest text-[12px] sm:text-[14px]" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
+        </tr>
+    </thead>
+    <tbody>
+        <!-- 最快淘汰 -->
+        <tr>
+            <td class="${baseCell} ${stickyLeft} bg-[#d9f2e6] shadow-[2px_0_0_#5E4B8B]">最快淘汰</td>
+            ${active.map(p => `<td class="${baseCell} bg-white text-[#fb2a53]">${formatSecToMMSS(tStats[p.id].fastestElim)}</td>`).join('')}
+        </tr>
+        <!-- 最长存活 -->
+        <tr>
+            <td class="${baseCell} ${stickyLeft} bg-[#e0ffc6] shadow-[2px_0_0_#5E4B8B]">最长存活</td>
+            ${active.map(p => `<td class="${baseCell} bg-white text-[#5c4c8b]">${formatSecToMMSS(tStats[p.id].longestSurv)}</td>`).join('')}
+        </tr>
+        <!-- 总存活 -->
+        <tr>
+            <td class="${baseCell} ${stickyLeft} bg-[#d9f2e6] shadow-[2px_0_0_#5E4B8B]">总存活</td>
+            ${active.map(p => `<td class="${baseCell} bg-white text-[#5c4c8b]">${formatSecToMMSS(tStats[p.id].totalSurv)}</td>`).join('')}
+        </tr>
+        <!-- 总参与 -->
+        <tr>
+            <td class="${baseCell} ${stickyLeft} bg-[#e0ffc6] shadow-[2px_0_0_#5E4B8B]">总参与</td>
+            ${active.map(p => `<td class="${baseCell} bg-white text-[#5c4c8b]">${formatSecToMMSS(tStats[p.id].totalPart)}</td>`).join('')}
+        </tr>
+    </tbody>`;
+    historyTable.innerHTML = hHtml;
+
+    // ================= 绘制详细轮次表 =================
+    let dHtml = `
+    <thead class="sticky top-0 z-[40]">
+        <tr>
+            <th class="${baseCell} ${stickyLeft} shadow-[2px_0_0_#5E4B8B]"></th>
+            ${active.map(p => `<th class="${baseCell} text-white tracking-widest text-[12px] sm:text-[14px]" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
+            <th class="${baseCell} sticky right-0 z-[30] bg-[#3AA5ED] text-white shadow-[-2px_0_0_#5E4B8B]">剩余<br>时间</th>
+        </tr>
+    </thead>
+    <tbody>`;
+
+    // 倒序遍历所有局数
+    [...viewRounds].reverse().forEach(r => {
+        let roundTime = (r.v2Stats && r.v2Stats.stopwatchTime) ? r.v2Stats.stopwatchTime : 0;
+        let remainTime = (r.v2Stats && r.v2Stats.timerRemainAtEnd !== undefined) ? r.v2Stats.timerRemainAtEnd : 480;
+        
+        // 剩余时间框逻辑
+        let remainBg = '#acbaca';
+        let remainText = formatSecToMMSS(remainTime);
+        let remainColor = '#ffffff';
+        
+        if (remainTime === 480) {
+            remainText = '未进入'; remainBg = '#8DA4D0';
+        } else if (remainTime <= 0) {
+            remainText = '耗尽'; remainBg = '#c00000';
+        } else {
+            // 倒计时颜色渐变：越少越红
+            let pct = remainTime / 480;
+            let red = Math.floor(255 * (1 - pct));
+            let green = Math.floor(255 * pct);
+            remainColor = `rgb(${red}, ${green}, 0)`;
+        }
+
+        dHtml += `<tr>`;
+        dHtml += `<td class="${baseCell} ${stickyLeft} bg-[#a7e6ce] shadow-[2px_0_0_#5E4B8B]">${r.round}</td>`;
+        
+        active.forEach(p => {
+            let tdText = '-'; let tdBg = '#d9e1f4'; let tdColor = '#5c4c8b';
+            let killerData = ''; // 存储凶手信息
+            
+            if (r.changes[p.id] !== undefined) {
+                // 胜利者
+                if (r.winner === p.id) {
+                    tdText = formatSecToMMSS(roundTime);
+                    tdBg = '#7bc365'; // 图1绿底
+                    tdColor = '#ffffff';
+                } 
+                // 淘汰者
+                else if (r.v2Stats && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]) {
+                    let survTime = r.v2Stats.eliminationDetails[p.id].time || roundTime;
+                    tdText = formatSecToMMSS(survTime);
+                    tdBg = '#ffffff';
+                    tdColor = '#fb2a53'; // 淘汰时间红色字体
+                    
+                    // 获取凶手信息用于十字光标
+                    let killerId = r.v2Stats.eliminationDetails[p.id].killerId;
+                    let kName = '自然'; let kColor = '#9CA3AF';
+                    if (killerId === p.id) { kName = '自尽'; kColor = p.color; }
+                    else if (killerId) {
+                        let kp = gameData.players.find(x => x.id === killerId);
+                        if (kp) { kName = kp.name.slice(-1); kColor = kp.color; }
+                    }
+                    killerData = `data-killer-name="${kName}" data-killer-color="${kColor}" data-orig-text="${tdText}" data-orig-bg="${tdBg}" data-orig-color="${tdColor}" onclick="handleSuperTableClick(this, 'timeDetailTable')" class="${baseCell} cursor-pointer transition-colors"`;
+                }
+            }
+            
+            if (killerData) {
+                dHtml += `<td ${killerData} style="background-color: ${tdBg}; color: ${tdColor};">${tdText}</td>`;
+            } else {
+                dHtml += `<td class="${baseCell}" style="background-color: ${tdBg}; color: ${tdColor};">${tdText}</td>`;
+            }
+        });
+
+        dHtml += `<td class="${baseCell} sticky right-0 z-[30] shadow-[-2px_0_0_#5E4B8B]" style="background-color: ${remainBg}; color: ${remainColor};">${remainText}</td>`;
+        dHtml += `</tr>`;
+    });
+
+    dHtml += `</tbody>`;
+    detailTable.innerHTML = dHtml;
+};
+
+// ----------------------------------------------------
+// 【核心画笔 2】淘汰顺位大模块 (图3)
+// ----------------------------------------------------
+window.renderEliminationOrderSection = function() {
+    const sec = document.getElementById('eliminationOrderSection');
+    const historyTable = document.getElementById('elimHistoryTable');
+    const detailTable = document.getElementById('elimDetailTable');
+    if (!sec || !historyTable || !detailTable) return;
+
+    const active = gameData.players.filter(p => p.isActive);
+    if (active.length === 0 || viewRounds.length === 0) {
+        sec.classList.add('hidden');
+        return;
+    }
+    sec.classList.remove('hidden');
+
+    // 血液层级渐变色 (从深红到浅粉)
+    const bloodColors = ['#800000', '#b30000', '#cc0000', '#e60000', '#ff1a1a', '#ff4d4d', '#ff8080', '#ffb3b3'];
+    const bloodNames = ['一血', '二血', '三血', '四血', '五血', '六血', '七血', '八血'];
+
+    // 1. 统计几血数据
+    let bStats = {};
+    active.forEach(p => {
+        bStats[p.id] = { bloods: Array(active.length).fill(0), firstBloodCount: 0 };
+    });
+
+    viewRounds.forEach(r => {
+        if (r.v2Stats && r.v2Stats.eliminationEvents) {
+            r.v2Stats.eliminationEvents.forEach((group, index) => {
+                group.forEach(pid => {
+                    if (bStats[pid]) {
+                        bStats[pid].bloods[index]++;
+                        if (index === 0) bStats[pid].firstBloodCount++;
+                    }
+                });
+            });
+        }
+    });
+
+    // 按照一血次数由高到低排序玩家 (图3要求)
+    const sortedPlayers = [...active].sort((a, b) => bStats[b.id].firstBloodCount - bStats[a.id].firstBloodCount);
+
+    const baseCell = "px-3 py-2 sm:py-3 border-r-[2px] sm:border-r-[2.5px] border-b-[2px] sm:border-b-[2.5px] border-[#5E4B8B]";
+    const stickyLeft = "sticky left-0 z-[30] bg-[#a7e6ce] text-[#5c4c8b]";
+
+    // ================= 绘制历史数据表 =================
+    let hHtml = `
+    <thead class="sticky top-0 z-[40]">
+        <tr>
+            <th class="${baseCell} ${stickyLeft} shadow-[2px_0_0_#5E4B8B]"></th>
+            ${sortedPlayers.map(p => `<th class="${baseCell} text-white tracking-widest text-[12px] sm:text-[14px]" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
+        </tr>
+    </thead>
+    <tbody>`;
+
+    // 动态生成行，只生成到有效击杀层级
+    const maxBloodLevel = Math.min(active.length - 1, bloodNames.length);
+    for (let i = 0; i < maxBloodLevel; i++) {
+        // 找出这一行的最大值以便高亮
+        let maxVal = -1;
+        let maxCount = 0;
+        sortedPlayers.forEach(p => {
+            let val = bStats[p.id].bloods[i];
+            if (val > maxVal) { maxVal = val; maxCount = 1; }
+            else if (val === maxVal) { maxCount++; }
+        });
+        // 按照图3要求：如果有两人次数一样最多，均不高亮
+        let highlightVal = maxCount === 1 ? maxVal : -1;
+
+        hHtml += `<tr>`;
+        hHtml += `<td class="${baseCell} ${stickyLeft} text-white shadow-[2px_0_0_#5E4B8B]" style="background-color: ${bloodColors[i]};">${bloodNames[i]}</td>`;
+        
+        sortedPlayers.forEach(p => {
+            let val = bStats[p.id].bloods[i];
+            let cellText = val === 0 ? '-' : val;
+            let bgColor = '#ffffff';
+            let textColor = '#5E4B8B';
+            
+            // 高亮逻辑 (浅粉底，红字)
+            if (val === highlightVal && val > 0) {
+                bgColor = '#fca5a5';
+                textColor = '#b91c1c';
+            }
+            hHtml += `<td class="${baseCell}" style="background-color: ${bgColor}; color: ${textColor};">${cellText}</td>`;
+        });
+        hHtml += `</tr>`;
+    }
+    hHtml += `</tbody>`;
+    historyTable.innerHTML = hHtml;
+
+    // ================= 绘制详细轮次表 =================
+    let dHtml = `
+    <thead class="sticky top-0 z-[40]">
+        <tr>
+            <th class="${baseCell} ${stickyLeft} shadow-[2px_0_0_#5E4B8B]"></th>
+            ${sortedPlayers.map(p => `<th class="${baseCell} text-white tracking-widest text-[12px] sm:text-[14px]" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
+            <th class="${baseCell} sticky right-[45px] sm:right-[55px] z-[30] bg-[#50ff21] text-white shadow-[-2px_0_0_#5E4B8B]">复活</th>
+            <th class="${baseCell} sticky right-0 z-[30] bg-[#ff0000] text-white shadow-[-2px_0_0_#5E4B8B]">被毒</th>
+        </tr>
+    </thead>
+    <tbody>`;
+
+    let poisonMethodName = typeof window.getSpecialMethodName === 'function' ? window.getSpecialMethodName('lose', 3) : '特殊淘汰3(未设置)';
+
+    [...viewRounds].reverse().forEach(r => {
+        dHtml += `<tr>`;
+        dHtml += `<td class="${baseCell} ${stickyLeft} bg-[#a7e6ce] shadow-[2px_0_0_#5E4B8B]">${r.round}</td>`;
+        
+        let elimEvents = (r.v2Stats && r.v2Stats.eliminationEvents) ? r.v2Stats.eliminationEvents : [];
+        let elimDetails = (r.v2Stats && r.v2Stats.eliminationDetails) ? r.v2Stats.eliminationDetails : {};
+        
+        let poisonedPlayerName = '-'; let poisonedBg = '#aeaaaa'; let poisonedColor = '#ffffff';
+        let revivedPlayerName = '-'; let revivedBg = '#aeaaaa'; let revivedColor = '#ffffff';
+
+        // 提取复活者
+        if (r.v2Stats && r.v2Stats.revivedPlayerId) {
+            let rp = gameData.players.find(x => x.id === r.v2Stats.revivedPlayerId);
+            if (rp) { revivedPlayerName = rp.name.slice(-1); revivedBg = rp.color; }
+        }
+
+        sortedPlayers.forEach(p => {
+            let tdText = '-'; let tdBg = '#d9e1f4'; let tdColor = '#5c4c8b';
+            let killerData = '';
+            
+            if (r.changes[p.id] !== undefined) {
+                if (r.winner === p.id) {
+                    tdText = '胜'; tdBg = '#7bc365'; tdColor = '#ffffff';
+                } else if (r.v2Stats && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]) {
+                    // 查找该玩家在第几血
+                    let bIndex = elimEvents.findIndex(group => group.includes(p.id));
+                    if (bIndex >= 0) {
+                        tdText = bloodNames[bIndex] || `${bIndex+1}血`;
+                        tdBg = bloodColors[Math.min(bIndex, bloodColors.length - 1)];
+                        tdColor = '#ffffff';
+                    }
+
+                    // 检查是否被毒
+                    if (r.v2Stats.eliminated[p.id] === poisonMethodName) {
+                        poisonedPlayerName = p.name.slice(-1); poisonedBg = p.color;
+                    }
+
+                    // 获取凶手信息用于十字光标
+                    let killerId = elimDetails[p.id] ? elimDetails[p.id].killerId : null;
+                    let kName = '自然'; let kColor = '#9CA3AF';
+                    if (killerId === p.id) { kName = '自尽'; kColor = p.color; }
+                    else if (killerId) {
+                        let kp = gameData.players.find(x => x.id === killerId);
+                        if (kp) { kName = kp.name.slice(-1); kColor = kp.color; }
+                    }
+                    killerData = `data-killer-name="${kName}" data-killer-color="${kColor}" data-orig-text="${tdText}" data-orig-bg="${tdBg}" data-orig-color="${tdColor}" onclick="handleSuperTableClick(this, 'elimDetailTable')" class="${baseCell} cursor-pointer transition-colors"`;
+                }
+            }
+
+            if (killerData) {
+                dHtml += `<td ${killerData} style="background-color: ${tdBg}; color: ${tdColor};">${tdText}</td>`;
+            } else {
+                dHtml += `<td class="${baseCell}" style="background-color: ${tdBg}; color: ${tdColor};">${tdText}</td>`;
+            }
+        });
+
+        // 渲染复活和被毒竖列
+        dHtml += `<td class="${baseCell} sticky right-[45px] sm:right-[55px] z-[30] shadow-[-2px_0_0_#5E4B8B]" style="background-color: ${revivedBg}; color: ${revivedColor};">${revivedPlayerName}</td>`;
+        dHtml += `<td class="${baseCell} sticky right-0 z-[30] shadow-[-2px_0_0_#5E4B8B]" style="background-color: ${poisonedBg}; color: ${poisonedColor};">${poisonedPlayerName}</td>`;
+        
+        dHtml += `</tr>`;
+    });
+
+    dHtml += `</tbody>`;
+    detailTable.innerHTML = dHtml;
+};
+// ====================================================================
+
+// 把这两个渲染函数绑定到全局 UI 更新链条中
+const prevRenderTimeData = window.updateAllUI;
+window.updateAllUI = function() {
+    if (prevRenderTimeData) prevRenderTimeData();
+    if (typeof window.renderTimeDataSection === 'function') window.renderTimeDataSection();
+    if (typeof window.renderEliminationOrderSection === 'function') window.renderEliminationOrderSection();
+};
 
 // ==========================================
 // 【全新重建】1V1-擂台区 核心渲染画笔 (像素级完美复刻)
@@ -6755,371 +7267,180 @@ function checkResetTimer() {
 }
 
 // ==========================================
-// 6. 渲染统计表格 (双视图完美整合版)
-// ==========================================
-// 控制视图的全局变量 (2 = 全新像素级复刻视图, 1 = 卡片视图, 0 = 列表视图)
-window.methodStatViewMode = 1;
+        // 6. 渲染统计表格 (图1 像素级复刻版)
+        // ==========================================
+        window.toggleMethodStatView = function() {
+            // 彻底废弃旧的视图切换，保留空壳防报错
+            if(typeof renderMethodStatsTable === 'function') renderMethodStatsTable();
+        };
 
-// 绑定给 HTML 按钮的切换视图函数 (3种视图循环切换)
-window.toggleMethodStatView = function() {
-    window.methodStatViewMode = (window.methodStatViewMode + 1) % 3;
-    if(typeof renderMethodStatsTable === 'function') renderMethodStatsTable();
-};
+        function renderMethodStatsTable() {
+            if(!gameData.methodStats) gameData.methodStats = { win: {}, lose: {} };
+            let totalWins = Object.values(gameData.methodStats.win).reduce((a,b)=>a+b, 0);
+            let totalLoses = Object.values(gameData.methodStats.lose).reduce((a,b)=>a+b, 0);
 
-function renderMethodStatsTable() {
-    if(!gameData.methodStats) gameData.methodStats = { win: {}, lose: {} };
-    let totalWins = Object.values(gameData.methodStats.win).reduce((a,b)=>a+b, 0);
-    let totalLoses = Object.values(gameData.methodStats.lose).reduce((a,b)=>a+b, 0);
+            const winContainer = document.getElementById('newWinStatsList');
+            const loseContainer = document.getElementById('newLoseStatsList');
+            if(!winContainer || !loseContainer) return;
 
-    const winContainer = document.getElementById('newWinStatsList');
-    const loseContainer = document.getElementById('newLoseStatsList');
-    if(!winContainer || !loseContainer) return;
-
-    // 找到 HTML 里那个并排的旧白色大画框
-    const dualBox = winContainer.parentElement.parentElement;
-
-    // 小工具 1：获取方式对应分类的颜色
-    const getCatColor = (methodName, type) => {
-        let defaultColor = '#A1A1AA'; 
-        if (!gameData.customMethods) return defaultColor;
-        let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
-        let item = data.items.find(i => i.name === methodName);
-        if (!item) {
-            data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
-            item = data.items.find(i => i.name === methodName);
-        }
-        if (item) {
-            let cat = data.categories.find(c => c.id === item.categoryId);
-            if (cat) return cat.color;
-        }
-        return defaultColor;
-    };
-
-    // 小工具 2：获取方式对应的图片
-    const getMethodUrl = (methodName, type) => {
-        let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23ffffff'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
-        if (!gameData.customMethods) return defaultUrl;
-        let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
-        let item = data.items.find(i => i.name === methodName);
-        if (!item) {
-            data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
-            item = data.items.find(i => i.name === methodName);
-        }
-        return item && item.url ? item.url : defaultUrl;
-    };
-
-    // 小工具 3：寻找经历过该方式最多次的玩家
-    const getTopPlayer = (methodName, type) => {
-        let maxVal = 0; let topP = null;
-        const active = gameData.players.filter(p => p.isActive);
-        active.forEach(p => {
-            let val = type === 'win' ? (p.winMethods[methodName] || 0) : (p.loseMethods[methodName] || 0);
-            if (val > maxVal) { maxVal = val; topP = p; }
-        });
-        return topP;
-    };
-
-    const buildOldRows = (statsObj, total, type) => {
-        let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
-        if (keys.length === 0) return '<div class="text-center text-gray-400 font-bold text-[10px] sm:text-xs py-2">暂无数据</div>';
-        let numColor = type === 'win' ? '#16a34a' : '#dc2626'; 
-        return keys.map(m => {
-            let count = statsObj[m];
-            let pct = total > 0 ? Math.round((count / total) * 100) + '%' : '0%';
-            let bgColor = getCatColor(m, type);
-            return `
-            <div class="flex items-stretch border-[2px] sm:border-[3px] border-[#5E4B8B] rounded-[0.5rem] overflow-hidden bg-white shadow-sm h-7 sm:h-9 method-stat-row cursor-pointer hover:scale-[1.02] transition-transform shrink-0" data-method="${m}" data-type="${type}">
-                <div class="w-[45%] flex items-center justify-center border-r-[2px] sm:border-[3px] border-[#5E4B8B] font-black text-[#5E4B8B] text-[10px] sm:text-[13px] tracking-widest px-1 truncate" style="background-color: ${bgColor};">${m}</div>
-                <div class="w-[30%] flex items-center justify-center border-r-[2px] sm:border-[3px] border-[#5E4B8B] font-black text-[16px] sm:text-[20px]" style="color: ${numColor}; line-height: 1;">${count}</div>
-                <div class="w-[25%] flex items-center justify-center font-black text-[#5E4B8B] text-[9px] sm:text-[12px]">${pct}</div>
-            </div>`;
-        }).join('');
-    };
-
-    const buildNewCardRows = (statsObj, total, type) => {
-        let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
-        if (keys.length === 0) return '<div class="text-center text-gray-400 font-bold text-[10px] sm:text-xs py-2">暂无数据</div>';
-        let numColor = type === 'win' ? '#16a34a' : '#dc2626'; 
-        return keys.map(m => {
-            let count = statsObj[m];
-            let pct = total > 0 ? Math.round((count / total) * 100) + '%' : '0%';
-            let bgColor = getCatColor(m, type);
-            let imgUrl = getMethodUrl(m, type);
-            let topPlayer = getTopPlayer(m, type);
-            let pName = topPlayer && topPlayer.name ? topPlayer.name.slice(-1) : '?';
-            let pColor = topPlayer ? topPlayer.color : '#9CA3AF';
-
-            return `
-            <div class="flex border-[3px] border-[#5E4B8B] bg-white rounded-[0.5rem] p-1 gap-1.5 method-stat-row cursor-pointer hover:scale-[1.02] transition-transform shadow-[0_2px_0_#5E4B8B] h-[65px] sm:h-[80px] shrink-0" data-method="${m}" data-type="${type}">
-                <div class="w-[48px] sm:w-[60px] h-full border-[2px] border-[#5E4B8B] rounded-sm overflow-hidden bg-white shrink-0 flex items-center justify-center relative p-[1px]">
-                    <img src="${imgUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
-                </div>
-                <div class="flex-1 flex flex-col justify-between gap-0.5 min-w-0 h-full">
-                    <div class="border-[2px] border-[#5E4B8B] rounded-[4px] flex items-center justify-center py-[2px] sm:py-0.5 px-1 w-full shadow-[0_1px_0_#5E4B8B]" style="background-color: ${bgColor};">
-                        <span class="font-black text-[#5E4B8B] text-[10px] sm:text-xs truncate tracking-widest leading-none drop-shadow-sm">${m}</span>
-                    </div>
-                    <div class="flex border-[2px] border-[#5E4B8B] rounded-[4px] overflow-hidden bg-white w-full h-6 sm:h-7 shadow-[0_1px_0_#5E4B8B]">
-                        <div class="w-[35%] flex items-center justify-center font-black text-[12px] sm:text-[14px] border-r-[2px] border-[#5E4B8B] leading-none" style="color: ${numColor};">${count}</div>
-                        <div class="flex-1 flex items-center justify-center font-black text-[9px] sm:text-[11px] text-[#9BA4C5] border-r-[2px] border-[#5E4B8B] leading-none">${pct}</div>
-                        <div class="w-6 sm:w-8 flex items-center justify-center font-black text-[10px] sm:text-[12px] text-white text-stroke leading-none" style="background-color: ${pColor};">${pName}</div>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-    };
-
-    // ==============================================================
-    // 🎨 全新画笔：图1完美复刻视图 (View Mode 2) 
-    // ==============================================================
-    const buildUltimateView = (statsObj, type) => {
-        let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
-        if (keys.length === 0) return ''; 
-        
-        let titleText = type === 'win' ? '胜利方式统计' : '淘汰方式统计';
-        let themeColor = type === 'win' ? '#70bf30' : '#ff2534';
-        
-        let cardsHtml = keys.map(m => {
-            let count = statsObj[m];
-            let imgUrl = getMethodUrl(m, type);
-            
-            return `
-            <!-- 
-              ========================================================
-              【UI参数调节面板：容器3 (单个卡牌总容器)】
-              * 宽度控制：w-[10.5vw] (根据手机屏幕百分比分配，保证一页正好露出8个)
-              * 宽度保护：min-w-[38px] max-w-[55px] (防止缩得太小或被拉得太大)
-              * 间距控制：gap-[4px] sm:gap-1.5 (图片和底部次数胶囊之间的垂直距离)
-              ========================================================
-            -->
-            <div class="flex flex-col items-center gap-[6px] sm:gap-4 shrink-0 w-[10.5vw] min-w-[38px] max-w-[55px] sm:w-[55px] method-stat-row cursor-pointer hover:scale-105 transition-transform" data-method="${m}" data-type="${type}">
+            // 【核心防裂开逻辑】：智能抓取对应的图片 URL
+            // 哪怕是剩最后两人，胜者继承了对面的自尽淘汰方式，也能顺藤摸瓜找回去，绝不裂图！
+            const getMethodUrl = (methodName, t) => {
+                let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+                if (!gameData.customMethods) return defaultUrl;
                 
-                <!-- 
-                  【UI参数调节面板：容器3-1 (图片展示区)】
-                  * 形状比例：aspect-[2/3] (经典修长的卡牌比例)
-                  * 边框描边：border-[2px] sm:border-[2.5px] 颜色：border-[#5E4B8B] 
-                  * 圆角大小：rounded-[4px] sm:rounded-[6px]
-                  * 底部投影：shadow-[0_4px_0_#5E4B8B] (厚重的紫色阴影，4px厚)
-                  * 溢出隐藏：overflow-hidden (极其重要！确保等比缩放的图片被切成圆角)
-                  * 图片缩放模式：object-contain (核心逻辑！确保图片等比缩放贴合边缘且不被乱切)
-                -->
-                <div class="w-full aspect-[2/3] bg-white border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[4px] sm:rounded-[6px] shadow-[0_4px_0_#5E4B8B] overflow-hidden flex items-center justify-center ">
-                    <img src="${imgUrl}" class="w-full h-full object-cover" crossorigin="anonymous">
-                </div>
+                // 1. 先去它原本对应的库里找
+                let data = t === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+                let item = data.items.find(i => i.name === methodName);
                 
-                <!-- 
-                  【UI参数调节面板：容器3-2 (次数显示胶囊)】
-                  * 形状：rounded-full (完美胶囊形状)
-                  * 描边：border-[2px] 颜色：border-[#5E4B8B]
-                  * 投影：shadow-[0_4px_0_#5E4B8B]
-                  * 字体：text-white (纯白文字无描边), text-[10px] sm:text-xs (字号)
-                  * 高度：h-[16px] sm:h-[22px] (强制固定高度，不被文字撑破)
-                -->
-                <div class="w-full h-[16px] sm:h-[22px] rounded-full border-[2px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B] flex items-center justify-center" style="background-color: ${themeColor};">
-                    <span class="text-white font-black text-[11px] sm:text-[13px] leading-none transform translate-y-[0.5px]">${count}</span>
-                </div>
-            </div>`;
-        }).join('');
+                // 2. 如果找不到，立刻去隔壁库里抓图！
+                if (!item) {
+                    let otherData = t === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+                    item = otherData.items.find(i => i.name === methodName);
+                }
+                return item && item.url ? item.url : defaultUrl;
+            };
 
-        return `
-        <!-- 
-          ========================================================
-          【整体大板块包裹器 (标题 + 大白框)】
-          * 外边距：mb-6 sm:mb-8 (与下一个板块拉开间距)
-          ========================================================
-        -->
-        <div class="flex flex-col items-center w-full mb-6 px-1 sm:px-2">
-            
-            <!-- 
-              【UI参数调节面板：容器1 (大标题胶囊)】
-              * 内边距：px-8 py-1 sm:py-1.5 (控制胶囊的胖瘦长短)
-              * 描边：border-[3px] 颜色：border-[#5E4B8B]
-              * 投影：shadow-[0_4px_0_#5E4B8B]
-              * 字体：text-white (纯白无描边)
-              * 间距：mb-3 sm:mb-4 (与下方容器2的距离)
-            -->
-            <div class="border-[3px] border-[#5E4B8B] rounded-full px-8 sm:px-12 py-1 sm:py-1.5 shadow-[0_4px_0_#5E4B8B] mb-3 sm:mb-4 z-10" style="background-color: ${themeColor};">
-                <span class="font-black text-white text-[15px] sm:text-[18px] tracking-widest leading-none">${titleText}</span>
-            </div>
-            
-            <!-- 
-              【UI参数调节面板：容器2 (容纳卡牌的白色外边框容器)】
-              * 颜色：bg-white
-              * 圆角：rounded-[1rem] sm:rounded-2xl
-              * 描边：border-[3px] sm:border-[4px] 颜色：border-[#5E4B8B]
-              * 投影：shadow-[0_4px_0_#5E4B8B]
-              * 内填充：p-2 sm:p-3 (框边界与内部卡牌的距离)
-            -->
-            <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-2xl shadow-[0_4px_0_#5E4B8B] p-2 sm:p-3">
-                <!-- 
-                  【滑动轨道控制 (容纳容器3)】
-                  * 允许手机原生横滑，但隐藏难看滚动条：overflow-x-auto scrollbar-hide
-                  * 元素间距：gap-[5px] sm:gap-2 (卡片之间的横向距离)
-                  * 底部留白：pb-[6px] (极其重要！给卡片底部的4px投影留出空间，防止被残忍切断)
-                -->
-                <div class="flex items-start justify-start gap-[5px] sm:gap-2 w-full overflow-x-auto scrollbar-hide pb-[6px] px-0.5">
-                    ${cardsHtml}
-                </div>
-            </div>
-        </div>`;
-    };
+            // 生成单独一列（胜/负）内部的所有小卡牌 HTML
+            const buildList = (statsObj, total, type) => {
+                // 按照次数从多到少排序
+                let keys = Object.keys(statsObj).sort((a,b) => statsObj[b] - statsObj[a]);
+                if (keys.length === 0) return '';
+                
+                // 严格遵循图片色号：胜利绿色，淘汰红色
+                let numColor = type === 'win' ? '#1f8316' : '#fb2a53'; 
 
-    // -----------------------------------------------------------
-    // 视图切换调度中心
-    // -----------------------------------------------------------
-    if (window.methodStatViewMode === 0 || window.methodStatViewMode === 1) {
-        dualBox.style.display = 'flex'; // 恢复原本的并排布局大框
-        let ultimateBox = document.getElementById('methodStatUltimateContainer');
-        if (ultimateBox) ultimateBox.style.display = 'none';
+                return keys.map(m => {
+                    let count = statsObj[m];
+                    let pct = total > 0 ? ((count / total) * 100).toFixed(1) + '%' : '0%';
+                    let imgUrl = getMethodUrl(m, type);
 
-        if (window.methodStatViewMode === 1) {
-            winContainer.innerHTML = buildNewCardRows(gameData.methodStats.win, totalWins, 'win');
-            loseContainer.innerHTML = buildNewCardRows(gameData.methodStats.lose, totalLoses, 'lose');
-        } else {
-            winContainer.innerHTML = buildOldRows(gameData.methodStats.win, totalWins, 'win');
-            loseContainer.innerHTML = buildOldRows(gameData.methodStats.lose, totalLoses, 'lose');
+                    return `
+                    <!-- 
+                      ========================================================
+                      【小白调节区：单个数据条目卡片】
+                      [圆角] rounded-[8px] (卡片的边缘弧度)
+                      [描边] border-[3px] border-[#5E4B8B] (紫色外框)
+                      [阴影] shadow-[0_4px_0_#5E4B8B] (厚重的底座)
+                      ========================================================
+                    -->
+                    <div class="flex items-center bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[6px] sm:rounded-[8px] shadow-[0_4px_0_#5E4B8B] overflow-hidden cursor-pointer active:translate-y-1 active:shadow-none transition-all method-stat-row shrink-0 p-1.5 sm:p-2 gap-2 sm:gap-3" data-method="${m}" data-type="${type}">
+                        
+                        <!-- 
+                          左侧：卡牌图片展示区 
+                          [bg-[#111111]] 黑底，让图片嵌在黑框里
+                          [aspect-[2/3]] 强行控制比例为经典的卡牌比例
+                        -->
+                        <div class="w-[45px] sm:w-[55px] aspect-[2/3] border-[2.5px] border-[#5E4B8B] rounded-[6px] overflow-hidden bg-[#111111] shrink-0 flex items-center justify-center">
+                            <img src="${imgUrl}" class="w-full h-full object-contain" crossorigin="anonymous">
+                        </div>
+
+                        <!-- 右侧：文字与数据区 -->
+                        <div class="flex-1 flex flex-col justify-center min-w-0 pr-1">
+                            <!-- 次数 (极其巨大的字体) -->
+                            <div class="flex items-baseline leading-none mb-1">
+                                <span class="font-black text-[30px] sm:text-[36px] tracking-tighter" style="color: ${numColor};">${count}</span>
+                                <span class="font-black text-[13px] sm:text-[15px] ml-[2px] pb-[4px]" style="color: ${numColor};">次</span>
+                            </div>
+                            <!-- 百分比 -->
+                            <div class="font-black text-[14px] sm:text-[16px] leading-none tracking-tight" style="color: #5c4c8b;">
+                                ${pct}
+                            </div>
+                        </div>
+                        
+                    </div>`;
+                }).join('');
+            };
+
+            winContainer.innerHTML = buildList(gameData.methodStats.win, totalWins, 'win');
+            loseContainer.innerHTML = buildList(gameData.methodStats.lose, totalLoses, 'lose');
         }
-    } else if (window.methodStatViewMode === 2) {
-        dualBox.style.display = 'none'; // 彻底隐藏原本的并排布局大框
-
-        let ultimateBox = document.getElementById('methodStatUltimateContainer');
-        if (!ultimateBox) {
-            // 如果是第一次进入视图2，动态创建一个专属于它的容器
-            ultimateBox = document.createElement('div');
-            ultimateBox.id = 'methodStatUltimateContainer';
-            ultimateBox.className = 'w-full flex flex-col mt-2';
-            dualBox.parentElement.appendChild(ultimateBox);
-        }
-        ultimateBox.style.display = 'flex';
-        // 依次画出 胜利板块 和 淘汰板块
-        ultimateBox.innerHTML = buildUltimateView(gameData.methodStats.win, 'win') + buildUltimateView(gameData.methodStats.lose, 'lose');
-    }
-}
 
 // 7. 绑定所有的V2点击事件
 function bindV2Events() {
-// 【新增】监听结算方式统计表格的点击，弹出详细数据
-    const statSection = document.getElementById('methodStatSection');
-    if (statSection) {
-        statSection.addEventListener('click', e => {
-            const row = e.target.closest('.method-stat-row');
-            if(!row) return;
-            
-            const method = row.dataset.method;
-            const type = row.dataset.type; // 'win' 或 'lose'
-            
-// 组装数据 (图1复刻版)
-         const active = gameData.players.filter(p => p.isActive);
-         let playerCounts = {};
-         active.forEach(p => playerCounts[p.id] = 0);
-         let roundLogs =[];
+// ==========================================
+        // 【全新】监听统计卡片点击，弹出图2悬浮数据窗
+        // ==========================================
+        const statSection = document.getElementById('methodStatSection');
+        if (statSection) {
+            // 清理旧事件，防止重复触发
+            statSection.addEventListener('click', e => {
+                const row = e.target.closest('.method-stat-row');
+                if(!row) return;
+                
+                const method = row.dataset.method;
+                const type = row.dataset.type; // 'win' 或 'lose'
+                
+                // 1. 抓取被点击卡片的图片
+                let imgUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+                if (gameData.customMethods) {
+                    let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+                    let item = data.items.find(i => i.name === method);
+                    if (!item) {
+                        let otherData = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+                        item = otherData.items.find(i => i.name === method);
+                    }
+                    if (item && item.url) imgUrl = item.url;
+                }
 
-         // 小工具：获取玩家名字缩写(取最后一个字，像图1里那样单字显示)
-         const getShortName = (name) => name ? name.slice(-1) : '?';
+                // 将图片注入到顶部的悬浮画框中
+                const imgEl = document.getElementById('methodDetailImg');
+                if(imgEl) imgEl.src = imgUrl;
 
-         viewRounds.forEach(r => {
-             if(!r.v2Stats) return;
-             let affected = false;
-             let pData = {};
+                // 2. 统计每个玩家使用这个方式的次数
+                const active = gameData.players.filter(p => p.isActive);
+                let playerCounts = {};
+                active.forEach(p => playerCounts[p.id] = 0);
 
-             active.forEach(p => {
-                 pData[p.id] =[]; // 用数组装，支持同一局被淘汰多次并列显示
-                 
-                 // 如果是胜利方式
-                 if (type === 'win' && r.v2Stats.winMethod === method && r.winner === p.id) {
-                     affected = true;
-                     playerCounts[p.id]++;
-                     pData[p.id].push({ name: '胜', color: '#3B82F6' });
-                 }
-                 // 如果是淘汰方式
-                 else if (type === 'lose' && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id] === method) {
-                     affected = true;
-                     playerCounts[p.id]++;
-                     
-                     // 寻找是谁干掉了他
-                     let kName = '自'; let kColor = '#9CA3AF'; // 默认自然淘汰
-                     if (r.v2Stats.eliminationDetails && r.v2Stats.eliminationDetails[p.id] && r.v2Stats.eliminationDetails[p.id].killerId) {
-                         let kP = gameData.players.find(x => x.id === r.v2Stats.eliminationDetails[p.id].killerId);
-                         if (kP) { 
-                             kName = getShortName(kP.name); // 提取凶手最后一个字
-                             kColor = kP.color;             // 提取凶手颜色
-                         }
-                     }
-                     pData[p.id].push({ name: kName, color: kColor });
-                 }
-             });
+                viewRounds.forEach(r => {
+                    if(!r.v2Stats) return;
+                    active.forEach(p => {
+                        if (type === 'win' && r.v2Stats.winMethod === method && r.winner === p.id) {
+                            playerCounts[p.id]++;
+                        }
+                        else if (type === 'lose' && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id] === method) {
+                            playerCounts[p.id]++;
+                        }
+                    });
+                });
 
-             if (affected) {
-                 roundLogs.push({ round: r.round, data: pData });
-             }
-         });
+                // 3. 构建图2同款玩家数据连体网格
+                const getShortName = (name) => name ? name.slice(-1) : '?';
+                
+                let gridHtml = active.map((p, idx) => {
+                    let isLast = idx === active.length - 1;
+                    // 只要不是最后一个格子，右边就加一根紫色的隔断线
+                    let borderClass = isLast ? '' : 'border-r-[2.5px] border-[#5E4B8B]';
+                    
+                    return `
+                    <div class="flex flex-col min-w-[50px] sm:min-w-[65px] flex-1 ${borderClass} shrink-0">
+                        <!-- 上半部：玩家代表色底，白字单名 -->
+                        <div class="w-full py-1.5 sm:py-2 flex items-center justify-center border-b-[2.5px] border-[#5E4B8B]" style="background-color: ${p.color};">
+                            <span class="font-black text-white text-stroke tracking-widest text-[14px] sm:text-[16px] leading-none pb-[1px]">${getShortName(p.name)}</span>
+                        </div>
+                        <!-- 下半部：白底，红色巨大数字 -->
+                        <div class="w-full py-2 flex items-center justify-center bg-white">
+                            <span class="font-black text-[#E11D48] text-[18px] sm:text-[22px] leading-none">${playerCounts[p.id]}</span>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
 
-         // 设置标题内容 (标题外观已在HTML里写死为红底白字)
-         els.methodDetailTitle.textContent = method;
+                // 注入并显示弹窗
+                const gridEl = document.getElementById('methodDetailPlayerGrid');
+                const dialogEl = document.getElementById('methodDetailDialog');
+                if(gridEl && dialogEl) {
+                    gridEl.innerHTML = gridHtml;
+                    dialogEl.classList.remove('hidden');
+                }
+            });
+        }
 
-         // 画图1所示的完美融合表格
-         let tHead = `<thead class="border-b-[4px] border-[#5E4B8B]">
-             <tr>
-                 <th class="py-1 px-1 border-r-[4px] border-[#5E4B8B] bg-[#6B7280] w-12 sm:w-16"></th>
-                 ${active.map(p => `
-                 <th class="py-1.5 px-1 border-r-[4px] border-[#5E4B8B] last:border-r-0" style="background-color: ${p.color};">
-                     <div class="flex flex-col items-center justify-center gap-0.5">
-                         <div class="w-4 h-4 sm:w-6 sm:h-6 rounded-[4px] sm:rounded-md border-2 border-[#5E4B8B] overflow-hidden bg-white shrink-0 shadow-sm"><img src="${p.avatar}" class="w-full h-full object-cover"></div>
-                         <span class="text-white font-black text-[10px] sm:text-[13px] text-stroke tracking-widest leading-none">${getShortName(p.name)}</span>
-                     </div>
-                 </th>`).join('')}
-             </tr>
-         </thead>`;
+        const closeBtn = document.getElementById('closeMethodDetailBtn');
+        if(closeBtn) {
+            closeBtn.onclick = () => document.getElementById('methodDetailDialog').classList.add('hidden');
+        }
 
-         let tBody = `<tbody>
-             <!-- 总次数行 -->
-             <tr class="border-b-[4px] border-[#5E4B8B] bg-white">
-                 <td class="py-2.5 px-1 border-r-[4px] border-[#5E4B8B] bg-[#93C5FD] text-[#5E4B8B] font-black text-[10px] sm:text-xs tracking-widest leading-tight">总次数</td>
-                 ${active.map(p => `
-                 <td class="py-2.5 px-1 border-r-[4px] border-[#5E4B8B] last:border-r-0 text-[#E11D48] font-black text-lg sm:text-xl">${playerCounts[p.id]}</td>
-                 `).join('')}
-             </tr>`;
-
-         if (roundLogs.length === 0) {
-             tBody += `<tr><td colspan="${active.length + 1}" class="py-6 text-gray-400 font-bold bg-white">暂无记录</td></tr>`;
-         } else {
-             // 倒序显示，最新轮次在上面，复刻图1的轮次行
-             roundLogs.reverse().forEach(log => {
-                 tBody += `<tr class="border-b-[4px] border-[#5E4B8B] last:border-b-0">
-                     <!-- 左侧轮次灰色框 -->
-                     <td class="py-1 px-1 border-r-[4px] border-[#5E4B8B] bg-[#9BA4C5] text-[#5E4B8B] font-black text-sm sm:text-lg opacity-90">${log.round}</td>
-                     ${active.map(p => {
-                         let events = log.data[p.id];
-                         
-                         // 没被淘汰：底色改绿色，打斜杠
-                         if (events.length === 0) {
-                             return `<td class="py-1 px-1 border-r-[4px] border-[#5E4B8B] last:border-r-0 bg-[#A3D977] text-[#2c3e50] font-black text-lg sm:text-xl leading-none">/</td>`;
-                         } 
-                         // 被淘汰：画红叉叉和凶手名字
-                         else {
-                             let iconsHtml = events.map(ev => `
-                                 <div class="relative w-6 h-6 sm:w-8 sm:h-8 mx-0.5 inline-flex items-center justify-center shrink-0">
-                                     <!-- 用代码画的加粗红叉，完美复刻不用图标 -->
-                                     <div class="absolute w-[110%] h-[3.5px] sm:h-[4.5px] bg-[#E11D48] rotate-45 rounded-sm shadow-sm"></div>
-                                     <div class="absolute w-[110%] h-[3.5px] sm:h-[4.5px] bg-[#E11D48] -rotate-45 rounded-sm shadow-sm"></div>
-                                     <!-- 叠加白色描边名字 -->
-                                     <span class="relative z-10 font-black text-[11px] sm:text-[14px] tracking-tighter" style="color: ${ev.color}; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 1.5px 0 #fff, 0 -1.5px 0 #fff, 1.5px 0 0 #fff, -1.5px 0 0 #fff;">${ev.name}</span>
-                                 </div>
-                             `).join('');
-                             return `<td class="py-1 px-0.5 border-r-[4px] border-[#5E4B8B] last:border-r-0 bg-white"><div class="flex items-center justify-center flex-wrap gap-x-1 gap-y-1">${iconsHtml}</div></td>`;
-                         }
-                     }).join('')}
-                 </tr>`;
-             });
-         }
-         tBody += `</tbody>`;
-
-         els.methodDetailPlayerTable.innerHTML = tHead + tBody;
-         
-         els.methodDetailDialog.classList.remove('hidden');
-        });
-    }
-
-    els.closeMethodDetailBtn.onclick = () => els.methodDetailDialog.classList.add('hidden');
 // 【新增】区间筛选弹窗的点击事件
         document.getElementById('sessionFilterList').addEventListener('click', e => {
             const btn = e.target.closest('.filter-opt-btn');
@@ -7507,357 +7828,6 @@ const mobileTabs = {
         window.addEventListener('load', () => setTimeout(deployMobileEngine, 100));
     }
 })();
-
-// ========================================================
-// 【图1/图2像素级复刻：时间数据 与 淘汰顺位 核心画笔】
-// ========================================================
-(function() {
-    // 辅助工具：将HEX颜色转为带透明度的RGBA（用于十字光标）
-    function getCrossRgba(hex, alpha) {
-        if (!hex) return `rgba(0,0,0,${alpha})`;
-        let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-    }
-
-    // 辅助工具：时间格式化 00:00
-    function fmtT(sec) {
-        if (sec === undefined || sec === null || isNaN(sec)) return '--:--';
-        return `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
-    }
-
-    let activeTimeCell = null;
-    let activeElimCell = null;
-
-    // 通用十字光标引擎
-    window.handleCrosshairClick = function(e, tableId, cellVarName) {
-        const cell = e.target.closest('td.data-cell');
-        const table = document.getElementById(tableId);
-        if (!table) return;
-
-        // 1. 恢复所有单元格的原始状态
-        table.querySelectorAll('td, th').forEach(td => {
-            td.classList.remove('cross-highlight');
-            if (td.dataset.origBg) {
-                td.style.backgroundColor = td.dataset.origBg;
-                td.innerHTML = td.dataset.origHtml;
-                delete td.dataset.origBg;
-            }
-        });
-
-        // 如果点的是同一个，或者点的不是数据格，就取消高亮，直接退出
-        if (!cell || cell === window[cellVarName]) {
-            window[cellVarName] = null;
-            return;
-        }
-
-        // 2. 施加十字光标高亮
-        window[cellVarName] = cell;
-        const rowIdx = cell.dataset.row;
-        const colIdx = cell.dataset.col;
-        const pColor = cell.dataset.pColor;
-
-        // 设置当前玩家的颜色作为十字光标底色 (40% 透明度)
-        table.style.setProperty('--cross-bg', getCrossRgba(pColor, 0.4));
-
-        table.querySelectorAll('td, th').forEach(td => {
-            if (td.dataset.row === rowIdx || td.dataset.col === colIdx) {
-                td.classList.add('cross-highlight');
-            }
-        });
-
-        // 3. 凶手显影魔法：替换当前格子的内容
-        if (cell.dataset.kName && cell.dataset.kName !== '无') {
-            cell.dataset.origBg = cell.style.backgroundColor;
-            cell.dataset.origHtml = cell.innerHTML;
-
-            cell.style.backgroundColor = cell.dataset.kColor;
-            cell.innerHTML = `<span class="font-black text-[12px] sm:text-[14px] leading-none text-white">${cell.dataset.kName}</span>`;
-        }
-    };
-
-    // =======================================
-    // 画笔 1：时间数据区域 (图1、图2)
-    // =======================================
-    window.renderTimeDataSection = function() {
-        const container = document.getElementById('timeDataSection');
-        if (!container) return;
-
-        const active = gameData.players.filter(p => p.isActive);
-        if (active.length === 0 || viewRounds.length === 0) {
-            container.innerHTML = '<div class="text-center text-[#5E4B8B] font-bold py-4">暂无数据</div>';
-            return;
-        }
-
-        // 1. 整理统计数据
-        let stats = {};
-        active.forEach(p => {
-            stats[p.id] = { fastElim: Infinity, longSurv: 0, totSurv: 0, games: 0 };
-        });
-
-        viewRounds.forEach(r => {
-            if (!r.v2Stats) return;
-            let rTime = r.v2Stats.timerRemainAtEnd !== undefined ? (480 - r.v2Stats.timerRemainAtEnd) : 0;
-            active.forEach(p => {
-                if (r.changes[p.id] !== undefined) {
-                    stats[p.id].games++;
-                    let sTime = rTime;
-                    if (r.v2Stats.eliminationDetails && r.v2Stats.eliminationDetails[p.id] && r.v2Stats.eliminationDetails[p.id].time !== undefined) {
-                        sTime = r.v2Stats.eliminationDetails[p.id].time;
-                    }
-                    stats[p.id].totSurv += sTime;
-                    if (sTime < stats[p.id].fastElim) stats[p.id].fastElim = sTime;
-                    if (sTime > stats[p.id].longSurv) stats[p.id].longSurv = sTime;
-                }
-            });
-        });
-
-        // ==== 上半部：历史数据 ====
-        let historyHtml = `
-        <div class="bg-[#6ca5eb] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-8 py-1 mb-2 shadow-[0_3px_0_#5E4B8B] z-10">
-            <span class="font-black text-white text-base sm:text-lg tracking-widest text-stroke">历史数据</span>
-        </div>
-        <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] p-1.5 sm:p-2 mb-4 shadow-[0_4px_0_#5E4B8B] overflow-x-auto scrollbar-hide">
-            <table class="v2-smooth-table text-center bg-white text-[12px] sm:text-[14px]">
-                <thead>
-                    <tr>
-                        <th class="pin-corner-tl bg-[#8DA4D0] w-[60px] sm:w-[70px]"></th>
-                        ${active.map(p => `<th class="py-1.5 px-2 font-black text-white text-stroke tracking-widest min-w-[50px] sm:min-w-[65px]" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="pin-left bg-[#E2E8F0] font-bold text-[#5E4B8B] py-1.5">最快淘汰</td>
-                        ${active.map(p => `<td class="font-black text-[#fb2a53] bg-white">${stats[p.id].fastElim === Infinity ? '-' : fmtT(stats[p.id].fastElim)}</td>`).join('')}
-                    </tr>
-                    <tr>
-                        <td class="pin-left bg-[#E2E8F0] font-bold text-[#5E4B8B] py-1.5">最长存活</td>
-                        ${active.map(p => `<td class="font-black text-[#5E4B8B] bg-white">${fmtT(stats[p.id].longSurv)}</td>`).join('')}
-                    </tr>
-                    <tr>
-                        <td class="pin-left bg-[#E2E8F0] font-bold text-[#5E4B8B] py-1.5">总存活</td>
-                        ${active.map(p => `<td class="font-black text-[#5E4B8B] bg-white">${fmtT(stats[p.id].totSurv)}</td>`).join('')}
-                    </tr>
-                    <tr>
-                        <td class="pin-left bg-[#E2E8F0] font-bold text-[#5E4B8B] py-1.5">总参与</td>
-                        ${active.map(p => `<td class="font-black text-[#5E4B8B] bg-white">${fmtT(stats[p.id].games)}</td>`).join('')}
-                    </tr>
-                </tbody>
-            </table>
-        </div>`;
-
-        // ==== 下半部：详细轮次 ====
-        let reversedRounds = [...viewRounds].reverse();
-        let detailsHtml = `
-        <div class="bg-[#fb2a53] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-8 py-1 mb-2 shadow-[0_3px_0_#5E4B8B] z-10">
-            <span class="font-black text-white text-base sm:text-lg tracking-widest text-stroke">详细轮次</span>
-        </div>
-        <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] p-1.5 sm:p-2 shadow-[0_4px_0_#5E4B8B] overflow-x-auto scrollbar-hide">
-            <div class="max-h-[350px] overflow-y-auto scrollbar-hide relative" style="--right-col-w: 60px;">
-                <table class="v2-smooth-table text-center bg-white text-[12px] sm:text-[14px]" id="timeDataDetailsTable">
-                    <thead>
-                        <tr>
-                            <th class="pin-corner-tl bg-[#8DA4D0] w-[30px] sm:w-[40px]"></th>
-                            ${active.map((p, cIdx) => `<th class="pin-top py-1.5 px-2 font-black text-white text-stroke tracking-widest min-w-[50px] sm:min-w-[65px]" data-col="${cIdx}" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
-                            <th class="pin-corner-tr1 bg-[#3AA5ED] text-white text-[10px] sm:text-xs font-black tracking-widest w-[60px] sm:w-[70px] leading-tight">剩余<br>时间</th>
-                        </tr>
-                    </thead>
-                    <tbody onclick="handleCrosshairClick(event, 'timeDataDetailsTable', 'activeTimeCell')">
-                        ${reversedRounds.map((r, rIdx) => {
-                            let remainSec = (r.v2Stats && r.v2Stats.timerRemainAtEnd !== undefined) ? r.v2Stats.timerRemainAtEnd : 480;
-                            let remainHtml = '';
-                            if (remainSec === 480) {
-                                remainHtml = `<td class="pin-right1 bg-[#d9e1f4] text-[#5E4B8B] font-black tracking-widest">未进入</td>`;
-                            } else if (remainSec === 0) {
-                                remainHtml = `<td class="pin-right1 bg-[#c00000] text-white font-black tracking-widest">耗尽</td>`;
-                            } else {
-                                let hue = (remainSec / 480) * 120;
-                                remainHtml = `<td class="pin-right1 font-black text-white text-stroke" style="background-color: hsl(${hue}, 80%, 45%);">${fmtT(remainSec)}</td>`;
-                            }
-
-                            return `
-                            <tr>
-                                <td class="pin-left bg-[#a7e6ce] text-[#5E4B8B] font-black" data-row="${rIdx}">${r.round}</td>
-                                ${active.map((p, cIdx) => {
-                                    let cHtml = ''; let kName = '无'; let kColor = '#000';
-                                    if (r.changes[p.id] === undefined) {
-                                        cHtml = `<td class="data-cell bg-[#d9e1f4] text-[#5E4B8B] font-black" data-row="${rIdx}" data-col="${cIdx}" data-p-color="${p.color}">-</td>`;
-                                    } else {
-                                        let sTime = 480 - remainSec;
-                                        if (r.v2Stats && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id]) {
-                                            sTime = r.v2Stats.eliminationDetails[p.id].time !== undefined ? r.v2Stats.eliminationDetails[p.id].time : sTime;
-                                            let kId = r.v2Stats.eliminationDetails[p.id].killerId;
-                                            if (kId === p.id) { kName = '自'; kColor = p.color; }
-                                            else if (kId) { let kp = gameData.players.find(x=>x.id===kId); if(kp){ kName = kp.name.slice(-1); kColor = kp.color; } }
-                                        }
-                                        let displayTime = fmtT(sTime);
-                                        // 【极其核心的颜色判断】：
-                                        // 根据图片：赢家是 白底+红字(fb2a53) 还是 红底+白字？
-                                        // “胜利玩家的信息区显示本局所消耗的时间 字体用白色。信息框底色用fb2a53” -> 红底白字
-                                        // “被淘汰玩家时间信息颜色用fb2a53” -> 白底红字
-                                        if (r.winner === p.id) {
-                                            cHtml = `<td class="data-cell font-black text-white cursor-pointer" style="background-color: #fb2a53;" data-row="${rIdx}" data-col="${cIdx}" data-p-color="${p.color}" data-k-name="${kName}" data-k-color="${kColor}">${displayTime}</td>`;
-                                        } else {
-                                            cHtml = `<td class="data-cell font-black text-[#fb2a53] bg-white cursor-pointer" data-row="${rIdx}" data-col="${cIdx}" data-p-color="${p.color}" data-k-name="${kName}" data-k-color="${kColor}">${displayTime}</td>`;
-                                        }
-                                    }
-                                    return cHtml;
-                                }).join('')}
-                                ${remainHtml}
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>
-        </div>`;
-
-        container.innerHTML = historyHtml + detailsHtml;
-    };
-
-    // =======================================
-    // 画笔 2：淘汰顺位区域 (图3、图4)
-    // =======================================
-    window.renderEliminationOrder = function() {
-        const container = document.getElementById('eliminationOrderSection');
-        if (!container) return;
-
-        const active = gameData.players.filter(p => p.isActive);
-        if (active.length === 0 || viewRounds.length === 0) {
-            container.innerHTML = '<div class="text-center text-[#5E4B8B] font-bold py-4">暂无数据</div>';
-            return;
-        }
-
-        // 1. 整理统计数据
-        let bloodCounts = {};
-        active.forEach(p => bloodCounts[p.id] = [0,0,0,0,0,0,0,0]);
-        const bloodNames = ['一血','二血','三血','四血','五血','六血','七血','八血'];
-        const bloodColors = ['#9c0a00', '#ba1b0f', '#d43024', '#eb483a', '#f5695d', '#fa8a82', '#ffaba6', '#ffcfcc'];
-
-        viewRounds.forEach(r => {
-            if (r.v2Stats && r.v2Stats.eliminationEvents) {
-                r.v2Stats.eliminationEvents.forEach((group, idx) => {
-                    if (idx < 8) group.forEach(id => { if (bloodCounts[id]) bloodCounts[id][idx]++; });
-                });
-            }
-        });
-
-        // 排序：按一血次数降序
-        let sortedActive = [...active].sort((a,b) => bloodCounts[b.id][0] - bloodCounts[a.id][0]);
-
-        // 找出每血最高值
-        let maxBloods = [0,0,0,0,0,0,0,0];
-        for(let i=0; i<8; i++) {
-            let counts = sortedActive.map(p => bloodCounts[p.id][i]);
-            let max = Math.max(...counts);
-            // 唯一最高才高亮，并列不高亮
-            if (max > 0 && counts.filter(x => x === max).length === 1) maxBloods[i] = max;
-        }
-
-        // ==== 上半部：历史数据 ====
-        let historyHtml = `
-        <div class="bg-[#6ca5eb] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-8 py-1 mb-2 shadow-[0_3px_0_#5E4B8B] z-10">
-            <span class="font-black text-white text-base sm:text-lg tracking-widest text-stroke">历史数据</span>
-        </div>
-        <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] p-1.5 sm:p-2 mb-4 shadow-[0_4px_0_#5E4B8B] overflow-x-auto scrollbar-hide">
-            <table class="v2-smooth-table text-center bg-white text-[12px] sm:text-[14px]">
-                <thead>
-                    <tr>
-                        <th class="pin-corner-tl bg-[#8DA4D0] w-[60px] sm:w-[70px]"></th>
-                        ${sortedActive.map(p => `<th class="py-1.5 px-2 font-black text-white text-stroke tracking-widest min-w-[50px] sm:min-w-[65px]" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${[0,1,2,3].map(i => `
-                    <tr>
-                        <td class="pin-left font-black text-white tracking-widest py-1.5 text-stroke" style="background-color: ${bloodColors[i]};">${bloodNames[i]}</td>
-                        ${sortedActive.map(p => {
-                            let count = bloodCounts[p.id][i];
-                            let isMax = count > 0 && count === maxBloods[i];
-                            let bg = isMax ? '#ffc000' : 'bg-white'; // 高亮黄色
-                            let txt = count === 0 ? '-' : count;
-                            return `<td class="font-black text-[#E11D48] ${isMax ? '' : 'bg-white'}" style="background-color: ${isMax ? '#ffc000' : 'white'};">${txt}</td>`;
-                        }).join('')}
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-        </div>`;
-
-        // ==== 下半部：详细轮次 ====
-        let reversedRounds = [...viewRounds].reverse();
-        let detailsHtml = `
-        <div class="bg-[#fb2a53] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full px-8 py-1 mb-2 shadow-[0_3px_0_#5E4B8B] z-10">
-            <span class="font-black text-white text-base sm:text-lg tracking-widest text-stroke">详细轮次</span>
-        </div>
-        <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] p-1.5 sm:p-2 shadow-[0_4px_0_#5E4B8B] overflow-x-auto scrollbar-hide">
-            <div class="max-h-[350px] overflow-y-auto scrollbar-hide relative" style="--right-col-w: 60px;">
-                <table class="v2-smooth-table text-center bg-white text-[12px] sm:text-[14px]" id="elimOrderDetailsTable">
-                    <thead>
-                        <tr>
-                            <th class="pin-corner-tl bg-[#8DA4D0] w-[30px] sm:w-[40px]"></th>
-                            ${sortedActive.map((p, cIdx) => `<th class="pin-top py-1.5 px-2 font-black text-white text-stroke tracking-widest min-w-[50px] sm:min-w-[65px]" data-col="${cIdx}" style="background-color: ${p.color};">${p.name.slice(-1)}</th>`).join('')}
-                            <th class="pin-corner-tr2 bg-[#50ff21] text-white font-black text-stroke tracking-widest min-w-[50px] sm:min-w-[60px]">复活</th>
-                            <th class="pin-corner-tr1 bg-[#ff0000] text-white font-black text-stroke tracking-widest min-w-[50px] sm:min-w-[60px]">被毒</th>
-                        </tr>
-                    </thead>
-                    <tbody onclick="handleCrosshairClick(event, 'elimOrderDetailsTable', 'activeElimCell')">
-                        ${reversedRounds.map((r, rIdx) => {
-                            let revP = r.v2Stats && r.v2Stats.revivedPlayerId ? gameData.players.find(x=>x.id===r.v2Stats.revivedPlayerId) : null;
-                            let revHtml = revP ? `<td class="pin-right2 font-black text-white text-stroke tracking-widest" style="background-color: ${revP.color};">${revP.name.slice(-1)}</td>` : `<td class="pin-right2 bg-[#aeaaaa] text-[#5E4B8B] font-black tracking-widest">-</td>`;
-                            
-                            // 判断被毒 (特殊淘汰3)
-                            let poisonP = null;
-                            let poisonMethodName = typeof window.getSpecialMethodName === 'function' ? window.getSpecialMethodName('lose', 3) : '特殊淘汰3(未设置)';
-                            if (r.v2Stats && r.v2Stats.eliminated) {
-                                for(let pid in r.v2Stats.eliminated) {
-                                    if(r.v2Stats.eliminated[pid] === poisonMethodName) {
-                                        poisonP = gameData.players.find(x=>x.id===parseInt(pid));
-                                        break;
-                                    }
-                                }
-                            }
-                            let poiHtml = poisonP ? `<td class="pin-right1 font-black text-white text-stroke tracking-widest" style="background-color: ${poisonP.color};">${poisonP.name.slice(-1)}</td>` : `<td class="pin-right1 bg-[#aeaaaa] text-[#5E4B8B] font-black tracking-widest">-</td>`;
-
-                            return `
-                            <tr>
-                                <td class="pin-left bg-[#a7e6ce] text-[#5E4B8B] font-black" data-row="${rIdx}">${r.round}</td>
-                                ${sortedActive.map((p, cIdx) => {
-                                    let cHtml = ''; let kName = '无'; let kColor = '#000';
-                                    if (r.changes[p.id] === undefined) {
-                                        cHtml = `<td class="data-cell bg-[#d9e1f4] text-[#5E4B8B] font-black" data-row="${rIdx}" data-col="${cIdx}" data-p-color="${p.color}">-</td>`;
-                                    } else if (r.winner === p.id) {
-                                        cHtml = `<td class="data-cell bg-[#d9e1f4] text-[#5E4B8B] font-black" data-row="${rIdx}" data-col="${cIdx}" data-p-color="${p.color}">胜</td>`;
-                                    } else {
-                                        let bIndex = -1;
-                                        if (r.v2Stats && r.v2Stats.eliminationEvents) {
-                                            bIndex = r.v2Stats.eliminationEvents.findIndex(g => g.includes(p.id));
-                                        }
-                                        if (bIndex >= 0) {
-                                            let bg = bloodColors[Math.min(bIndex, 7)];
-                                            let txt = bloodNames[Math.min(bIndex, 7)];
-                                            
-                                            let kId = r.v2Stats.eliminationDetails[p.id].killerId;
-                                            if (kId === p.id) { kName = '自'; kColor = p.color; }
-                                            else if (kId) { let kp = gameData.players.find(x=>x.id===kId); if(kp){ kName = kp.name.slice(-1); kColor = kp.color; } }
-
-                                            cHtml = `<td class="data-cell font-black text-white text-stroke tracking-widest cursor-pointer" style="background-color: ${bg};" data-row="${rIdx}" data-col="${cIdx}" data-p-color="${p.color}" data-k-name="${kName}" data-k-color="${kColor}">${txt}</td>`;
-                                        } else {
-                                            cHtml = `<td class="data-cell bg-[#d9e1f4] text-[#5E4B8B] font-black" data-row="${rIdx}" data-col="${cIdx}" data-p-color="${p.color}">-</td>`;
-                                        }
-                                    }
-                                    return cHtml;
-                                }).join('')}
-                                ${revHtml}
-                                ${poiHtml}
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>
-        </div>`;
-
-        container.innerHTML = historyHtml + detailsHtml;
-    };
-})();
-
         window.onload = init;
 // ==========================================
 // 【终极纠错霸体引擎：全功能修复版】
@@ -9249,8 +9219,8 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
 (function() {
 // 1. 【模块花名册】
     window.detailModulesConfig =[
-        { id: 'timeDataSection', name: '时间数据', color: '#93c5fd' },
-        { id: 'eliminationOrderSection', name: '淘汰顺位', color: '#a3d977' },
+        { id: 'timeDataSection', name: '时间数据', color: '#93C5FD' },
+        { id: 'eliminationOrderSection', name: '淘汰顺位', color: '#A3D977' },
         { id: 'chartSection', name: '走势图', color: '#7ecef4' },
         { id: 'radarSection', name: '个人能力', color: '#e0ffc6' },
         { id: 'oneVsOneSection', name: '1V1擂台', color: '#ffb3a7' },
@@ -9261,6 +9231,8 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
         { id: 'tableSection', name: '局次得分详情', color: '#93c5fd' },
         { id: 'badgeSection', name: '全场奖杯', color: '#FDE047' } 
     ];
+    
+    window.currentDetailIndex = 0; // 默认停留在第0个（时间数据）
     
     window.currentDetailIndex = 1; // 默认走势图
 
