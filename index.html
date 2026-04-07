@@ -117,13 +117,57 @@
             }
         }
         @layer utilities {
+/* 
+     * ========================================================
+     * 【小白调节区：结算详情1 区域专属参数】
+     * 
+     * [控制代码] .md-table        
+     * [使用方法] 控制整个内部表格的紧密贴合，保证边框不断裂。
+     * [控制代码] .md-th-killer    
+     * [使用方法] 控制左上角“凶手”按钮的死角固定、底色、紫边、以及大小。宽和高严格锁死 30px。
+     * [控制代码] .md-th-player    
+     * [使用方法] 控制最上方第一行玩家名字的格子。高度锁死 30px，宽度锁死 60px。自带 -webkit-text-stroke 极细紫边。
+     * [控制代码] .md-td-round     
+     * [使用方法] 控制最左侧第一列轮次数的格子。宽度锁死 30px，高度锁死 90px。
+     * [控制代码] .md-td-img       
+     * [使用方法] 控制每一张结算图片的格子。宽度 60px，高度 90px。背景设为纯黑(#000)。
+     * [控制代码] .md-img-win      
+     * [使用方法] 控制胜利玩家图片。这里的 border: 2px solid #00ff00 控制了图1要求的绿色外描边！
+     * [控制代码] .md-lose-overlay 
+     * [使用方法] 淘汰玩家图片的黑色压暗遮罩。rgba(0,0,0,0.35) 里的 0.35 就是图1要求的 35% 黑色透明度！
+     * [控制代码] .md-killer-text  
+     * [使用方法] 图2中点击后浮现的凶手名字特效。1.5px #5E4B8B是紫描边，下面的 drop-shadow 模拟了最外围的纯白外发光！
+     * ========================================================
+     */
+    .md-table { border-collapse: separate; border-spacing: 0; width: max-content; }
+    .md-th-killer { position: sticky; top: 0; left: 0; z-index: 50; width: 30px; height: 30px; min-width: 30px; max-width: 30px; background-color: #ffffff; border-right: 2px solid #5E4B8B; border-bottom: 2px solid #5E4B8B; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .md-th-player { position: sticky; top: 0; z-index: 40; height: 30px; width: 60px; min-width: 60px; max-width: 60px; border-right: 2px solid #5E4B8B; border-bottom: 2px solid #5E4B8B; color: white; font-weight: 900; font-size: 16px; line-height: 1; -webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill; text-align: center; vertical-align: middle; }
+    .md-td-round { position: sticky; left: 0; z-index: 30; width: 30px; min-width: 30px; max-width: 30px; height: 90px; border-right: 2px solid #5E4B8B; border-bottom: 2px solid #5E4B8B; background-color: #b5c6ea; color: #5E4B8B; font-weight: 900; font-size: 20px; text-align: center; vertical-align: middle; }
+    .md-td-img { width: 60px; min-width: 60px; max-width: 60px; height: 90px; border-right: 2px solid #5E4B8B; border-bottom: 2px solid #5E4B8B; position: relative; background: #000; padding: 2px; }
+    
+    .md-th-player:last-child, .md-td-img:last-child { border-right: none; }
+    .md-tr-body:last-child .md-td-round, .md-tr-body:last-child .md-td-img { border-bottom: none; }
+
+    .md-img-win { border: 2px solid #00ff00; width: 100%; height: 100%; object-fit: contain; }
+    .md-img-lose { width: 100%; height: 100%; object-fit: contain; }
+    .md-lose-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); z-index: 10; pointer-events: none; }
+    
+    .md-killer-text {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 20;
+        font-size: 24px; font-weight: 900; -webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;
+        filter: drop-shadow(1.5px 1.5px 0px white) drop-shadow(-1.5px -1.5px 0px white) drop-shadow(1.5px -1.5px 0px white) drop-shadow(-1.5px 1.5px 0px white);
+        pointer-events: none;
+    }
+    
+    .md-table.show-killers .md-killer-text { display: block; }
+    .md-table:not(.show-killers) .md-killer-text { display: none; }
             .kawaii-card { 
                 background: var(--card-bg);
                 @apply border-4 border-[#5E4B8B] rounded-[2rem] shadow-[0_6px_0_rgba(94,75,139,0.15)]; 
             }
             .kawaii-btn { @apply border-4 border-[#5E4B8B] rounded-full font-bold transition-all active:translate-y-1 shadow-[0_4px_0_#5E4B8B]; }
             .kawaii-input { @apply bg-[#F1F5F9] border-4 border-[#5E4B8B] rounded-2xl focus:outline-none; }
-            
+         
 /* 
              * ========================================================
              * 【小白调节区：模块切换平滑淡入动画】
@@ -1293,6 +1337,27 @@
                 <input type="file" id="excelFile" class="hidden" accept=".xlsx, .xls">
             </div>
         </section>
+
+<!-- 
+  ========================================================
+  【图1像素级复刻：结算详情1 大模块】 
+  小白调节区：
+  [控制代码] max-h-[480px]
+  [使用方法] 核心滑动限制！5个图片(5*90) + 表头(30) = 480。超过480的第6行会被底部白框死死裁掉，并自动产生上下滑动。
+  [控制代码] rounded-[1rem] 和 border-[3px]
+  [使用方法] 决定了最外围白色大画框的圆润度和紫色边框的粗细。
+  ========================================================
+-->
+<section id="methodDetailSection" class="kawaii-card p-[8px] mb-6 flex flex-col items-center relative hidden" style="order: 0;">
+    <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.5rem] w-full flex flex-col items-center p-0  overflow-hidden relative">
+        <div class="w-full overflow-auto scrollbar-hide relative max-h-[600px]" id="methodDetailWrapper">
+            <table class="md-table" id="methodDetailTable">
+                <!-- JS 动态填入图1的网格内容 -->
+            </table>
+        </div>
+    </div>
+</section>
+
 <!-- 【完美复刻版】淘汰方式/胜利方式 条目管理区 -->
 <!-- 
   ========================================================
@@ -1880,6 +1945,7 @@
         ];
 
 const modulesConfig =[
+{ id: 'methodDetailSection', name: '结算详情1', icon: 'fa-images' },
 { id: 'timeRecordSection', name: '时间记录区', icon: 'fa-stopwatch' }, // <--- 【新增】把时间记录区加到这里
 { id: 'timeDataSection', name: '时间数据', icon: 'fa-clock' }, /* 【最新新增】时间数据区 */
 { id: 'eliminationOrderSection', name: '淘汰顺位', icon: 'fa-list-ol' }, /* 【最新新增】淘汰顺位区 */
@@ -4214,6 +4280,7 @@ window.renderEliminationOrderSection = function() {
 // 把这两个渲染函数绑定到全局 UI 更新链条中
 const prevRenderTimeData = window.updateAllUI;
 window.updateAllUI = function() {
+if(typeof window.renderMethodDetailSection === 'function') window.renderMethodDetailSection();
     if (prevRenderTimeData) prevRenderTimeData();
     if (typeof window.renderTimeDataSection === 'function') window.renderTimeDataSection();
     if (typeof window.renderEliminationOrderSection === 'function') window.renderEliminationOrderSection();
@@ -6325,6 +6392,99 @@ window.renderDetailedRecords = function() {
 
     targetContainer.innerHTML = html;
 };
+
+window.renderMethodDetailSection = function() {
+    const table = document.getElementById('methodDetailTable');
+    if (!table) return;
+
+    const active = gameData.players.filter(p => p.isActive);
+    if (active.length === 0 || viewRounds.length === 0) {
+        table.innerHTML = '<tr><td class="text-center text-gray-400 py-4">暂无对局或玩家数据</td></tr>';
+        return;
+    }
+
+    const sortedPlayers = [...active].sort((a, b) => b.total - a.total); // 排序与详细表格同步
+    const mdRounds = [...viewRounds].reverse(); // 倒序，最新的局次排在最上面第一行
+
+    // 智能提取对应淘汰方式或胜利方式的图片Url
+    let getMethodUrl = (methodName, type) => {
+        let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+        if (!gameData.customMethods) return defaultUrl;
+        let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+        let item = data.items.find(i => i.name === methodName);
+        if (!item) { // 跨库防裂开寻找
+            data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+            item = data.items.find(i => i.name === methodName);
+        }
+        return item && item.url ? item.url : defaultUrl;
+    };
+
+    // 1. 画出首行固定表头
+    let html = `
+    <thead class="sticky top-0 z-[50]">
+        <tr>
+            <!-- 点击左上角触发图2的凶手显示魔法 -->
+            <th class="md-th-killer" onclick="document.getElementById('methodDetailTable').classList.toggle('show-killers')">
+                <span style="color: white; -webkit-text-stroke: 1.5px #5E4B8B; font-weight: 900; font-size: 13px;">凶手</span>
+            </th>
+            ${sortedPlayers.map(p => `
+            <th class="md-th-player" style="background-color: ${p.color};">${p.name.slice(-1)}</th>
+            `).join('')}
+        </tr>
+    </thead>
+    <tbody>
+    `;
+
+    // 2. 按局次画出行
+    mdRounds.forEach(r => {
+        html += `<tr class="md-tr-body">`;
+        html += `<td class="md-td-round">${r.round}</td>`;
+        
+        // 画出每个人这一局的格子
+        sortedPlayers.forEach(p => {
+            let isWinner = r.winner === p.id;
+            let isElim = r.v2Stats && r.v2Stats.eliminated && r.v2Stats.eliminated[p.id];
+            
+            let tdContent = '';
+            
+            // 如果是胜利的玩家 (图1：纯粹的绿边)
+            if (isWinner) {
+                let method = (r.v2Stats && r.v2Stats.winMethod) ? r.v2Stats.winMethod : '默认胜利';
+                let imgUrl = getMethodUrl(method, 'win');
+                tdContent = `<img src="${imgUrl}" class="md-img-win" crossorigin="anonymous">`;
+            } 
+            // 如果是被淘汰的玩家 (图1：35%压暗 + 图2：准备好凶手名)
+            else if (isElim) {
+                let method = r.v2Stats.eliminated[p.id];
+                let imgUrl = getMethodUrl(method, 'lose');
+                
+                let killerName = '';
+                let killerColor = '';
+                let kId = r.v2Stats.eliminationDetails[p.id] ? r.v2Stats.eliminationDetails[p.id].killerId : null;
+                
+                if (kId === p.id) { killerName = '自'; killerColor = p.color; }
+                else if (kId) { 
+                    let kP = gameData.players.find(x => x.id === kId); 
+                    if (kP) { killerName = kP.name.slice(-1); killerColor = kP.color; }
+                } else { killerName = '系'; killerColor = '#6B7280'; }
+                
+                tdContent = `
+                <img src="${imgUrl}" class="md-img-lose" crossorigin="anonymous">
+                <div class="md-lose-overlay"></div>
+                <div class="md-killer-text" style="color: ${killerColor};">${killerName}</div>
+                `;
+            }
+            
+            html += `<td class="md-td-img">${tdContent}</td>`;
+        });
+        
+        html += `</tr>`;
+    });
+
+    html += `</tbody>`;
+    table.innerHTML = html;
+};
+
 function renderChart() {
             const active = gameData.players.filter(p => p.isActive);
             const ctx = els.scoreChart.getContext('2d');
@@ -7711,7 +7871,7 @@ const mobileTabs = {
         'tab2': { name: '排行榜单', color: '#A3D977', modules:['championSectionWrapper', 'leaderboardSection'] }, // 移除了Round动态条
         'tab3': { name: '实时结算', color: '#FCA5A5', modules:['playerSection', 'latestStatusSection', 'timeRecordSection', 'timerSection', 'randomSelectorSection', 'penaltySection', 'penaltyStatsSection'] },
         // 下面把 barSection (Round动态条) 和 badgeSection (奖杯墙) 塞进去了，排在饼图前面和最后面
-        'tab4': { name: '详细数据', color: '#93C5FD', modules:['timeDataSection', 'oneVsOneSection', 'sessionFilterDisplay', 'methodStatSection', 'eliminationOrderSection', 'chartSection', 'barSection', 'pieChartSection', 'radarSection', 'sessionSection', 'tableSection', 'badgeSection'] },
+        'tab4': { name: '详细数据', color: '#93C5FD', modules:['timeDataSection', 'oneVsOneSection', 'sessionFilterDisplay', 'methodStatSection', 'methodDetailSection', 'eliminationOrderSection', 'chartSection', 'barSection', 'pieChartSection', 'radarSection', 'sessionSection', 'tableSection', 'badgeSection'] },
         'tab5': { name: '数据备份', color: '#F472B6', modules: ['cloudShareSection', 'methodManagerSection', 'dataIOSection', 'tableSection'] }
     };
 
@@ -9183,6 +9343,7 @@ window.renderLatestStatus = function() {
         // 绑定原本每次结算游戏后，自动把视角切回最新一局并重绘
         const originalStatusUpdate = window.updateAllUI;
         window.updateAllUI = function() {
+if(typeof window.renderMethodDetailSection === 'function') window.renderMethodDetailSection();
 if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSection();
             if(originalUpdateAllUI) originalUpdateAllUI();
             statusCurrentViewRound = -1; // 只要有新操作，自动跳回追踪最新一局
@@ -9226,6 +9387,7 @@ if(typeof window.renderTimeDataSection === 'function') window.renderTimeDataSect
         { id: 'oneVsOneSection', name: '1V1擂台', color: '#ffb3a7' },
         { id: 'penaltyStatsSection', name: '罚牌统计', color: '#f3d27b' },
         { id: 'methodStatSection', name: '结算统计', color: '#a0b0c4' },
+{ id: 'methodDetailSection', name: '结算详情1', color: '#BBAAEE' },
         { id: 'pieChartSection', name: '得分占比', color: '#a3d977' },
         { id: 'sessionSection', name: '场次记录', color: '#fca5a5' },
         { id: 'tableSection', name: '局次得分详情', color: '#93c5fd' },
