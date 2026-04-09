@@ -2643,16 +2643,11 @@ function initCloudUI() {
                 if(quickHostBtn) { quickHostBtn.classList.add('hidden'); quickHostBtn.classList.remove('flex'); }
                 if(quickAudBtn) { quickAudBtn.classList.remove('hidden'); quickAudBtn.classList.add('flex'); }
 
-/* 
-                 * ========================================================
-                 * 【小白修复区：观众端 Tab 5 显隐控制】
-                 * 修复 Bug：让观众端正常显示详细数据。
-                 * ========================================================
-                 */
+// 【修复：观众端也显示详细数据，并绝对保留您的 5 等分排版！】
                 if(tab5) tab5.style.setProperty('display', 'flex', 'important');
                 navTabs.forEach(tab => {
-                    tab.classList.remove('w-1/5'); 
                     tab.classList.remove('w-1/4'); 
+                    tab.classList.add('w-1/5'); // 恢复原有的5等分，绝不破坏排版！
                 });
 
                 const disableBtnIds =['calculateBtn', 'undoBtn', 'redoBtn', 'resetBtn', 'importBtn', 'v2CalculateBtn', 'v2UndoBtn', 'v2RedoBtn', 'earlyWinBtn', 'addSessionBtn', 'penaltyAddBtn', 'penaltyUndoBtn', 'penaltyRedoBtn'];
@@ -2674,10 +2669,11 @@ function initCloudUI() {
                 if(quickHostBtn) { quickHostBtn.classList.remove('hidden'); quickHostBtn.classList.add('flex'); }
                 if(quickAudBtn) { quickAudBtn.classList.add('hidden'); quickAudBtn.classList.remove('flex'); }
 
-if(tab5) tab5.style.setProperty('display', 'flex', 'important');
+                // 【核心逻辑：底部导航重排版】主机端恢复第5个按钮，并改回5等分
+                if(tab5) tab5.style.setProperty('display', 'flex', 'important');
                 navTabs.forEach(tab => {
                     tab.classList.remove('w-1/4');
-                    tab.classList.remove('w-1/5');
+                    tab.classList.add('w-1/5');
                 });
             }
         }
