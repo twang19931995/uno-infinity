@@ -699,10 +699,18 @@
 <!-- ======================================================== -->
         <!-- 【新增模块】随机选择器区域 (图1 像素级复刻) -->
         <!-- ======================================================== -->
-        <section id="randomSelectorSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8] mt-40" style="order: 0;">
+        <section id="randomSelectorSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8]" style="order: 0;">
             <div class="flex flex-col items-center w-full relative gap-4">
                 
-             
+                <!-- 【容器1：主标题】 
+                     bg-[#4A90E2]: 蓝色背景
+                     border-[3px] border-[#5E4B8B]: 紫色外描边粗细和颜色
+                     px-8 py-1.5: 控制胶囊的宽窄和高矮
+                     shadow-[0_4px_0_#5E4B8B]: 底部的紫色厚重投影
+                -->
+                <div class="bg-[#4A90E2] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1.5 shadow-[0_4px_0_#5E4B8B] z-10 w-[60%] flex justify-center">
+                    <span class="font-black text-white text-lg sm:text-xl tracking-widest text-stroke">随机选择器</span>
+                </div>
 
                 <!-- 【容器2：动画展示区 (核心)】
                      h-[70px] sm:h-[80px]: 控制整个白色横条的高度
@@ -1010,34 +1018,11 @@
         </div>
     </div>
 
-<div class="flex flex-col items-center w-full">
-        
-        <!-- 
-          ========================================================
-          【小白调节区：双重排序按钮控制台】
-          [控制代码] gap-2 sm:gap-4
-          [使用方法] 控制这两个按钮中间的距离。
-          [控制代码] bg-[#b3d465]
-          [使用方法] 控制按钮的黄绿色底色。
-          ========================================================
-        -->
-        <div class="flex items-center justify-center gap-2 sm:gap-4 w-full mb-4 z-10 px-2">
-            
-            <!-- 按钮1：切换排序依据 (轮次/耗时/剩余时间) -->
-            <button id="trSortFieldBtn" class="flex-1 max-w-[160px] bg-[#b3d465] border-[3px] border-[#5E4B8B] rounded-full py-1.5 shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
-                <i class="fa-solid fa-list text-[#5E4B8B] text-xs sm:text-sm mr-1.5"></i>
-                <span id="trSortFieldText" class="font-black text-[#5E4B8B] text-xs sm:text-sm tracking-widest leading-none translate-y-[0.5px]">排序: 轮次</span>
-            </button>
-
-            <!-- 按钮2：切换升降序 -->
-            <button id="trSortOrderBtn" class="flex-1 max-w-[120px] bg-[#f8b551] border-[3px] border-[#5E4B8B] rounded-full py-1.5 shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
-                <i id="trSortOrderIcon" class="fa-solid fa-arrow-down-9-1 text-white text-xs sm:text-sm mr-1.5"></i>
-                <span id="trSortOrderText" class="font-black text-white text-xs sm:text-sm tracking-widest leading-none translate-y-[0.5px]">降序</span>
-            </button>
-            
-        </div>
-
-        <!-- 容器4：详细信息条列表大容器 -->
+    <div class="flex flex-col items-center w-full">
+        <!-- 容器3：排序切换按钮 (黄绿底) -->
+        <button id="trSortBtn" class="bg-[#b3d465] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1 shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all z-10 mb-4 flex items-center justify-center">
+            <span id="trSortText" class="font-black text-[#5E4B8B] text-sm sm:text-base tracking-widest leading-none">按局数降序排列</span>
+        </button>
 
         <!-- 容器4：详细信息条列表大容器 -->
         <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-5 shadow-[0_4px_0_#5E4B8B] flex flex-col items-center">
@@ -2100,13 +2085,11 @@ let chartInstance = null;
         let trElapsedSeconds = 0; // 累计秒数
         let trIsRunning = false;
         let trCurrentView = 'realtime'; // 'realtime' 实时 或 'history' 历史
- let trSortField = 'round'; // 排序字段：'round'(轮次), 'used'(耗时), 'remain'(剩余时间)
-        let trSortOrder = 'desc';  // 排序顺序：'desc'(降序), 'asc'(升序)
+        let trSortMode = 'round'; // 'round' 按局数 或 'time' 按时间
 
         // --- 【新增】时间记录模块核心功能 ---
         // 格式化时间为 00:00 的函数
         function formatTrTime(seconds) {
-            if (seconds === undefined || isNaN(seconds)) return "00:00";
             const m = String(Math.floor(seconds / 60)).padStart(2, '0');
             const s = String(seconds % 60).padStart(2, '0');
             return `${m}:${s}`;
@@ -2118,24 +2101,50 @@ let chartInstance = null;
             if (display) display.textContent = formatTrTime(trElapsedSeconds);
         }
 
-        // 【核心修复Bug】：挂载到全局，让游戏底层引擎每次更新数据时，都能自动调用它刷新界面！
-        window.renderTimeDataSection = function() {
-            renderTrHistoryList();
-        };
+        // 开始计时
+        function startTrStopwatch() {
+            if (trIsRunning) return;
+            trIsRunning = true;
+            trStopwatchInterval = setInterval(() => {
+                trElapsedSeconds++;
+                updateTrDisplay();
+            }, 1000);
+        }
 
-        // 渲染图1的 1:1 像素级复刻 UI
+        // 暂停计时
+        function pauseTrStopwatch() {
+            if (!trIsRunning) return;
+            trIsRunning = false;
+            clearInterval(trStopwatchInterval);
+        }
+
+// 重置计时
+        function resetTrStopwatch() {
+            pauseTrStopwatch();
+            trElapsedSeconds = 0;
+            updateTrDisplay();
+            
+            // 【UI状态同步修复】：不论什么时候重置，都强制把切换按钮变回绿色的播放状态
+            const btnToggle = document.getElementById('trToggleBtn');
+            if (btnToggle) {
+                btnToggle.innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
+                btnToggle.classList.remove('bg-[#F59E0B]'); // 移除黄色
+                btnToggle.classList.add('bg-[#4ADE80]');    // 加回绿色
+            }
+        }
+
+        // 渲染图2的历史记录列表（严格复刻容器5）
         function renderTrHistoryList() {
             const listContainer = document.getElementById('trHistoryList');
             if (!listContainer) return;
 
-            // 1. 数据收集：同时提取耗时和倒计时剩余时间
-            let records = [];
+            // 从游戏对局数据中提取有时间记录的局数
+            let records =[];
             gameData.rounds.forEach(r => {
-                if (r.v2Stats) {
+                if (r.v2Stats && r.v2Stats.stopwatchTime !== undefined) {
                     records.push({
                         round: r.round,
-                        used: r.v2Stats.stopwatchTime || 0,
-                        remain: r.v2Stats.timerRemainAtEnd || 0
+                        time: r.v2Stats.stopwatchTime
                     });
                 }
             });
@@ -2145,50 +2154,29 @@ let chartInstance = null;
                 return;
             }
 
-            // 2. 强大的双重排序引擎
-            records.sort((a, b) => {
-                let valA = a[trSortField];
-                let valB = b[trSortField];
-                return trSortOrder === 'desc' ? (valB - valA) : (valA - valB);
-            });
+            // 根据当前排序模式进行排序
+            if (trSortMode === 'round') {
+                // 按局数降序（最新局在最上面）
+                records.sort((a, b) => b.round - a.round);
+            } else {
+                // 按使用时间由高到低降序
+                records.sort((a, b) => b.time - a.time);
+            }
 
-            // 3. 像素级复刻图1渲染
+            // 生成容器5 HTML (像素级复刻图2的内部胶囊条)
             listContainer.innerHTML = records.map(rec => `
-            <!-- 
-              ========================================================
-              【小白调节区：整条外框 (胶囊形状)】
-              [使用方法] rounded-full 让它变成两边半圆的完美胶囊形。
-              [使用方法] border-[2px] sm:border-[2.5px] border-[#5E4B8B] 外框的深紫色粗细。
-              [使用方法] p-[2.5px] sm:p-[3px] 这是外框内壁跟里面三个小件的距离，完美还原图1中贴边的效果。
-              ========================================================
-            -->
-            <div class="w-full bg-white border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-full p-[2.5px] sm:p-[3px] shadow-[0_2.5px_0_#5E4B8B] flex items-center justify-between shrink-0 mb-1.5">
+            <!-- 容器5：单独的信息条 (白底，紫色投影，flex布局左右分开) -->
+            <div class="w-full bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[1rem] p-1.5 sm:p-2 shadow-[0_3px_0_#5E4B8B] flex items-center justify-between shrink-0">
                 
-                <!-- 
-                  【左边元素：轮次胶囊】 
-                  [使用方法] bg-[#6ca5eb] 蓝色底色。
-                  [使用方法] w-[45px] sm:w-[50px] 控制蓝胶囊宽度。
-                  [使用方法] font-leslie 启用专属电子字体！
-                -->
-                <div class="bg-[#6ca5eb] border-[1.5px] sm:border-[2px] border-[#5E4B8B] rounded-full w-[45px] sm:w-[52px] h-[24px] sm:h-[30px] flex items-center justify-center shrink-0">
-                    <span class="font-leslie text-white text-[16px] sm:text-[20px] font-bold leading-none translate-y-[0.5px]">${rec.round}</span>
+                <!-- 容器5-1：局数 (蓝底白字胶囊，使用 font-leslie 电子字体) -->
+                <div class="bg-[#6ca5eb] border-[2px] border-[#5E4B8B] rounded-full w-[60px] sm:w-[70px] py-1 shadow-[0_2px_0_#5E4B8B] flex items-center justify-center ml-1">
+                    <span class="font-leslie text-white text-lg sm:text-xl font-bold leading-none translate-y-[1px]">${rec.round}</span>
                 </div>
 
-                <!-- 
-                  【中间元素：耗时 LCD 屏】
-                  [使用方法] bg-[#bfc7b8] 屏幕底色。lcd-screen-shadow 是专属内凹阴影特效。
-                  [使用方法] text-[#5c4c8b] 专属要求的深紫色！
-                -->
-                <div class="flex-1 bg-[#bfc7b8] rounded-[0.4rem] sm:rounded-[0.5rem] h-[24px] sm:h-[30px] lcd-screen-shadow flex items-center justify-center border-[1px] border-[#727a6b]/30 mx-1 sm:mx-1.5">
-                    <span class="font-leslie text-[#5c4c8b] text-[18px] sm:text-[22px] font-bold tracking-widest leading-none drop-shadow-sm translate-y-[0.5px]">${formatTrTime(rec.used)}</span>
-                </div>
-
-                <!-- 
-                  【右边元素：剩余时间 LCD 屏】
-                  [使用方法] text-[#fb2a53] 专属要求的红色！
-                -->
-                <div class="flex-1 bg-[#bfc7b8] rounded-[0.4rem] sm:rounded-[0.5rem] h-[24px] sm:h-[30px] lcd-screen-shadow flex items-center justify-center border-[1px] border-[#727a6b]/30">
-                    <span class="font-leslie text-[#fb2a53] text-[18px] sm:text-[22px] font-bold tracking-widest leading-none drop-shadow-sm translate-y-[0.5px]">${formatTrTime(rec.remain)}</span>
+                <!-- 容器5-2：LCD 电子屏时间显示 -->
+                <!-- bg-[#bfc7b8] 绿灰底，无描边，lcd-screen-shadow 专属内阴影 -->
+                <div class="bg-[#bfc7b8] rounded-lg w-[110px] sm:w-[130px] h-[32px] sm:h-[38px] lcd-screen-shadow flex items-center justify-center border-[1px] border-[#727a6b]/30 mr-1">
+                    <span class="font-leslie text-[#5E4B8B] text-[22px] sm:text-[26px] font-bold tracking-widest leading-none drop-shadow-sm">${formatTrTime(rec.time)}</span>
                 </div>
 
             </div>
@@ -2272,45 +2260,19 @@ let chartInstance = null;
                 };
             }
 
-// 3. 新版：双重排序按钮绑定
-            const fieldBtn = document.getElementById('trSortFieldBtn');
-            const fieldText = document.getElementById('trSortFieldText');
-            const orderBtn = document.getElementById('trSortOrderBtn');
-            const orderText = document.getElementById('trSortOrderText');
-            const orderIcon = document.getElementById('trSortOrderIcon');
-
-            if (fieldBtn) {
-                fieldBtn.onclick = () => {
-                    // 循环切换字段：轮次 -> 耗时 -> 剩余
-                    if (trSortField === 'round') {
-                        trSortField = 'used';
-                        fieldText.textContent = '排序: 耗时';
-                    } else if (trSortField === 'used') {
-                        trSortField = 'remain';
-                        fieldText.textContent = '排序: 剩余';
+            // 3. 图2 排序切换按钮
+            const btnSort = document.getElementById('trSortBtn');
+            const txtSort = document.getElementById('trSortText');
+            if(btnSort) {
+                btnSort.onclick = () => {
+                    if (trSortMode === 'round') {
+                        trSortMode = 'time';
+                        txtSort.textContent = '按用时由高到低降序';
                     } else {
-                        trSortField = 'round';
-                        fieldText.textContent = '排序: 轮次';
+                        trSortMode = 'round';
+                        txtSort.textContent = '按局数降序排列';
                     }
-                    renderTrHistoryList(); // 自动刷新列表
-                };
-            }
-
-            if (orderBtn) {
-                orderBtn.onclick = () => {
-                    // 切换升序/降序
-                    if (trSortOrder === 'desc') {
-                        trSortOrder = 'asc';
-                        orderText.textContent = '升序';
-                        orderIcon.className = "fa-solid fa-arrow-up-a-z text-white text-xs sm:text-sm mr-1.5";
-                        orderBtn.classList.replace('bg-[#f8b551]', 'bg-[#3AA5ED]'); // 变蓝
-                    } else {
-                        trSortOrder = 'desc';
-                        orderText.textContent = '降序';
-                        orderIcon.className = "fa-solid fa-arrow-down-9-1 text-white text-xs sm:text-sm mr-1.5";
-                        orderBtn.classList.replace('bg-[#3AA5ED]', 'bg-[#f8b551]'); // 变回橙黄
-                    }
-                    renderTrHistoryList(); // 自动刷新列表
+                    renderTrHistoryList(); // 重新渲染列表
                 };
             }
         }
@@ -2681,11 +2643,16 @@ function initCloudUI() {
                 if(quickHostBtn) { quickHostBtn.classList.add('hidden'); quickHostBtn.classList.remove('flex'); }
                 if(quickAudBtn) { quickAudBtn.classList.remove('hidden'); quickAudBtn.classList.add('flex'); }
 
-                // 【核心逻辑：底部导航重排版】观众端隐藏第5个按钮，并把前4个变宽占满屏幕
-                if(tab5) tab5.style.setProperty('display', 'none', 'important');
+/* 
+                 * ========================================================
+                 * 【小白修复区：观众端 Tab 5 显隐控制】
+                 * 修复 Bug：让观众端正常显示详细数据。
+                 * ========================================================
+                 */
+                if(tab5) tab5.style.setProperty('display', 'flex', 'important');
                 navTabs.forEach(tab => {
-                    tab.classList.remove('w-1/5'); // 移除5等分
-                    if(tab.dataset.tab !== 'tab5') tab.classList.add('w-1/4'); // 赋予4等分
+                    tab.classList.remove('w-1/5'); 
+                    tab.classList.remove('w-1/4'); 
                 });
 
                 const disableBtnIds =['calculateBtn', 'undoBtn', 'redoBtn', 'resetBtn', 'importBtn', 'v2CalculateBtn', 'v2UndoBtn', 'v2RedoBtn', 'earlyWinBtn', 'addSessionBtn', 'penaltyAddBtn', 'penaltyUndoBtn', 'penaltyRedoBtn'];
@@ -2707,11 +2674,10 @@ function initCloudUI() {
                 if(quickHostBtn) { quickHostBtn.classList.remove('hidden'); quickHostBtn.classList.add('flex'); }
                 if(quickAudBtn) { quickAudBtn.classList.add('hidden'); quickAudBtn.classList.remove('flex'); }
 
-                // 【核心逻辑：底部导航重排版】主机端恢复第5个按钮，并改回5等分
-                if(tab5) tab5.style.setProperty('display', 'flex', 'important');
+if(tab5) tab5.style.setProperty('display', 'flex', 'important');
                 navTabs.forEach(tab => {
                     tab.classList.remove('w-1/4');
-                    tab.classList.add('w-1/5');
+                    tab.classList.remove('w-1/5');
                 });
             }
         }
