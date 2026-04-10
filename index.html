@@ -697,56 +697,112 @@
         </style>
 
 <!-- ======================================================== -->
-        <!-- 【新增模块】随机选择器区域 (图1 像素级复刻) -->
+        <!-- 【全新重构】随机选择器区域 (双引擎UI版，包含经典轨道与全新大转盘) -->
         <!-- ======================================================== -->
         <section id="randomSelectorSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8]" style="order: 0;">
             <div class="flex flex-col items-center w-full relative gap-4">
                 
-                <!-- 【容器1：主标题】 
-                     bg-[#4A90E2]: 蓝色背景
-                     border-[3px] border-[#5E4B8B]: 紫色外描边粗细和颜色
-                     px-8 py-1.5: 控制胶囊的宽窄和高矮
-                     shadow-[0_4px_0_#5E4B8B]: 底部的紫色厚重投影
-                -->
-                <div class="bg-[#4A90E2] border-[3px] border-[#5E4B8B] rounded-full px-8 py-1.5 shadow-[0_4px_0_#5E4B8B] z-10 w-[60%] flex justify-center">
-                    <span class="font-black text-white text-lg sm:text-xl tracking-widest text-stroke">随机选择器</span>
-                </div>
+                <!-- 【顶部控制区：标题与切换按钮】 -->
+                <div class="w-full flex justify-between items-center mb-2 px-1 sm:px-2 relative z-10">
 
-                <!-- 【容器2：动画展示区 (核心)】
-                     h-[70px] sm:h-[80px]: 控制整个白色横条的高度
-                     bg-white: 白色背景
-                -->
-                <div class="w-full bg-white border-[3px] border-[#5E4B8B] rounded-[1.5rem] h-[80px] sm:h-[90px] shadow-[0_4px_0_#5E4B8B] relative overflow-hidden flex items-center justify-center">
                     
-                    <!-- 中心固定不动的红色框框 (选中框)
-                         border-[#D0021B]: 红色的边框颜色
-                         w-[55px] h-[55px]: 红色框的大小 (略大于头像)
+                    <!-- 切换UI按钮 (黄底紫字) -->
+                    <!-- 
+                      ========================================================
+                      【小白调节区：切换按钮外观】
+                      [背景色] bg-[#FDE047] (鲜黄色)
+                      [字体] text-[#5E4B8B] (深紫色)
+                      ========================================================
                     -->
-                    <div class="absolute z-20 border-[3px] sm:border-[4px] border-[#D0021B] rounded-[0.8rem] w-[58px] h-[58px] sm:w-[68px] sm:h-[68px] shadow-[0_0_10px_rgba(208,2,27,0.4)] pointer-events-none"></div>
+                    <button id="rsSwitchUIBtn" class="bg-[#FDE047] border-[3px] border-[#5E4B8B] rounded-full px-4 py-1.5 font-black text-[#5E4B8B] text-xs sm:text-sm shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="window.toggleRSUI()">
+                        切换经典版
+                    </button>
+                </div>
 
-                    <!-- 滚动的头像轨道 (JS 会操控它里面的内容) -->
-                    <div id="rsTrackContainer" class="absolute z-10 w-full h-full flex items-center left-0 top-0 pointer-events-none">
-                        <!-- JS动态填入头像 -->
+                <!-- ======================================================== -->
+                <!-- 【经典版 轨道UI】 (默认隐藏，随时可切回) -->
+                <!-- ======================================================== -->
+                <div id="rsOldUI" class="w-full flex flex-col items-center gap-4 hidden">
+                    <div class="w-full bg-white border-[3px] border-[#5E4B8B] rounded-[1.5rem] h-[80px] sm:h-[90px] shadow-[0_4px_0_#5E4B8B] relative overflow-hidden flex items-center justify-center">
+                        <div class="absolute z-20 border-[3px] sm:border-[4px] border-[#D0021B] rounded-[0.8rem] w-[58px] h-[58px] sm:w-[68px] sm:h-[68px] shadow-[0_0_10px_rgba(208,2,27,0.4)] pointer-events-none"></div>
+                        <div id="rsTrackContainer" class="absolute z-10 w-full h-full flex items-center left-0 top-0 pointer-events-none"></div>
                     </div>
+                    <div class="bg-[#F5C57A] border-[3px] border-[#5E4B8B] rounded-xl px-12 py-1 shadow-[0_4px_0_#5E4B8B] z-10 min-w-[120px] min-h-[36px] flex justify-center items-center transition-all" id="rsNameBox">
+                        <span id="rsWinnerName" class="font-black text-white text-xl sm:text-2xl tracking-widest leading-none" style="text-shadow: 2px 2px 0 #5E4B8B, -2px -2px 0 #5E4B8B, 2px -2px 0 #5E4B8B, -2px 2px 0 #5E4B8B, 0 2px 0 #5E4B8B, 0 -2px 0 #5E4B8B, 2px 0 0 #5E4B8B, -2px 0 0 #5E4B8B;">?</span>
+                    </div>
+                    <button id="rsStartBtn" class="bg-[#88D1F1] border-[3px] border-[#5E4B8B] rounded-xl w-[50%] py-2 shadow-[0_4px_0_#5E4B8B] z-10 flex justify-center items-center active:translate-y-1 active:shadow-none hover:brightness-110 transition-all cursor-pointer">
+                        <i class="fa-solid fa-shuffle text-white text-3xl sm:text-4xl text-stroke"></i>
+                    </button>
                 </div>
 
-                <!-- 【容器3：显示被选中玩家名字】
-                     bg-[#F5C57A]: 偏黄/土黄色的背景
-                -->
-                <div class="bg-[#F5C57A] border-[3px] border-[#5E4B8B] rounded-xl px-12 py-1 shadow-[0_4px_0_#5E4B8B] z-10 min-w-[120px] min-h-[36px] flex justify-center items-center transition-all" id="rsNameBox">
-                    <!-- 【修复】：删除了容易引起浏览器色块BUG的 text-stroke，改用 8向文字阴影 模拟完美的紫边 -->
-                    <span id="rsWinnerName" class="font-black text-white  text-xl sm:text-2xl tracking-widest leading-none" style="text-shadow: 2px 2px 0 #5E4B8B, -2px -2px 0 #5E4B8B, 2px -2px 0 #5E4B8B, -2px 2px 0 #5E4B8B, 0 2px 0 #5E4B8B, 0 -2px 0 #5E4B8B, 2px 0 0 #5E4B8B, -2px 0 0 #5E4B8B;">?</span>
+                <!-- ======================================================== -->
+                <!-- 【新版 像素级复刻大转盘UI】 (默认显示) -->
+                <!-- ======================================================== -->
+                <div id="rsNewUI" class="w-full flex flex-col items-center">
+                    
+                    <!-- 
+                      ========================================================
+                      【小白调节区：转盘整体比例参数】
+                      [核心大小] w-[260px] h-[260px] 控制手机端外圈大圆盘直径
+                      ========================================================
+                    -->
+                    <div class="relative w-[350px] h-[350px] sm:w-[320px] sm:h-[320px] mt-4 mb-2">
+                        
+                        <!-- 外圈顶部倒三角 -->
+                        <!-- -top-7 控制它骑在最上方的距离，text-[40px]是箭头大小 -->
+                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-[#5E4B8B] z-30 drop-shadow-md">
+                            <i class="fa-solid fa-caret-down text-[40px] sm:text-[45px]" style="-webkit-text-stroke: 2px white; paint-order: stroke fill;"></i>
+                        </div>
+
+                        <!-- 转盘本体 (会旋转的彩色大画板) -->
+                        <div id="rsWheel" class="w-full h-full rounded-full border-[4px] border-[#5E4B8B]  overflow-hidden relative transition-transform" style="background: conic-gradient(#ccc 0 360deg);">
+                            <div id="rsWheelItems" class="absolute inset-0 w-full h-full pointer-events-none">
+                                <!-- JS魔法会自动把玩家头像以完美角度种在这里 -->
+                            </div>
+                        </div>
+
+                        <!-- 中心静止遮挡圈与GO按钮区 -->
+                        <!-- w-[110px] h-[110px] 控制中间被挖空的白圈大小，让它像个甜甜圈 -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110px] h-[110px] sm:w-[130px] sm:h-[130px] z-20 flex items-center justify-center">
+                            <div class="w-full h-full bg-white rounded-full border-[4px] border-[#5E4B8B] relative shadow-inner">
+                                
+                                <!-- 内圈正三角 -->
+                                <div class="absolute -top-[18px] sm:-top-[18px] left-1/2 -translate-x-1/2 text-[#5E4B8B]">
+                                    <i class="fa-solid fa-caret-up text-[40px] sm:text-[28px]" style="-webkit-text-stroke: 1.5px white; paint-order: stroke fill;"></i>
+                                </div>
+                                
+                                <!-- GO 启动按钮 -->
+                                <!-- 完美的蓝色 bg-[#6ca5eb] 与 紫色阴影 shadow-[0_4px_0_#5E4B8B] -->
+<!--
+                                  ========================================================
+                                  【小白调节区：GO 启动按钮参数设定】
+                                  [控制代码 1: 大小] w-[75px] h-[75px] sm:w-[90px] sm:h-[90px]
+                                  [使用方法] 控制中间GO按钮的大小。前两个是手机端，后两个是电脑端。[控制代码 2: 交互动画] active:scale-90
+                                  [使用方法] (已修复) 现在点击按钮不会往下沉压到边框了，而是会“向内缩小到90%”，松手回弹！
+                                             如果觉得缩得太厉害，可以改成 active:scale-95。[控制代码 3: 底部阴影] shadow-[0_4px_0_#5E4B8B][使用方法] 这是立体的厚度投影，如果想要更厚的按钮，把 4px 改成 6px。[特效备份库 (发光呼吸灯特效)] 
+                                  如果你想让这个GO按钮自带仙气发光，请在 class 双引号里最后加上: magic-glow
+                                  ========================================================
+                                -->
+                                <button id="rsGoBtn" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[75px] h-[75px] sm:w-[90px] sm:h-[90px] bg-[#6ca5eb] border-[3px] border-[#5E4B8B] rounded-full  flex items-center justify-center active:scale-90 transition-all cursor-pointer hover:brightness-110" onclick="window.startRandomSelectorV2()">
+                                    <span class="font-black text-white text-3xl sm:text-4xl tracking-tighter" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">GO!</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 
+                      ========================================================
+                      【小白调节区：底部胶囊池参数】
+                      [排版指令] grid-cols-5：严格限制每行最多5个！
+                      [空隙] gap-[5px]：控制胶囊之间的紧凑度
+                      ========================================================
+                    -->
+                    <div id="rsPlayerToggles" class="w-full mt-6 grid grid-cols-5 gap-[5px] sm:gap-2 px-1">
+                        <!-- JS 自动在这里下崽子 -->
+                    </div>
+
                 </div>
-
-                <!-- 【容器4：启动按钮】
-                     bg-[#88D1F1]: 浅蓝色背景
-                     active:translate-y-1: 点击时往下压的动画效果
-                -->
-                <button id="rsStartBtn" class="bg-[#88D1F1] border-[3px] border-[#5E4B8B] rounded-xl w-[50%] py-2 shadow-[0_4px_0_#5E4B8B] z-10 flex justify-center items-center active:translate-y-1 active:shadow-none hover:brightness-110 transition-all cursor-pointer">
-                    <!-- text-4xl: 控制中间那个交叉箭头的图标大小 -->
-                    <i class="fa-solid fa-shuffle text-white text-3xl sm:text-4xl text-stroke"></i>
-                </button>
-
             </div>
         </section>
 
@@ -3064,7 +3120,212 @@ bindTimeRecordEvents(); // 初始化时间记录模块事件
             rsAnimationId = requestAnimationFrame(drawFrame);
         };
         // ========================================================
+// ========================================================
+        // ★★★ 【全新引擎】随机选择器大转盘版 核心物理逻辑 ★★★
+        // ========================================================
+        
+// ========================================================
+        // ★★★ 【全新引擎】随机选择器大转盘版 核心物理逻辑 (防崩溃+带分割线版) ★★★
+        // ========================================================
+        
+        // ========================================================
+        // 【小白专属调节区：大转盘动画与样式参数设定】
+        // ========================================================
+        window.rsAnimDuration = 2.5;  // [调节1] 转盘从开始到停下的时间，默认 2.5 秒。
+        window.rsSpins = 5;           // [调节2] 转盘要狂转几圈？默认 5 圈。
+        
+        // --- 🌟 分割线魔法调节区 🌟 ---
+        window.rsLineThickness = 1.5;   // [调节3] 玩家之间的分割线粗细(角度)，默认 1.5 度。如果不想要线条，改成 0 即可！
+        window.rsLineColor = '#5E4B8B'; // [调节4] 分割线的颜色，默认深紫色。如果你想换成纯白，就改成 '#FFFFFF'。
 
+        // 使用 window. 强制挂载，彻底解决代码重复粘贴导致的报错死机问题！
+        window.rsCurrentUI = window.rsCurrentUI || 'new';           
+        window.rsExcludedPlayers = window.rsExcludedPlayers || new Set(); 
+        window.rsCurrentRotation = window.rsCurrentRotation || 0;         
+        window.rsIsRunningV2 = false;         
+
+        // [点击事件] 切换 UI 控制
+        window.toggleRSUI = function() {
+            if(window.rsIsRunningV2 || (typeof rsIsRunning !== 'undefined' && rsIsRunning)) return; 
+            
+            const btn = document.getElementById('rsSwitchUIBtn');
+            const oldUI = document.getElementById('rsOldUI');
+            const newUI = document.getElementById('rsNewUI');
+            if(!btn || !oldUI || !newUI) return;
+            
+            if (window.rsCurrentUI === 'new') {
+                window.rsCurrentUI = 'old';
+                btn.textContent = '切换转盘版';
+                newUI.classList.add('hidden');
+                oldUI.classList.remove('hidden');
+                if(typeof window.renderRandomSelectorOld === 'function') window.renderRandomSelectorOld();
+            } else {
+                window.rsCurrentUI = 'new';
+                btn.textContent = '切换经典版';
+                oldUI.classList.add('hidden');
+                newUI.classList.remove('hidden');
+                if(typeof window.renderRandomSelectorV2 === 'function') window.renderRandomSelectorV2();
+            }
+        };
+
+        // [核心画笔] 把头像极其均匀地种在圆盘上 (包含线条隔断特效)
+        window.renderRandomSelectorV2 = function() {
+            const wheel = document.getElementById('rsWheel');
+            const itemsContainer = document.getElementById('rsWheelItems');
+            const togglesContainer = document.getElementById('rsPlayerToggles');
+            if(!wheel || !itemsContainer || !togglesContainer) return;
+
+            const active = gameData.players.filter(p => p.isActive);
+            const alive = active.filter(p => !(v2State && v2State.eliminated && v2State.eliminated[p.id]));
+            
+            let togglesHtml = '';
+            alive.forEach(p => {
+                let isExcluded = window.rsExcludedPlayers.has(p.id);
+                let opacityClass = isExcluded ? 'opacity-40 grayscale' : 'opacity-100';
+                let shortName = p.name ? p.name.slice(-1) : '?';
+                
+                togglesHtml += `
+                <div class="flex items-center justify-center border-[2.5px] border-[#5E4B8B] rounded-[8px] px-1 py-[3px] shadow-[0_3px_0_#5E4B8B] cursor-pointer transition-all ${opacityClass} active:translate-y-1 active:shadow-none rs-toggle-btn" data-id="${p.id}" style="background-color: ${p.color};" onclick="window.toggleRSParticipant(${p.id})">
+                    <div class="w-6 h-6 sm:w-[18px] sm:h-[18px] rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center">
+                        <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <span class="font-black text-white text-[16px] sm:text-[13px] text-stroke pl-1 leading-none" style="-webkit-text-stroke: 4px #5E4B8B;">${shortName}</span>
+                </div>
+                `;
+            });
+            togglesContainer.innerHTML = togglesHtml;
+
+            const wheelPlayers = alive.filter(p => !window.rsExcludedPlayers.has(p.id));
+            
+            if(wheelPlayers.length === 0) {
+                wheel.style.background = 'conic-gradient(#e5e7eb 0 360deg)';
+                itemsContainer.innerHTML = '<div class="absolute inset-0 flex items-center justify-center font-black text-gray-400 text-lg">全员离线</div>';
+                return;
+            }
+
+            let N = wheelPlayers.length;
+            let anglePerPlayer = 360 / N;
+            let gradientStops =[];
+            let itemsHtml = '';
+
+            let translateY = window.innerWidth < 640 ? 110 : 130;
+
+            wheelPlayers.forEach((p, i) => {
+                let startAng = i * anglePerPlayer;
+                let endAng = (i + 1) * anglePerPlayer;
+                
+                // 【核心魔法：画出带分割线的完美扇形】
+                if(window.rsLineThickness > 0 && N > 1) {
+                    gradientStops.push(`${p.color} ${startAng}deg ${endAng - window.rsLineThickness}deg`);
+                    gradientStops.push(`${window.rsLineColor} ${endAng - window.rsLineThickness}deg ${endAng}deg`);
+                } else {
+                    gradientStops.push(`${p.color} ${startAng}deg ${endAng}deg`);
+                }
+                
+                let midAng = startAng + anglePerPlayer / 2;
+                let shortName = p.name ? p.name.slice(-1) : '?';
+                
+                itemsHtml += `
+                <div class="absolute top-1/2 left-1/2 flex flex-col items-center justify-center -ml-[30px] -mt-[40px] w-[60px] h-[80px]" style="transform: rotate(${midAng}deg) translateY(-${translateY}px);">
+                    <div class="w-[45px] h-[45px] sm:w-[40px] sm:h-[40px] rounded-[6px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden mb-1 shadow-sm shrink-0">
+                        <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <span class="font-black text-white text-[25px] sm:text-[16px] tracking-widest leading-none drop-shadow-md" style="-webkit-text-stroke: 5px #5E4B8B; paint-order: stroke fill;">${shortName}</span>
+                </div>
+                `;
+            });
+
+            wheel.style.background = `conic-gradient(${gradientStops.join(', ')})`;
+            itemsContainer.innerHTML = itemsHtml;
+        };
+
+        // [点击事件] 触发在线/离线切换
+        window.toggleRSParticipant = function(id) {
+            if(window.rsIsRunningV2 || (typeof rsIsRunning !== 'undefined' && rsIsRunning)) return;
+            if(window.rsExcludedPlayers.has(id)) window.rsExcludedPlayers.delete(id);
+            else window.rsExcludedPlayers.add(id);
+            window.renderRandomSelectorV2();
+        };
+
+        // [点击事件] 核心：GO按钮！启动转盘马达！
+        window.startRandomSelectorV2 = function() {
+            if(window.rsIsRunningV2) return;
+            
+            const active = gameData.players.filter(p => p.isActive);
+            const alive = active.filter(p => !(v2State && v2State.eliminated && v2State.eliminated[p.id]));
+            const wheelPlayers = alive.filter(p => !window.rsExcludedPlayers.has(p.id));
+
+            if(wheelPlayers.length === 0) return;
+
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if(typeof playRSClick === 'function') playRSClick(); 
+
+            window.rsIsRunningV2 = true;
+
+            let winnerIndex = Math.floor(Math.random() * wheelPlayers.length);
+            let N = wheelPlayers.length;
+            let anglePerPlayer = 360 / N;
+            let midAng = winnerIndex * anglePerPlayer + anglePerPlayer / 2;
+            
+            let currentMod = window.rsCurrentRotation % 360;
+            let targetMod = (360 - midAng) % 360;
+            if (targetMod < 0) targetMod += 360;
+            
+            let diff = targetMod - currentMod;
+            if (diff <= 0) diff += 360;
+            
+            let addedRotation = window.rsSpins * 360 + diff;
+            window.rsCurrentRotation += addedRotation;
+
+            const wheel = document.getElementById('rsWheel');
+            wheel.style.transition = `transform ${window.rsAnimDuration}s cubic-bezier(0.4, 0, 0.2, 1)`;
+            wheel.style.transform = `rotate(${window.rsCurrentRotation}deg)`;
+
+            let tickCount = Math.floor(addedRotation / anglePerPlayer);
+            let tickInterval = (window.rsAnimDuration * 1000) / tickCount;
+            let soundTimer = setInterval(() => {
+                if(typeof playRSTick === 'function') playRSTick();
+            }, Math.max(120, tickInterval)); 
+
+            setTimeout(() => {
+                clearInterval(soundTimer);
+                window.rsIsRunningV2 = false;
+                if(typeof playRSWin === 'function') playRSWin(); 
+                wheel.classList.add('scale-[1.04]');
+                setTimeout(() => wheel.classList.remove('scale-[1.04]'), 250);
+            }, window.rsAnimDuration * 1000);
+        };
+        
+        // 【终极兼容拦截魔法】(防复读报错版)
+        if (!window.rsWrapperInstalled) {
+            window.renderRandomSelectorOld = window.renderRandomSelector;
+            window.rsWrapperInstalled = true;
+        }
+        
+        window.renderRandomSelector = function() {
+            if(window.rsCurrentUI === 'new') {
+                if(typeof window.renderRandomSelectorV2 === 'function') window.renderRandomSelectorV2();
+            } else {
+                if(window.renderRandomSelectorOld) window.renderRandomSelectorOld();
+            }
+        };
+
+        // 【核心修复：强行接管全局更新链条，保证添加玩家时圆盘100%实时刷新！】
+        if (!window.rsAutoUpdateHooked) {
+            const rsTempUpdate = window.updateAllUI;
+            window.updateAllUI = function() {
+                if(rsTempUpdate) rsTempUpdate();
+                if(typeof window.renderRandomSelector === 'function') window.renderRandomSelector();
+            };
+            window.rsAutoUpdateHooked = true;
+        }
+        
+        // 兜底：网页刚加载时立刻画一次，防空白！
+        setTimeout(() => {
+            if(typeof window.renderRandomSelector === 'function') window.renderRandomSelector();
+        }, 300);
+        // ========================================================
         // 【新增函数】生成 Web Audio 蜂鸣声
         function playBeep(vol, freq, duration) {
             if (!audioCtx) {
