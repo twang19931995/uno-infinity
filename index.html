@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<!-- 引入免费的 MQTT 跨设备通信天线 -->
+<!-- 引入免费的 MQTT 跨设备信使天线 -->
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <script>
@@ -2560,27 +2560,18 @@ const CLOUD_API_KEY = "$2a$10$QIpfAXWpKRuC9hRiCVNz1.V4182RJx9SaHuotcsOapPlMy2GYA
         let isAudienceMode = false;
 
         // ========================================================
-        // 【新增：AUTO 自动广播引擎核心大脑 (终极省流跨设备版)】
+        // 【新增：AUTO 自动广播引擎核心大脑 (MQTT 跨设备信使版)】
         // ========================================================
         let isAutoSyncOn = localStorage.getItem('unoAutoSync') === 'true';
-        const unoBroadcastChannel = new BroadcastChannel('uno_sync_channel'); 
-        let mqttClient = null; // 我们雇佣的免费信使
+        let mqttClient = null; 
         
-        // 1. 同设备光速广播接收 (同一台电脑双开网页用)
-        unoBroadcastChannel.onmessage = (event) => {
-            if (event.data === 'NEW_DATA_UPLOADED' && isAudienceMode) {
-                if(typeof fetchDataFromCloud === 'function') fetchDataFromCloud(false);
-            }
-        };
-
-        // 主机端开关 AUTO 功能
         window.toggleAutoSync = function() {
             isAutoSyncOn = !isAutoSyncOn;
             localStorage.setItem('unoAutoSync', isAutoSyncOn);
             updateAutoSyncUI();
         };
 
-        function updateAutoSyncUI() {
+        window.updateAutoSyncUI = function() {
             const autoBtn = document.getElementById('autoSyncBtn');
             if (!autoBtn) return;
             if (isAutoSyncOn) {
@@ -2588,34 +2579,32 @@ const CLOUD_API_KEY = "$2a$10$QIpfAXWpKRuC9hRiCVNz1.V4182RJx9SaHuotcsOapPlMy2GYA
             } else {
                 autoBtn.classList.replace('bg-[#F58220]', 'bg-gray-400'); 
             }
-        }
+        };
 
-        // 【全新核心魔法：跨设备信使连接器】
+        // 【跨设备信使连接器】
         function connectMessenger(binId) {
-            if (mqttClient || !binId) return; // 已经连过了就不连了
-            // 连接到全球免费的 EMQX 公共节点 (完全免费，无需注册)
+            if (mqttClient || !binId || typeof mqtt === 'undefined') return; 
             mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
-            const roomName = 'uno_infinity_room_' + binId; // 我们的专属房间号
+            const roomName = 'uno_infinity_room_' + binId; 
 
             mqttClient.on('connect', () => {
                 console.log('【信使】天线已连接！房间号:', roomName);
                 if (isAudienceMode) {
-                    // 如果我是观众，我就在房间里竖起耳朵听
                     mqttClient.subscribe(roomName); 
                 }
             });
 
             mqttClient.on('message', (topic, message) => {
-                // 如果观众听到了“有新数据”的暗号，立刻精准去云端拿一次数据！
                 if (isAudienceMode && message.toString() === 'NEW_DATA_UPLOADED') {
-                    console.log('【信使】收到主机更新指令！精准触发 1 次静默拉取...');
-                    if(typeof fetchDataFromCloud === 'function') fetchDataFromCloud(false, true);
+                    console.log('【信使】收到主机更新指令！准备拉取新数据...');
+                    // 给云端留出 1.5 秒的数据保存缓冲时间，防止拿到旧数据
+                    setTimeout(() => {
+                        if(typeof fetchDataFromCloud === 'function') fetchDataFromCloud(false, true);
+                    }, 1500);
                 }
             });
         }
-        // ========================================================
 
-        // 核心引擎1：判断当前是不是观众端
         function checkAudienceMode() {
             const urlParams = new URLSearchParams(window.location.search);
             const viewId = urlParams.get('view');
@@ -2629,15 +2618,15 @@ const CLOUD_API_KEY = "$2a$10$QIpfAXWpKRuC9hRiCVNz1.V4182RJx9SaHuotcsOapPlMy2GYA
             if (viewId) {
                 isAudienceMode = true;
                 cloudBinId = viewId;
-                // 【核心改变】：观众一进场，立刻连接信使待命！(抛弃了以前傻傻的 6秒刷新)
+                // 观众一进场，立刻连接信使待命！
                 connectMessenger(cloudBinId);
             } else {
                 isAudienceMode = false;
             }
         }
-        checkAudienceMode();
+        checkAudienceMode(); 
 
-        // 核心功能3：将当前所有数据打包，上传到云端
+        // 主机上传数据
         async function uploadDataToCloud() {
             if (!CLOUD_API_KEY) {
                 alert("请先在代码中填入您的 JSONBin API Key 喔！");
@@ -2683,24 +2672,19 @@ const CLOUD_API_KEY = "$2a$10$QIpfAXWpKRuC9hRiCVNz1.V4182RJx9SaHuotcsOapPlMy2GYA
                     body: JSON.stringify(payload)
                 });
                 const result = await response.json();
-if (response.ok) {
+                if (response.ok) {
                     if (!cloudBinId) {
                         cloudBinId = result.metadata.id;
-                        // 主机第一次上传拿到房间号后，立刻连接信使准备后续发号施令
                         if(typeof connectMessenger === 'function') connectMessenger(cloudBinId); 
                     }
                     statusBadge.textContent = "同步成功";
                     statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
                     
                     if (typeof isAutoSyncOn !== 'undefined' && isAutoSyncOn && !isAudienceMode) {
-                        // 1. 发射广播通知同设备的网页
-                        unoBroadcastChannel.postMessage('NEW_DATA_UPLOADED');
-                        // 2. 【跨设备魔法】通过公共信使，呼叫远在天边的手机/电脑观众端！
                         if (mqttClient) {
                             mqttClient.publish('uno_infinity_room_' + cloudBinId, 'NEW_DATA_UPLOADED');
                         }
                     }
-                    
                     return true;
                 } else {
                     throw new Error(result.message);
@@ -2715,7 +2699,7 @@ if (response.ok) {
             }
         }
 
-        // 观众端拉取数据 (加入 isSilent 静默模式参数)
+        // 观众端拉取数据 (加入 isSilent 静默模式，并穿透浏览器缓存)
         async function fetchDataFromCloud(syncView = false, isSilent = false) {
             if (!cloudBinId) return;
             const statusBadge = document.getElementById('shareStatusBadge');
@@ -2731,39 +2715,35 @@ if (response.ok) {
             let oldAudUpHTML = audUpBtn ? audUpBtn.innerHTML : '';
             let oldAudSyncHTML = audSyncBtn ? audSyncBtn.innerHTML : '';
             
-            // 只有当不是静默模式时，才让按钮转圈圈
             if (!isSilent) {
                 if(quickAudBtn) quickAudBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-white text-xs sm:text-base"></i>';
                 if(!syncView && audUpBtn) audUpBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-white text-lg mr-2"></i>拉取中...';
                 if(syncView && audSyncBtn) audSyncBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-white text-base mr-2"></i>同步中...';
+            } else {
+                statusBadge.textContent = "收到新数据, 更新中...";
+                statusBadge.classList.replace('text-gray-400', 'text-[#3B82F6]');
             }
 
             try {
+                // 【核心穿透魔法】: 加 cache: 'no-store' 确保绝不拿旧数据！
                 const response = await fetch(`https://api.jsonbin.io/v3/b/${cloudBinId}/latest`, {
-                    headers: { "X-Master-Key": CLOUD_API_KEY }
+                    headers: { "X-Master-Key": CLOUD_API_KEY },
+                    cache: 'no-store' 
                 });
                 const result = await response.json();
                 
                 if (response.ok && result.record.data) {
-                    
-                    // 【核心魔法】：比对数据！如果没有变化，就直接退出，绝不让屏幕瞎闪烁！
-                    const currentLocalData = localStorage.getItem('unoInfinityPro') || '{}';
-                    if (isSilent && result.record.data === currentLocalData) {
-                        return; // 数据一模一样，偷偷离开
-                    }
-
                     if (!syncView) {
-                        const localData = JSON.parse(currentLocalData);
+                        const localData = JSON.parse(localStorage.getItem('unoInfinityPro') || '{}');
                         const incomingData = JSON.parse(result.record.data);
                         if (localData.sectionOrder) incomingData.sectionOrder = localData.sectionOrder;
                         
                         gameData = incomingData;
                         localStorage.setItem('unoInfinityPro', JSON.stringify(incomingData));
                         
-                        if (!isSilent) {
-                            statusBadge.textContent = "更新完成！";
-                            statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
-                        }
+                        statusBadge.textContent = "更新完成！";
+                        statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
+                        statusBadge.classList.replace('text-[#3B82F6]', 'text-[#4ADE80]');
                         
                         if(typeof updateViewRounds === 'function') updateViewRounds();
                         if(typeof recalculateStats === 'function') recalculateStats();
@@ -2777,10 +2757,9 @@ if (response.ok) {
                             localStorage.setItem('unoHiddenModules', result.record.hidden);
                         }
                         
-                        if (!isSilent) {
-                            statusBadge.textContent = "同步完成！";
-                            statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
-                        }
+                        statusBadge.textContent = "同步完成！";
+                        statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
+                        statusBadge.classList.replace('text-[#3B82F6]', 'text-[#4ADE80]');
                         
                         if(typeof updateViewRounds === 'function') updateViewRounds();
                         if(typeof recalculateStats === 'function') recalculateStats();
@@ -2793,13 +2772,18 @@ if (response.ok) {
                 console.error("拉取失败:", error);
                 if (!isSilent) {
                     statusBadge.textContent = "更新失败";
-                    setTimeout(() => { statusBadge.textContent = originalText; }, 2000);
+                    setTimeout(() => { statusBadge.textContent = originalText; statusBadge.classList.replace('text-[#3B82F6]', 'text-gray-400'); }, 2000);
                 }
             } finally {
                 if (!isSilent) {
                     if(quickAudBtn) quickAudBtn.innerHTML = oldQuickAudHTML;
                     if(!syncView && audUpBtn) audUpBtn.innerHTML = oldAudUpHTML;
                     if(syncView && audSyncBtn) audSyncBtn.innerHTML = oldAudSyncHTML;
+                } else {
+                    setTimeout(() => { 
+                        statusBadge.textContent = "观众模式 (只读)"; 
+                        statusBadge.classList.replace('text-[#4ADE80]', 'text-[#F43F5E]'); 
+                    }, 3000);
                 }
             }
         }
@@ -2864,9 +2848,10 @@ function initCloudUI() {
                 statusBadge.classList.replace('text-gray-400', 'text-[#F43F5E]');
                 statusBadge.classList.add('border-[#F43F5E]');
                 
-                // 【核心逻辑：左上角按钮切换】观众端：隐藏蓝色上传，显示绿色下载
+// 【核心逻辑：左上角按钮切换】观众端：隐藏蓝色上传，显示绿色下载，隐藏AUTO
                 if(quickHostBtn) { quickHostBtn.classList.add('hidden'); quickHostBtn.classList.remove('flex'); }
                 if(quickAudBtn) { quickAudBtn.classList.remove('hidden'); quickAudBtn.classList.add('flex'); }
+                if(autoBtn) { autoBtn.classList.add('hidden'); autoBtn.classList.remove('flex'); }
 
 // 【修复：观众端也显示详细数据，并绝对保留您的 5 等分排版！】
                 if(tab5) tab5.style.setProperty('display', 'flex', 'important');
@@ -2890,9 +2875,11 @@ function initCloudUI() {
                 statusBadge.classList.replace('text-gray-400', 'text-[#4ADE80]');
                 statusBadge.classList.add('border-[#4ADE80]');
                 
-// 【核心逻辑：左上角按钮切换】主机端：显示蓝色上传，隐藏绿色下载
+// 【核心逻辑：左上角按钮切换】主机端：显示蓝和橙，隐藏绿色下载
                 if(quickHostBtn) { quickHostBtn.classList.remove('hidden'); quickHostBtn.classList.add('flex'); }
                 if(quickAudBtn) { quickAudBtn.classList.add('hidden'); quickAudBtn.classList.remove('flex'); }
+                if(autoBtn) { autoBtn.classList.remove('hidden'); autoBtn.classList.add('flex'); }
+                if(typeof updateAutoSyncUI === 'function') updateAutoSyncUI();
                 
                 // 【核心逻辑：AUTO按钮】只在主机端显示！
                 if(autoBtn) { autoBtn.classList.remove('hidden'); autoBtn.classList.add('flex'); }
@@ -8260,10 +8247,10 @@ gameData.currentSessionIndex = -1; // 强制回到全局视角
                 if(typeof saveData === 'function') saveData();
 
                 // ========================================================
-                // 【新增引擎：检测到新数据产生，如果 AUTO 开启则全自动上传！】
+                // 【无错版新增：检测到新数据产生，如果 AUTO 开启则全自动上传！】
                 // ========================================================
                 if (typeof isAutoSyncOn !== 'undefined' && isAutoSyncOn && !isAudienceMode && typeof uploadDataToCloud === 'function') {
-                    // 为了防止UI卡顿，稍微延时 0.2 秒再上传
+                    // 稍微延时 0.2 秒再上传，确保本地数据已存稳
                     setTimeout(() => uploadDataToCloud(), 200);
                 }
             };
