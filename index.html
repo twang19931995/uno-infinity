@@ -378,6 +378,12 @@
                 <button id="quickAudienceFetchBtn" class="hidden w-8 h-8 sm:w-10 sm:h-10 bg-[#A3D977] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="if(typeof fetchDataFromCloud === 'function') fetchDataFromCloud(false)">
                     <i class="fa-solid fa-download text-white text-xs sm:text-base"></i>
                 </button>
+<!-- ======================================================== -->
+                <!-- 【全新添加】：后台卡牌编辑按钮 (仅在卡牌页面且为主机端时显示) -->
+                <!-- ======================================================== -->
+                <button id="quickEditCardBtn" class="hidden w-8 h-8 sm:w-10 sm:h-10 bg-[#FBBF24] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="window.toggleCardEditMode()">
+                    <i class="fa-solid fa-pencil text-white text-xs sm:text-base"></i>
+                </button>
             </div>
    
             <!-- 中间：动态胶囊标题 -->
@@ -539,7 +545,108 @@
         <div class="space-y-3 sm:space-y-5" id="barRanking"></div>
     </div>
 
+<!-- ==================================================================== -->
+<!-- ★★★ 【全新大模块】卡牌百科信息图鉴 (含后台编辑系统) ★★★ -->
+<!-- ==================================================================== -->
+<!-- 小白调节区：bg-[#A0E6CC] 控制背景图1那种渐变薄荷绿的底层感受，这里用纯色模拟最佳 -->
+<section id="cardInfoSection" class="kawaii-card p-3 sm:p-5 mb-6 bg-[#A0E6CC]" style="order: 0; display: none;">
+    <div class="flex flex-col items-center w-full relative gap-3">
+        
+        <!-- 容器1：横向分类滑动栏 (图1上方) -->
+        <div class="w-full bg-[white] border-[3px] border-[#5E4B8B] rounded-[1rem] p-1.5 flex items-center shadow-[0_4px_0_#5E4B8B]">
+            <!-- 固定不动的 ALL 按钮 -->
+            <button class="shrink-0 bg-[#E11D48] border-[2.5px] border-[#5E4B8B] rounded-[8px] px-4 py-1 sm:py-1.5 font-black text-white text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] mr-2 z-10 hover:brightness-110 active:translate-y-1 transition-all" onclick="window.switchCardCat('ALL')">ALL</button>
+            
+            <!-- 分类滑动轨道 (由JS注入，支持拖拽排序) -->
+            <div class="flex-1 overflow-x-auto scrollbar-hide flex items-center gap-2 px-1 py-1 min-h-[40px]" id="cardCatTrack"></div>
+            
+            <!-- 后台专属：添加分类按钮 -->
+            <button id="cardAddCatBtn" class="hidden shrink-0 bg-white border-[2.5px] border-[#5E4B8B] rounded-[8px] w-9 h-9 flex items-center justify-center font-black text-[#5E4B8B] shadow-[0_3px_0_#5E4B8B] ml-2 hover:bg-gray-100 active:translate-y-1 transition-all" onclick="window.openCardCatModal()"><i class="fa-solid fa-plus"></i></button>
+        </div>
 
+        <!-- 容器2：动态大标题 -->
+        <div id="cardCatBigTitle" class="bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] px-8 py-1.5 shadow-[0_4px_0_#5E4B8B] flex justify-center items-center mt-1 mb-1 transition-colors duration-300">
+            <span class="font-black text-white text-[22px] sm:text-[28px] tracking-widest leading-none drop-shadow-md">ALL</span>
+        </div>
+
+        <!-- 容器3：卡牌网格展示板 (内部由JS画出) -->
+        <div class="w-full bg-[white] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1.2rem] p-2 sm:p-3 shadow-[0_4px_0_#5E4B8B] min-h-[200px]">
+            <div class="grid grid-cols-5 gap-1.5 sm:gap-2 w-full" id="cardGridContainer"></div>
+        </div>
+
+        <!-- 容器4：后台专属底部数据区 -->
+        <div id="cardEditBottomPanel" class="hidden flex-col items-center w-full gap-3 mt-4">
+            <div class="flex justify-center gap-3 w-full">
+                <button class="flex-1 bg-[#60A5FA] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-base shadow-[0_4px_0_#5E4B8B] active:translate-y-1 transition-all text-stroke" onclick="window.importCardExcel()">导入EXCEL</button>
+                <button class="flex-1 bg-[#4ADE80] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-base shadow-[0_4px_0_#5E4B8B] active:translate-y-1 transition-all text-stroke" onclick="window.exportCardExcel()">导出EXCEL</button>
+            </div>
+            <button class="w-[60%] bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full py-2 font-black text-white text-lg shadow-[0_4px_0_#5E4B8B] active:translate-y-1 transition-all text-stroke tracking-widest mt-2" onclick="window.clearAllCards()">清空数据</button>
+            <input type="file" id="cardExcelInput" class="hidden" accept=".xlsx, .xls">
+        </div>
+    </div>
+</section>
+
+<!-- 【图2复刻】卡牌详细信息弹窗 -->
+<div id="cardDetailModal" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden" onclick="if(event.target===this) this.classList.add('hidden')">
+    <div id="cardDetailBg" class="relative w-[85%] max-w-[320px] aspect-[2/3] border-[4px] border-[#5E4B8B] rounded-[1.5rem] shadow-[0_8px_0_rgba(94,75,139,0.5)] overflow-hidden bg-[#111111] bg-center bg-cover flex flex-col items-center p-4">
+        <!-- 透明度70%的白色遮罩 -->
+        <div class="absolute inset-0 bg-white/70 pointer-events-none z-0"></div>
+        <div class="relative z-10 flex flex-col items-center w-full h-full">
+            <div id="cdmBadge" class="bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-full px-6 py-1 shadow-[0_3px_0_#5E4B8B] mt-4 mb-4">
+                <span class="font-black text-white text-2xl tracking-widest leading-none">A1</span>
+            </div>
+            <div id="cdmNameBg" class="border-[3px] border-[#5E4B8B] rounded-full px-8 py-2 shadow-[0_3px_0_#5E4B8B] mb-5 bg-[#E11D48]/50">
+                <span id="cdmName" class="font-black text-[#5c4c8b] text-2xl tracking-widest leading-none drop-shadow-sm">转向++8</span>
+            </div>
+            <div class="w-[95%] border-[3px] border-[#5E4B8B] rounded-[1.2rem] p-4 shadow-[0_4px_0_#5E4B8B] bg-[var(--card-bg)] text-[#5c4c8b] font-bold text-sm sm:text-base leading-relaxed overflow-y-auto custom-scroll">
+                <ul id="cdmDesc" class="list-disc pl-4 space-y-1"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 【图3复刻】后台设置：分类颜色面板弹窗 -->
+<div id="cardCatModal" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-4 w-[280px] flex flex-col items-center shadow-[0_8px_0_rgba(94,75,139,0.5)]">
+        <div class="bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 w-[80%] text-center font-black text-white mb-4 shadow-[0_3px_0_#5E4B8B] text-stroke tracking-widest">设置分类</div>
+        <input type="text" id="ccmNameInput" placeholder="分类名称(如 A, B, 道具)" class="w-full h-10 border-[3px] border-[#5E4B8B] rounded-xl px-3 font-black text-[#5E4B8B] focus:outline-none mb-3 text-center">
+        <!-- 图4要求：专属颜色网格 -->
+        <div class="w-full mb-4">
+            <div class="text-xs font-bold text-[#5E4B8B] mb-2 text-center tracking-widest">选择专属颜色</div>
+            <div class="grid grid-cols-5 gap-2 justify-items-center px-2" id="ccmColorGrid"></div>
+        </div>
+        <div class="flex justify-center gap-3 w-full">
+            <button class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 font-black text-white text-stroke shadow-[0_3px_0_#5E4B8B] active:translate-y-1 transition-all" onclick="window.saveCardCat()">保存</button>
+            <button class="flex-1 bg-[#F87171] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 font-black text-white text-stroke shadow-[0_3px_0_#5E4B8B] active:translate-y-1 transition-all" onclick="document.getElementById('cardCatModal').classList.add('hidden')">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- 【后台设置】添加/编辑 卡牌详细参数弹窗 -->
+<div id="cardItemModal" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-4 w-[300px] flex flex-col items-center shadow-[0_8px_0_rgba(94,75,139,0.5)]">
+        <div class="bg-[#F59E0B] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 w-[80%] text-center font-black text-white mb-4 shadow-[0_3px_0_#5E4B8B] text-stroke tracking-widest">设置卡牌</div>
+        <div class="w-full space-y-3 mb-4">
+            <div>
+                <div class="text-xs font-bold text-[#5E4B8B] mb-0.5 ml-1 tracking-widest">卡牌名称</div>
+                <input type="text" id="cimNameInput" placeholder="输入名称(可留空占位)" class="w-full h-9 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-bold text-[#5E4B8B] text-sm focus:outline-none">
+            </div>
+            <div>
+                <div class="text-xs font-bold text-[#5E4B8B] mb-0.5 ml-1 tracking-widest">图片 URL</div>
+                <input type="text" id="cimUrlInput" placeholder="http://..." class="w-full h-9 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-bold text-[#5E4B8B] text-sm focus:outline-none">
+            </div>
+            <div>
+                <div class="text-xs font-bold text-[#5E4B8B] mb-0.5 ml-1 tracking-widest">卡牌信息 (换行自动变圆点列表)</div>
+                <textarea id="cimDescInput" rows="3" placeholder="转向\n上家摸8张..." class="w-full border-[3px] border-[#5E4B8B] rounded-xl p-2 font-bold text-[#5E4B8B] text-sm focus:outline-none custom-scroll"></textarea>
+            </div>
+        </div>
+        <div class="flex justify-center gap-3 w-full">
+            <button class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 font-black text-white text-stroke shadow-[0_3px_0_#5E4B8B] active:translate-y-1 transition-all" onclick="window.saveCardItem()">保存</button>
+            <button class="flex-1 bg-[#F87171] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 font-black text-white text-stroke shadow-[0_3px_0_#5E4B8B] active:translate-y-1 transition-all" onclick="document.getElementById('cardItemModal').classList.add('hidden')">取消</button>
+        </div>
+    </div>
+</div>
+<!-- ==================================================================== -->
 
         <!-- 【全新新增】图2 历史局数选择弹窗 -->
         <div id="statusRoundDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
@@ -1431,6 +1538,13 @@
         </div>
     </div>
     
+<!-- 9. 卡牌信息 (全新白色) -->
+    <div class="snap-center shrink-0 flex flex-col items-center justify-center relative cursor-pointer group mobile-tab-btn" data-tab="tab9">
+        <div class="w-[58px] h-[58px] sm:w-[65px] sm:h-[65px] bg-[#ffffff] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box">
+            <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">卡牌<br>信息</span>
+        </div>
+    </div>
+
     <!-- 占位垫片，防止最后一个按钮滑动时贴边 -->
     <div class="shrink-0 w-[10px] sm:w-[20px]"></div>
 </nav>
@@ -1917,6 +2031,7 @@
         ];
 
 const modulesConfig =[
+{ id: 'cardInfoSection', name: '卡牌图鉴百科', icon: 'fa-book-open' },
 { id: 'methodDetailSection', name: '结算详情1', icon: 'fa-images' },
 { id: 'timeRecordSection', name: '时间记录区', icon: 'fa-stopwatch' }, // <--- 【新增】把时间记录区加到这里
 { id: 'timeDataSection', name: '时间数据', icon: 'fa-clock' }, /* 【最新新增】时间数据区 */
@@ -8264,9 +8379,10 @@ const mobileTabs = {
         'tab3': { name: '奖杯荣誉', color: '#FDE047', modules:['badgeSection'] },
         'tab4': { name: '全场成就', color: '#fbbf24', modules:['achievementsSection'] },
         'tab5': { name: '详细数据', color: '#93C5FD', modules:['timeHistorySection', 'pieChartSection', 'methodStatSection', 'methodDetailSection', 'chartSection', 'radarSection', 'oneVsOneSection', 'sessionSection', 'tableSection'] },
-        'tab6': { name: '随机选择器', color: '#7dd3fc', modules:['randomSelectorSection'] },
+        'tab6': { name: '随机抽选', color: '#7dd3fc', modules:['randomSelectorSection'] },
         'tab7': { name: '实时结算', color: '#d8b4e2', modules:['playerSection', 'timeRecordSection', 'timerSection', 'penaltySection', 'penaltyStatsSection'] },
-        'tab8': { name: '数据备份', color: '#F472B6', modules:['cloudShareSection', 'methodManagerSection', 'dataIOSection'] }
+        'tab8': { name: '数据备份', color: '#F472B6', modules:['cloudShareSection', 'methodManagerSection', 'dataIOSection'] },
+        'tab9': { name: '卡牌信息', color: '#E0E7FF', modules:['cardInfoSection'] } // <--- 我们新加的
     };
 
     // 【观众模式判断】：观众端隐藏 实时结算和数据备份
@@ -8366,6 +8482,16 @@ const mobileTabs = {
                 }
             }
         }
+const quickEditCardBtn = document.getElementById('quickEditCardBtn');
+        if(quickEditCardBtn) {
+            if(tabId === 'tab9' && (typeof isAudienceMode === 'undefined' || !isAudienceMode)) {
+                quickEditCardBtn.classList.remove('hidden');
+                quickEditCardBtn.classList.add('flex');
+            } else {
+                quickEditCardBtn.classList.add('hidden');
+                quickEditCardBtn.classList.remove('flex');
+            }
+        }
         // =======================================================
         window.dispatchEvent(new Event('resize'));
     };
@@ -8393,6 +8519,358 @@ const mobileTabs = {
         window.addEventListener('load', () => setTimeout(deployMobileEngine, 100));
     }
 })();
+// ====================================================================
+// ★★★ 卡牌百科图鉴引擎 (图1/2/3复刻 + 后台操作) ★★★
+// ====================================================================
+window.isCardEditMode = false;
+window.currentCardCat = 'ALL';
+window.ccmTargetId = null;
+window.cimTargetId = null;
+window.cimCatId = null;
+
+// 图4要求的十个绝美色卡
+const cardPalette =['#f886aa', '#fe8d6f', '#dfdd6c', '#a0dde0', '#9adbc5', '#f6d7c3', '#acbfea', '#c8d5f7', '#fed7dc', '#ffacbc'];
+
+// 初始化数据
+function initCardSystem() {
+    if (!gameData.cardSystem) {
+        gameData.cardSystem = { categories: [], items:[] };
+    }
+}
+
+// 核心画笔：渲染分类与卡片
+window.renderCardInfoSystem = function() {
+    initCardSystem();
+    const track = document.getElementById('cardCatTrack');
+    const grid = document.getElementById('cardGridContainer');
+    const title = document.getElementById('cardCatBigTitle');
+    const addCatBtn = document.getElementById('cardAddCatBtn');
+    const bottomPanel = document.getElementById('cardEditBottomPanel');
+
+    // 1. 根据模式显示后台按钮
+    if(window.isCardEditMode) {
+        addCatBtn.classList.remove('hidden');
+        bottomPanel.classList.remove('hidden');
+        bottomPanel.classList.add('flex');
+    } else {
+        addCatBtn.classList.add('hidden');
+        bottomPanel.classList.add('hidden');
+        bottomPanel.classList.remove('flex');
+    }
+
+    // 2. 渲染横向分类胶囊 (支持拖拽排序)
+    let catHtml = gameData.cardSystem.categories.map(c => {
+        let isSel = c.id === window.currentCardCat;
+        let opacity = isSel ? 'opacity-100' : 'opacity-60 hover:opacity-80';
+        let crossHtml = window.isCardEditMode ? `<button class="absolute -top-1.5 -right-1.5 bg-[#E11D48] text-white rounded-full w-[16px] h-[16px] flex items-center justify-center border-[1.5px] border-[#5E4B8B] z-20 shadow-sm hover:scale-110" onclick="event.stopPropagation(); window.delCardCat('${c.id}')"><i class="fa-solid fa-times" style="font-size:8px;"></i></button>` : '';
+        
+        return `
+        <div class="relative shrink-0 card-cat-item cursor-pointer transition-all ${opacity}" data-id="${c.id}" onclick="${window.isCardEditMode ? `window.openCardCatModal('${c.id}')` : `window.switchCardCat('${c.id}')`}">
+            ${crossHtml}
+            <div class="border-[2.5px] border-[#5E4B8B] rounded-[8px] px-3 sm:px-4 py-1 sm:py-1.5 font-black text-white text-sm sm:text-base shadow-[0_3px_0_#5E4B8B] tracking-widest text-stroke" style="background-color: ${c.color};">
+                ${c.name}
+            </div>
+        </div>`;
+    }).join('');
+    track.innerHTML = catHtml;
+
+    // 激活分类拖拽排序 (复用已有的 SortableJS)
+    if(window.isCardEditMode && window.Sortable) {
+        if(track.sortableInst) track.sortableInst.destroy();
+        track.sortableInst = new Sortable(track, {
+            animation: 150, delay: 100, delayOnTouchOnly: true,
+            onEnd: function() {
+                const newOrder = [...track.querySelectorAll('.card-cat-item')].map(el => el.dataset.id);
+                gameData.cardSystem.categories.sort((a,b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
+                saveData(); window.renderCardInfoSystem();
+            }
+        });
+    }
+
+    // 3. 动态大标题渲染
+    let currentCatObj = gameData.cardSystem.categories.find(c => c.id === window.currentCardCat);
+    if(window.currentCardCat === 'ALL') {
+        title.style.backgroundColor = '#E11D48'; title.querySelector('span').textContent = 'ALL';
+    } else if (currentCatObj) {
+        title.style.backgroundColor = currentCatObj.color; title.querySelector('span').textContent = currentCatObj.name;
+    }
+
+    // 4. 提取要展示的卡牌
+    let displayItems =[];
+    if(window.currentCardCat === 'ALL') {
+        displayItems = gameData.cardSystem.items;
+    } else {
+        displayItems = gameData.cardSystem.items.filter(i => i.categoryId === window.currentCardCat);
+    }
+
+    // 智能排序：如果选了全部，先按分类排，再按在各自分类里的顺序排！保证A1,A2,B1,B2有序！
+    let renderItems = displayItems.map(item => {
+        let parentCat = gameData.cardSystem.categories.find(c => c.id === item.categoryId);
+        // 【核心魔法】计算它是该分类下的第几张卡，自动生成编号！(如 A1, B3)
+        let catAllItems = gameData.cardSystem.items.filter(i => i.categoryId === item.categoryId);
+        let indexInCat = catAllItems.indexOf(item) + 1;
+        let displayCode = parentCat ? `${parentCat.name}${indexInCat}` : `?${indexInCat}`;
+        let catColor = parentCat ? parentCat.color : '#9CA3AF';
+        
+        return { item, displayCode, catColor, parentCat };
+    });
+
+    // 5. 画出每一张精美的塔罗卡牌 (图1下半部分)
+    let gridHtml = renderItems.map(obj => {
+        let { item, displayCode, catColor } = obj;
+        let imgUrl = item.url || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+        let crossHtml = window.isCardEditMode ? `<button class="absolute -top-1.5 -right-1.5 bg-[#E11D48] text-white rounded-full w-[16px] h-[16px] flex items-center justify-center border-[1.5px] border-[#5E4B8B] z-20 shadow-sm hover:scale-110" onclick="event.stopPropagation(); window.delCardItem('${item.id}')"><i class="fa-solid fa-times" style="font-size:8px;"></i></button>` : '';
+
+        return `
+        <div class="flex flex-col items-center w-full shrink-0 gap-[3px] sm:gap-1.5 relative cursor-pointer hover:scale-105 transition-transform" onclick="${window.isCardEditMode ? `window.openCardItemModal('${item.categoryId}', '${item.id}')` : `window.openCardDetail('${item.id}')`}">
+            ${crossHtml}
+            <!-- 图片框 (2:3黑底比例) -->
+            <div class="w-full aspect-[2/3] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[4px] sm:rounded-[6px] overflow-hidden bg-[#111111] flex items-center justify-center shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] pointer-events-none">
+                <img src="${imgUrl}" class="w-full h-full object-contain" crossorigin="anonymous" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'150\\' height=\\'150\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23f3f4f6\\'/><text x=\\'50%\\' y=\\'50%\\' fill=\\'%239ca3af\\' font-size=\\'20\\' font-family=\\'sans-serif\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>失效</text></svg>'">
+            </div>
+            <!-- 编号胶囊 -->
+            <div class="w-full rounded-[4px] py-[1.5px] sm:py-[2px] flex justify-center items-center border-[2px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] sm:shadow-[0_3px_0_#5E4B8B] mt-0.5 sm:mt-1 pointer-events-none" style="background-color: ${catColor};">
+                <span class="font-black text-white text-[12px] sm:text-[14px] leading-none text-stroke tracking-widest pt-[1px]" style="-webkit-text-stroke: 1px #5E4B8B;">${displayCode}</span>
+            </div>
+        </div>`;
+    }).join('');
+
+    // 如果处于编辑模式且选中了具体分类，最后面加一个硕大的“加号”占位符
+    if(window.isCardEditMode && window.currentCardCat !== 'ALL') {
+        gridHtml += `
+        <div class="flex flex-col items-center w-full shrink-0 gap-[3px] sm:gap-1.5 cursor-pointer hover:scale-105 transition-transform opacity-70 hover:opacity-100" onclick="window.openCardItemModal('${window.currentCardCat}', null)">
+            <div class="w-full aspect-[2/3] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[4px] sm:rounded-[6px] overflow-hidden bg-white flex items-center justify-center shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] pointer-events-none">
+                <i class="fa-solid fa-plus text-3xl text-[#5E4B8B]"></i>
+            </div>
+            <div class="w-full h-[18px] sm:h-[22px]"></div>
+        </div>`;
+    }
+
+    if (!gridHtml) gridHtml = '<div class="col-span-5 text-center text-[#5E4B8B] font-bold py-4 text-sm">该分类下暂无卡牌</div>';
+    grid.innerHTML = gridHtml;
+};
+
+// 后台开关按钮
+window.toggleCardEditMode = function() {
+    window.isCardEditMode = !window.isCardEditMode;
+    const btn = document.getElementById('quickEditCardBtn');
+    if(window.isCardEditMode) {
+        btn.classList.replace('bg-[#FBBF24]', 'bg-[#F43F5E]');
+        btn.innerHTML = '<i class="fa-solid fa-check text-white text-xs sm:text-base"></i>';
+    } else {
+        btn.classList.replace('bg-[#F43F5E]', 'bg-[#FBBF24]');
+        btn.innerHTML = '<i class="fa-solid fa-pencil text-[#5E4B8B] text-xs sm:text-base"></i>';
+    }
+    window.renderCardInfoSystem();
+};
+
+window.switchCardCat = function(id) { window.currentCardCat = id; window.renderCardInfoSystem(); };
+
+// =================后台分类管理=================
+window.openCardCatModal = function(id = null) {
+    window.ccmTargetId = id;
+    const input = document.getElementById('ccmNameInput');
+    const grid = document.getElementById('ccmColorGrid');
+    
+    let selectedColor = cardPalette[0];
+    if(id) {
+        let c = gameData.cardSystem.categories.find(x => x.id === id);
+        if(c) { input.value = c.name; selectedColor = c.color; }
+    } else { input.value = ''; }
+
+    // 渲染色卡，并给选中的色卡加上白圈紫边的高亮
+    grid.innerHTML = cardPalette.map(color => `
+        <div class="w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110 flex items-center justify-center ${color === selectedColor ? 'border-[3px] border-[#5E4B8B] ring-[3px] ring-white scale-110' : ''}" style="background-color: ${color};" onclick="window.selectCcmColor(this, '${color}')"></div>
+    `).join('');
+    
+    document.getElementById('cardCatModal').classList.remove('hidden');
+};
+
+window.selectCcmColor = function(el, color) {
+    document.querySelectorAll('#ccmColorGrid > div').forEach(d => { d.className = "w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110 flex items-center justify-center"; });
+    el.className = "w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110 flex items-center justify-center border-[3px] border-[#5E4B8B] ring-[3px] ring-white scale-110";
+    el.dataset.selColor = color;
+};
+
+window.saveCardCat = function() {
+    const name = document.getElementById('ccmNameInput').value.trim();
+    if(!name) return alert("必须输入分类名称！");
+    const selEl = document.querySelector('#ccmColorGrid > div.ring-white');
+    const color = selEl ? selEl.dataset.selColor : cardPalette[0];
+
+    if(window.ccmTargetId) {
+        let c = gameData.cardSystem.categories.find(x => x.id === window.ccmTargetId);
+        if(c) { c.name = name; c.color = color; }
+    } else {
+        gameData.cardSystem.categories.push({ id: 'cc_' + Date.now(), name, color });
+    }
+    saveData(); window.renderCardInfoSystem();
+    document.getElementById('cardCatModal').classList.add('hidden');
+};
+
+window.delCardCat = function(id) {
+    els.confirmMsg.innerText = "确定要删除此分类吗？\n警告：这会同时删除该分类下的所有卡牌！";
+    els.confirmDialog.classList.remove('hidden');
+    const oldOk = els.confirmBtn.onclick; const oldCancel = els.cancelBtn.onclick;
+    els.confirmBtn.onclick = () => {
+        gameData.cardSystem.categories = gameData.cardSystem.categories.filter(c => c.id !== id);
+        gameData.cardSystem.items = gameData.cardSystem.items.filter(i => i.categoryId !== id);
+        if(window.currentCardCat === id) window.currentCardCat = 'ALL';
+        saveData(); window.renderCardInfoSystem();
+        els.confirmDialog.classList.add('hidden'); els.confirmBtn.onclick = oldOk; els.cancelBtn.onclick = oldCancel;
+    };
+    els.cancelBtn.onclick = () => { els.confirmDialog.classList.add('hidden'); els.confirmBtn.onclick = oldOk; els.cancelBtn.onclick = oldCancel; };
+};
+
+// =================后台卡片管理=================
+window.openCardItemModal = function(catId, itemId = null) {
+    window.cimCatId = catId; window.cimTargetId = itemId;
+    const nameIn = document.getElementById('cimNameInput');
+    const urlIn = document.getElementById('cimUrlInput');
+    const descIn = document.getElementById('cimDescInput');
+    
+    if(itemId) {
+        let item = gameData.cardSystem.items.find(x => x.id === itemId);
+        if(item) { nameIn.value = item.name || ''; urlIn.value = item.url || ''; descIn.value = item.desc ? item.desc.join('\n') : ''; }
+    } else {
+        nameIn.value = ''; urlIn.value = ''; descIn.value = '';
+    }
+    document.getElementById('cardItemModal').classList.remove('hidden');
+};
+
+window.saveCardItem = function() {
+    const name = document.getElementById('cimNameInput').value.trim();
+    const url = document.getElementById('cimUrlInput').value.trim();
+    const rawDesc = document.getElementById('cimDescInput').value;
+    // 将用户输入的回车直接切割为数组保存
+    const descArray = rawDesc ? rawDesc.split('\n').map(s=>s.trim()).filter(s=>s!=='') :[];
+
+    if(window.cimTargetId) {
+        let item = gameData.cardSystem.items.find(x => x.id === window.cimTargetId);
+        if(item) { item.name = name; item.url = url; item.desc = descArray; }
+    } else {
+        gameData.cardSystem.items.push({ id: 'ci_' + Date.now(), categoryId: window.cimCatId, name, url, desc: descArray });
+    }
+    saveData(); window.renderCardInfoSystem();
+    document.getElementById('cardItemModal').classList.add('hidden');
+};
+
+window.delCardItem = function(id) {
+    els.confirmMsg.innerText = "确定要删除这张卡牌吗？";
+    els.confirmDialog.classList.remove('hidden');
+    const oldOk = els.confirmBtn.onclick; const oldCancel = els.cancelBtn.onclick;
+    els.confirmBtn.onclick = () => {
+        gameData.cardSystem.items = gameData.cardSystem.items.filter(i => i.id !== id);
+        saveData(); window.renderCardInfoSystem();
+        els.confirmDialog.classList.add('hidden'); els.confirmBtn.onclick = oldOk; els.cancelBtn.onclick = oldCancel;
+    };
+    els.cancelBtn.onclick = () => { els.confirmDialog.classList.add('hidden'); els.confirmBtn.onclick = oldOk; els.cancelBtn.onclick = oldCancel; };
+};
+
+// =================观众端看详情弹窗=================
+window.openCardDetail = function(id) {
+    const item = gameData.cardSystem.items.find(i => i.id === id);
+    const cat = gameData.cardSystem.categories.find(c => c.id === item.categoryId);
+    if(!item || !cat) return;
+
+    let catAllItems = gameData.cardSystem.items.filter(i => i.categoryId === item.categoryId);
+    let indexInCat = catAllItems.indexOf(item) + 1;
+    let displayCode = `${cat.name}${indexInCat}`;
+
+    const bgEl = document.getElementById('cardDetailBg');
+    const badge = document.getElementById('cdmBadge');
+    const nameBg = document.getElementById('cdmNameBg');
+    const nameText = document.getElementById('cdmName');
+    const descUl = document.getElementById('cdmDesc');
+
+    // 图片设置为底层背景
+    let imgUrl = item.url || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+    bgEl.style.backgroundImage = `url('${imgUrl}')`;
+
+    // 设置编号与名字
+    badge.style.backgroundColor = cat.color;
+    badge.querySelector('span').textContent = displayCode;
+    
+    // 背景50%透明魔法
+    nameBg.style.backgroundColor = hexToRgba(cat.color, 0.5);
+    nameText.textContent = item.name || '未命名卡牌';
+
+    // 渲染圆点列表描述
+    if(item.desc && item.desc.length > 0) {
+        descUl.innerHTML = item.desc.map(line => `<li>${line}</li>`).join('');
+    } else {
+        descUl.innerHTML = '<li class="list-none text-center">暂无详细说明</li>';
+    }
+
+    document.getElementById('cardDetailModal').classList.remove('hidden');
+};
+
+// =================导入导出清空引擎=================
+window.clearAllCards = function() {
+    els.confirmMsg.innerText = "确定清空【所有分类】与【卡牌数据】吗？此操作无法撤销！";
+    els.confirmDialog.classList.remove('hidden');
+    const oldOk = els.confirmBtn.onclick; const oldCancel = els.cancelBtn.onclick;
+    els.confirmBtn.onclick = () => {
+        gameData.cardSystem = { categories: [], items:[] };
+        window.currentCardCat = 'ALL';
+        saveData(); window.renderCardInfoSystem();
+        els.confirmDialog.classList.add('hidden'); els.confirmBtn.onclick = oldOk; els.cancelBtn.onclick = oldCancel;
+    };
+    els.cancelBtn.onclick = () => { els.confirmDialog.classList.add('hidden'); els.confirmBtn.onclick = oldOk; els.cancelBtn.onclick = oldCancel; };
+};
+
+window.exportCardExcel = function() {
+    if (typeof XLSX === 'undefined') return alert('请等待 Excel 库加载完成！');
+    const wb = XLSX.utils.book_new();
+    const count = gameData.cardSystem.items.length;
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const mmdd = String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+    const filename = `UNO卡牌配置-${yy}${mmdd}-共${count}张.xlsx`;
+    
+    const jsonStr = JSON.stringify(gameData.cardSystem);
+    const rows =[];
+    for(let i=0; i<jsonStr.length; i+=30000) rows.push([jsonStr.substring(i, i+30000)]);
+    
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "Card_System_Config");
+    XLSX.writeFile(wb, filename);
+};
+
+window.importCardExcel = function() { document.getElementById('cardExcelInput').click(); };
+const ceInput = document.getElementById('cardExcelInput');
+if(ceInput) {
+    ceInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            try {
+                const workbook = XLSX.read(evt.target.result, {type:'array'});
+                const sheet = workbook.Sheets["Card_System_Config"];
+                if (!sheet) throw new Error("该Excel不包含卡牌图鉴配置！");
+                
+                const arr = XLSX.utils.sheet_to_json(sheet, {header:1});
+                let jsonStr = '';
+                arr.forEach(row => { if (row[0]) jsonStr += row[0]; });
+                
+                const parsed = JSON.parse(jsonStr);
+                if (parsed && parsed.categories && parsed.items) {
+                    gameData.cardSystem = parsed; window.currentCardCat = 'ALL';
+                    saveData(); window.renderCardInfoSystem(); alert("导入卡牌配置成功！");
+                }
+            } catch(err) { alert("导入失败: " + err.message); }
+        };
+        reader.readAsArrayBuffer(file); e.target.value = ''; 
+    };
+}
+// ====================================================================
+
+// 给系统主更新链条挂上更新指令 (兜底)
+const prevCardInfoRender = window.updateAllUI;
+window.updateAllUI = function() {
+    if(prevCardInfoRender) prevCardInfoRender();
+    if(typeof window.renderCardInfoSystem === 'function') window.renderCardInfoSystem();
+};
         window.onload = init;
 // ==========================================
 // 【终极纠错霸体引擎：全功能修复版】
