@@ -546,6 +546,90 @@
     </div>
 
 <!-- ==================================================================== -->
+<!-- ★★★ 【全新大模块】动态数据可视化引擎 (你追我赶跑马图) ★★★ -->
+<!-- ==================================================================== -->
+<!-- 小白调节区：bg-[#A0E6CC] 控制背景那层淡淡的青绿色 -->
+<section id="dynamicDataSection" class="kawaii-card p-3 sm:p-4 mb-6 bg-[#A0E6CC] relative" style="order: 0; display: none;">
+    
+    <!-- 顶部：粘性局次控制台 (复用系统的组件，这里我们放个占位标识即可，底层JS会把真控制台吸附过来) -->
+    <div class="w-full h-[0px] mb-0 pointer-events-none"></div>
+
+    <!-- 【全新拆分】：容器 1-1：显示当前播放到的局数 (独立悬浮在白框上方) -->
+    <!-- [底色] bg-[#389ff5] 蓝色底色，文字白色 text-white -->
+    <div class="flex justify-center mb-3 sm:mb-4 z-20 relative w-full">
+        <div class="bg-[#389ff5] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] px-8 py-1.5 shadow-[0_4px_0_#5E4B8B]">
+            <span id="ddPlayRoundText" class="font-black text-white text-[20px] sm:text-[24px] tracking-widest leading-none drop-shadow-sm">第000局</span>
+        </div>
+    </div>
+
+    <!-- 核心大容器 (白底紫边) -->
+    <!-- [高度自适应] 稍微减少了一点高度分配，保证不遮挡底部 -->
+    <div class="bg-[white] border-[4px] border-[#5E4B8B] rounded-[1rem] w-full flex flex-col shadow-[0_6px_0_#5E4B8B] relative overflow-hidden" style="height: calc(100dvh - 410px); min-height: 400px;">
+        
+        <!-- 容器 1-2：玩家数据动态可视化画板 -->
+        <!-- mt-2 取代了以前硬留的 mt-[60px] 顶部空白 -->
+        <div class="w-full flex-1 relative mt-6 sm:mt-3 p-2 overflow-hidden" id="ddRaceTrack">
+            <!-- JS 引擎会在这里生成疯狂移动的胶囊条 -->
+        </div>
+
+    </div>
+</section>
+
+<!-- 悬浮在底部的播放控制台 (始终固定在此处，只有切到动态数据页才显示) -->
+<div id="ddControlsBar" class="fixed bottom-[95px] sm:bottom-[105px] left-0 w-full z-[90] flex justify-center gap-4 hidden transition-all duration-300 pointer-events-none">
+    <div class="pointer-events-auto mb-3 flex items-center gap-3 sm:gap-4 px-2">
+        <!-- 设置按钮 (红色) -->
+        <button class="bg-[#E11D48] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-2xl w-[80px] h-[50px] sm:w-14 sm:h-14 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="window.openDDSettings()">
+            <i class="fa-solid fa-gear text-white text-xl sm:text-2xl"></i>
+        </button>
+        <!-- 播放/暂停按钮 (黄色) -->
+        <button id="ddPlayPauseBtn" class="bg-[#F59E0B] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-2xl w-[80px] h-[50px] sm:w-[100px] sm:h-[60px] flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="window.toggleDDPlay()">
+            <i class="fa-solid fa-play text-white text-2xl sm:text-3xl ml-1"></i>
+        </button>
+        <!-- 速度设置按钮 (蓝色) -->
+        <button id="ddSpeedBtn" class="bg-[#3B82F6] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-2xl w-[80px] h-[50px] sm:w-[100px] sm:h-[60px] flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="window.changeDDSpeed()">
+            <span id="ddSpeedText" class="font-black text-white text-xl sm:text-2xl tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">X 2.0</span>
+        </button>
+    </div>
+</div>
+
+<!-- 【后台弹窗】动态数据专属设置面板 -->
+<div id="ddSettingsModal" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-4 w-[280px] flex flex-col items-center shadow-[0_8px_0_rgba(94,75,139,0.5)]">
+        <div class="bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 w-[80%] text-center font-black text-white mb-4 shadow-[0_3px_0_#5E4B8B] text-stroke tracking-widest">动态条设置</div>
+        <div class="w-full space-y-3 mb-4">
+            <div class="flex justify-between items-center bg-white border-[2px] border-[#5E4B8B] rounded-lg p-2">
+                <span class="text-xs font-bold text-[#5E4B8B]">胶囊粗细 (px)</span>
+                <input type="number" id="ddsHeight" class="w-16 text-center border-b-2 border-[#5E4B8B] focus:outline-none font-bold text-[#E11D48]">
+            </div>
+            <div class="flex justify-between items-center bg-white border-[2px] border-[#5E4B8B] rounded-lg p-2">
+                <span class="text-xs font-bold text-[#5E4B8B]">头像大小 (px)</span>
+                <input type="number" id="ddsAvatar" class="w-16 text-center border-b-2 border-[#5E4B8B] focus:outline-none font-bold text-[#E11D48]">
+            </div>
+            <div class="flex justify-between items-center bg-white border-[2px] border-[#5E4B8B] rounded-lg p-2">
+                <span class="text-xs font-bold text-[#5E4B8B]">名字字号 (px)</span>
+                <input type="number" id="ddsName" class="w-16 text-center border-b-2 border-[#5E4B8B] focus:outline-none font-bold text-[#E11D48]">
+            </div>
+            <div class="flex justify-between items-center bg-white border-[2px] border-[#5E4B8B] rounded-lg p-2">
+                <span class="text-xs font-bold text-[#5E4B8B]">分数数字字号 (px)</span>
+                <input type="number" id="ddsScore" class="w-16 text-center border-b-2 border-[#5E4B8B] focus:outline-none font-bold text-[#E11D48]">
+            </div>
+            <div class="flex justify-between items-center bg-white border-[2px] border-[#5E4B8B] rounded-lg p-2">
+                <span class="text-xs font-bold text-[#5E4B8B]">胶囊上下间距 (px)</span>
+                <input type="number" id="ddsGap" class="w-16 text-center border-b-2 border-[#5E4B8B] focus:outline-none font-bold text-[#E11D48]">
+            </div>
+        </div>
+<!-- 小白调节区：设置面板底部三连按钮 -->
+        <div class="flex justify-center gap-2 sm:gap-3 w-full mt-2">
+            <button class="flex-1 bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 font-black text-white text-[12px] sm:text-sm text-stroke shadow-[0_3px_0_#5E4B8B] active:translate-y-1 transition-all whitespace-nowrap" onclick="window.resetDDSettings()">恢复默认</button>
+            <button class="flex-[1.2] bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 font-black text-white text-[12px] sm:text-sm text-stroke shadow-[0_3px_0_#5E4B8B] active:translate-y-1 transition-all whitespace-nowrap" onclick="window.saveDDSettings()">保存应用</button>
+            <button class="flex-1 bg-[#F87171] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 font-black text-white text-[12px] sm:text-sm text-stroke shadow-[0_3px_0_#5E4B8B] active:translate-y-1 transition-all whitespace-nowrap" onclick="document.getElementById('ddSettingsModal').classList.add('hidden')">取消</button>
+        </div>
+    </div>
+</div>
+<!-- ==================================================================== -->
+
+<!-- ==================================================================== -->
 <!-- ★★★ 【全新大模块】卡牌百科信息图鉴 (含后台编辑系统) ★★★ -->
 <!-- ==================================================================== -->
 <!-- 小白调节区：bg-[#A0E6CC] 控制背景图1那种渐变薄荷绿的底层感受，这里用纯色模拟最佳 -->
@@ -626,7 +710,13 @@
 <div id="cardItemModal" class="fixed inset-0 bg-[#5E4B8B]/70 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
     <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-4 w-[300px] flex flex-col items-center shadow-[0_8px_0_rgba(94,75,139,0.5)]">
         <div class="bg-[#F59E0B] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 w-[80%] text-center font-black text-white mb-4 shadow-[0_3px_0_#5E4B8B] text-stroke tracking-widest">设置卡牌</div>
-        <div class="w-full space-y-3 mb-4">
+<div class="w-full space-y-3 mb-4">
+            <!-- 【全新增加：卡牌自定义编号输入框】 -->
+            <div>
+                <div class="text-xs font-bold text-[#5E4B8B] mb-0.5 ml-1 tracking-widest">卡牌编号 (可自由修改)</div>
+                <input type="text" id="cimCodeInput" placeholder="如 A1, 1.2 等(留空自动生成)" class="w-full h-9 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-bold text-[#5E4B8B] text-sm focus:outline-none bg-[#FDE047]/20">
+            </div>
+            <!-- 原来的卡牌名称 -->
             <div>
                 <div class="text-xs font-bold text-[#5E4B8B] mb-0.5 ml-1 tracking-widest">卡牌名称</div>
                 <input type="text" id="cimNameInput" placeholder="输入名称(可留空占位)" class="w-full h-9 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-bold text-[#5E4B8B] text-sm focus:outline-none">
@@ -1537,9 +1627,16 @@
             <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">数据<br>备份</span>
         </div>
     </div>
-    
-<!-- 9. 卡牌信息 (全新白色) -->
+ 
+<!-- 9. 动态数据 (亮绿色) -->
     <div class="snap-center shrink-0 flex flex-col items-center justify-center relative cursor-pointer group mobile-tab-btn" data-tab="tab9">
+        <div class="w-[58px] h-[58px] sm:w-[65px] sm:h-[65px] bg-[#86EFAC] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box">
+            <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">动态<br>数据</span>
+        </div>
+    </div>
+   
+<!-- 10. 卡牌信息 (全新白色) -->
+    <div class="snap-center shrink-0 flex flex-col items-center justify-center relative cursor-pointer group mobile-tab-btn" data-tab="tab10">
         <div class="w-[58px] h-[58px] sm:w-[65px] sm:h-[65px] bg-[#ffffff] border-[3px] border-[#5E4B8B] rounded-[1rem] flex flex-col items-center justify-center shadow-[0_3px_0_#5E4B8B] transition-transform active:translate-y-1 active:shadow-none relative z-10 tab-icon-box">
             <span class="font-black text-[#5E4B8B] text-[12px] sm:text-[13px] leading-tight tracking-widest text-center mt-0.5">卡牌<br>信息</span>
         </div>
@@ -2031,6 +2128,7 @@
         ];
 
 const modulesConfig =[
+{ id: 'dynamicDataSection', name: '动态数据', icon: 'fa-chart-bar' },
 { id: 'cardInfoSection', name: '卡牌图鉴百科', icon: 'fa-book-open' },
 { id: 'methodDetailSection', name: '结算详情1', icon: 'fa-images' },
 { id: 'timeRecordSection', name: '时间记录区', icon: 'fa-stopwatch' }, // <--- 【新增】把时间记录区加到这里
@@ -8382,7 +8480,8 @@ const mobileTabs = {
         'tab6': { name: '随机抽选', color: '#7dd3fc', modules:['randomSelectorSection'] },
         'tab7': { name: '实时结算', color: '#d8b4e2', modules:['playerSection', 'timeRecordSection', 'timerSection', 'penaltySection', 'penaltyStatsSection'] },
         'tab8': { name: '数据备份', color: '#F472B6', modules:['cloudShareSection', 'methodManagerSection', 'dataIOSection'] },
-        'tab9': { name: '卡牌信息', color: '#E0E7FF', modules:['cardInfoSection'] } // <--- 我们新加的
+        'tab9': { name: '动态数据', color: '#6ee7b7', modules:['dynamicDataSection'] }, // <--- 全新：动态数据
+        'tab10': { name: '卡牌信息', color: '#E0E7FF', modules:['cardInfoSection'] }  // 原来的卡牌顺延
     };
 
     // 【观众模式判断】：观众端隐藏 实时结算和数据备份
@@ -8595,7 +8694,7 @@ window.renderCardInfoSystem = function() {
         title.style.backgroundColor = currentCatObj.color; title.querySelector('span').textContent = currentCatObj.name;
     }
 
-    // 4. 提取要展示的卡牌
+// 4. 提取要展示的卡牌
     let displayItems =[];
     if(window.currentCardCat === 'ALL') {
         displayItems = gameData.cardSystem.items;
@@ -8603,26 +8702,32 @@ window.renderCardInfoSystem = function() {
         displayItems = gameData.cardSystem.items.filter(i => i.categoryId === window.currentCardCat);
     }
 
-    // 智能排序：如果选了全部，先按分类排，再按在各自分类里的顺序排！保证A1,A2,B1,B2有序！
     let renderItems = displayItems.map(item => {
         let parentCat = gameData.cardSystem.categories.find(c => c.id === item.categoryId);
-        // 【核心魔法】计算它是该分类下的第几张卡，自动生成编号！(如 A1, B3)
-        let catAllItems = gameData.cardSystem.items.filter(i => i.categoryId === item.categoryId);
-        let indexInCat = catAllItems.indexOf(item) + 1;
-        let displayCode = parentCat ? `${parentCat.name}${indexInCat}` : `?${indexInCat}`;
+        
+        // 【核心魔法升级】：优先使用自定义固化的 code，如果没有再用老方法智能推算！
+        let displayCode = item.code;
+        if (!displayCode) {
+            let catAllItems = gameData.cardSystem.items.filter(i => i.categoryId === item.categoryId);
+            let indexInCat = catAllItems.indexOf(item) + 1;
+            displayCode = parentCat ? `${parentCat.name}${indexInCat}` : `?${indexInCat}`;
+        }
         let catColor = parentCat ? parentCat.color : '#9CA3AF';
         
         return { item, displayCode, catColor, parentCat };
     });
 
-    // 5. 画出每一张精美的塔罗卡牌 (图1下半部分)
+    // 5. 画出每一张精美的塔罗卡牌 (加入 card-item-cap 和 data-id 支持拖拽)
     let gridHtml = renderItems.map(obj => {
         let { item, displayCode, catColor } = obj;
         let imgUrl = item.url || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
         let crossHtml = window.isCardEditMode ? `<button class="absolute -top-1.5 -right-1.5 bg-[#E11D48] text-white rounded-full w-[16px] h-[16px] flex items-center justify-center border-[1.5px] border-[#5E4B8B] z-20 shadow-sm hover:scale-110" onclick="event.stopPropagation(); window.delCardItem('${item.id}')"><i class="fa-solid fa-times" style="font-size:8px;"></i></button>` : '';
 
+        // 【拖拽标识】：加上 card-item-cap 和 cursor-move (如果是编辑模式)
+        let dragClass = window.isCardEditMode ? "card-item-cap cursor-move" : "";
+
         return `
-        <div class="flex flex-col items-center w-full shrink-0 gap-[3px] sm:gap-1.5 relative cursor-pointer hover:scale-105 transition-transform" onclick="${window.isCardEditMode ? `window.openCardItemModal('${item.categoryId}', '${item.id}')` : `window.openCardDetail('${item.id}')`}">
+        <div class="flex flex-col items-center w-full shrink-0 gap-[3px] sm:gap-1.5 relative hover:scale-105 transition-transform ${dragClass}" data-id="${item.id}" onclick="${window.isCardEditMode ? `window.openCardItemModal('${item.categoryId}', '${item.id}')` : `window.openCardDetail('${item.id}')`}">
             ${crossHtml}
             <!-- 图片框 (2:3黑底比例) -->
             <div class="w-full aspect-[2/3] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[4px] sm:rounded-[6px] overflow-hidden bg-[#111111] flex items-center justify-center shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] pointer-events-none">
@@ -8635,10 +8740,10 @@ window.renderCardInfoSystem = function() {
         </div>`;
     }).join('');
 
-    // 如果处于编辑模式且选中了具体分类，最后面加一个硕大的“加号”占位符
+    // 如果处于编辑模式且选中了具体分类，最后面加一个硕大的“加号”占位符 (加上 ignore-drag 防止它被拖走)
     if(window.isCardEditMode && window.currentCardCat !== 'ALL') {
         gridHtml += `
-        <div class="flex flex-col items-center w-full shrink-0 gap-[3px] sm:gap-1.5 cursor-pointer hover:scale-105 transition-transform opacity-70 hover:opacity-100" onclick="window.openCardItemModal('${window.currentCardCat}', null)">
+        <div class="flex flex-col items-center w-full shrink-0 gap-[3px] sm:gap-1.5 cursor-pointer hover:scale-105 transition-transform opacity-70 hover:opacity-100 ignore-drag" onclick="window.openCardItemModal('${window.currentCardCat}', null)">
             <div class="w-full aspect-[2/3] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[4px] sm:rounded-[6px] overflow-hidden bg-white flex items-center justify-center shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] pointer-events-none">
                 <i class="fa-solid fa-plus text-3xl text-[#5E4B8B]"></i>
             </div>
@@ -8648,6 +8753,32 @@ window.renderCardInfoSystem = function() {
 
     if (!gridHtml) gridHtml = '<div class="col-span-5 text-center text-[#5E4B8B] font-bold py-4 text-sm">该分类下暂无卡牌</div>';
     grid.innerHTML = gridHtml;
+
+    // 【新增卡牌拖拽排序引擎】
+    if(window.isCardEditMode && window.Sortable) {
+        if(grid.sortableInst) grid.sortableInst.destroy();
+        grid.sortableInst = new Sortable(grid, {
+            animation: 150, delay: 100, delayOnTouchOnly: true,
+            filter: '.ignore-drag', // 绝对不能拖动加号！
+            onEnd: function() {
+                // 获取拖拽后界面上卡牌的 ID 顺序
+                const newOrderIds =[...grid.querySelectorAll('.card-item-cap')].map(el => el.dataset.id);
+                
+                // 提取出这些卡牌的原对象
+                let currentItems = newOrderIds.map(id => gameData.cardSystem.items.find(i => i.id === id)).filter(Boolean);
+                
+                // 找出这批卡牌在全局大数组中的原始索引，并从小到大排好
+                let originalIndices = newOrderIds.map(id => gameData.cardSystem.items.findIndex(i => i.id === id)).sort((a,b)=>a-b);
+                
+                // 把重新排序好的对象，按顺序塞回它们原本腾出来的位置坑里 (完美支持 ALL 和 单分类 视图下的拖拽)
+                originalIndices.forEach((origIdx, i) => {
+                    gameData.cardSystem.items[origIdx] = currentItems[i];
+                });
+                
+                saveData(); window.renderCardInfoSystem();
+            }
+        });
+    }
 };
 
 // 后台开关按钮
@@ -8678,7 +8809,6 @@ window.openCardCatModal = function(id = null) {
         if(c) { input.value = c.name; selectedColor = c.color; }
     } else { input.value = ''; }
 
-    // 渲染色卡，并给选中的色卡加上白圈紫边的高亮
     grid.innerHTML = cardPalette.map(color => `
         <div class="w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110 flex items-center justify-center ${color === selectedColor ? 'border-[3px] border-[#5E4B8B] ring-[3px] ring-white scale-110' : ''}" style="background-color: ${color};" onclick="window.selectCcmColor(this, '${color}')"></div>
     `).join('');
@@ -8725,31 +8855,48 @@ window.delCardCat = function(id) {
 // =================后台卡片管理=================
 window.openCardItemModal = function(catId, itemId = null) {
     window.cimCatId = catId; window.cimTargetId = itemId;
+    const codeIn = document.getElementById('cimCodeInput');
     const nameIn = document.getElementById('cimNameInput');
     const urlIn = document.getElementById('cimUrlInput');
     const descIn = document.getElementById('cimDescInput');
     
     if(itemId) {
         let item = gameData.cardSystem.items.find(x => x.id === itemId);
-        if(item) { nameIn.value = item.name || ''; urlIn.value = item.url || ''; descIn.value = item.desc ? item.desc.join('\n') : ''; }
+        if(item) { 
+            codeIn.value = item.code || '';
+            nameIn.value = item.name || ''; 
+            urlIn.value = item.url || ''; 
+            descIn.value = item.desc ? item.desc.join('\n') : ''; 
+        }
     } else {
+        // 新建卡片时，智能推测下一个编号并预填！
+        let cat = gameData.cardSystem.categories.find(c => c.id === catId);
+        let count = gameData.cardSystem.items.filter(i => i.categoryId === catId).length + 1;
+        codeIn.value = cat ? `${cat.name}${count}` : `${count}`;
         nameIn.value = ''; urlIn.value = ''; descIn.value = '';
     }
     document.getElementById('cardItemModal').classList.remove('hidden');
 };
 
 window.saveCardItem = function() {
+    const code = document.getElementById('cimCodeInput').value.trim();
     const name = document.getElementById('cimNameInput').value.trim();
     const url = document.getElementById('cimUrlInput').value.trim();
     const rawDesc = document.getElementById('cimDescInput').value;
-    // 将用户输入的回车直接切割为数组保存
+    // 将用户输入的回车直接切割为数组保存 (防截断完整版)
     const descArray = rawDesc ? rawDesc.split('\n').map(s=>s.trim()).filter(s=>s!=='') :[];
 
     if(window.cimTargetId) {
         let item = gameData.cardSystem.items.find(x => x.id === window.cimTargetId);
-        if(item) { item.name = name; item.url = url; item.desc = descArray; }
+        if(item) { 
+            item.code = code; // 【新增】保存固化的编号
+            item.name = name; 
+            item.url = url; 
+            item.desc = descArray; 
+        }
     } else {
-        gameData.cardSystem.items.push({ id: 'ci_' + Date.now(), categoryId: window.cimCatId, name, url, desc: descArray });
+        // 【新增】新建时写入 code 属性
+        gameData.cardSystem.items.push({ id: 'ci_' + Date.now(), categoryId: window.cimCatId, code: code, name: name, url: url, desc: descArray });
     }
     saveData(); window.renderCardInfoSystem();
     document.getElementById('cardItemModal').classList.add('hidden');
@@ -8773,9 +8920,13 @@ window.openCardDetail = function(id) {
     const cat = gameData.cardSystem.categories.find(c => c.id === item.categoryId);
     if(!item || !cat) return;
 
-    let catAllItems = gameData.cardSystem.items.filter(i => i.categoryId === item.categoryId);
-    let indexInCat = catAllItems.indexOf(item) + 1;
-    let displayCode = `${cat.name}${indexInCat}`;
+    // 【核心魔法升级】：优先使用自定义固化的 code！
+    let displayCode = item.code;
+    if (!displayCode) {
+        let catAllItems = gameData.cardSystem.items.filter(i => i.categoryId === item.categoryId);
+        let indexInCat = catAllItems.indexOf(item) + 1;
+        displayCode = `${cat.name}${indexInCat}`;
+    }
 
     const bgEl = document.getElementById('cardDetailBg');
     const badge = document.getElementById('cdmBadge');
@@ -8871,6 +9022,294 @@ window.updateAllUI = function() {
     if(prevCardInfoRender) prevCardInfoRender();
     if(typeof window.renderCardInfoSystem === 'function') window.renderCardInfoSystem();
 };
+// ====================================================================
+// ★★★ 动态数据可视化引擎 (极致丝滑 60/120帧 RAF 硬件加速算法) ★★★
+// ====================================================================
+window.ddEngine = {
+    isPlaying: false,
+    currentFrame: 0, // 变为浮点数，实现无极平滑
+    speedIdx: 0,
+    speeds: [0.5, 1, 2, 4, 8], // 每秒播放的局数。减小基数让动画更从容可见
+    lastTime: null,
+    timelineData: [], 
+    maxScorePerFrame:[], 
+    settings: {
+        barHeight: 32, 
+        avatarSize: 22, 
+        nameSize: 14,  
+        scoreSize: 18, 
+        gap: 16        
+    },
+    animationRef: null
+};
+
+// 1. 初始化 DOM 和 预计算数据大脑
+window.initDDEngine = function() {
+    const active = gameData.players.filter(p => p.isActive);
+    if(active.length === 0 || viewRounds.length === 0) return;
+
+    window.ddEngine.timelineData =[];
+    window.ddEngine.maxScorePerFrame =[];
+    window.ddEngine.lastScores = {}; 
+    
+    let cumulative = {};
+    let hasPlayed = {}; 
+    active.forEach(p => { 
+        cumulative[p.id] = 0; 
+        hasPlayed[p.id] = false; 
+        window.ddEngine.lastScores[p.id] = 0; 
+    });
+
+    viewRounds.forEach((r) => {
+        let frameObj = {};
+        let frameMax = 1; 
+        
+        active.forEach(p => {
+            if (r.changes[p.id] !== undefined) {
+                cumulative[p.id] += r.changes[p.id];
+                hasPlayed[p.id] = true;
+            }
+            frameObj[p.id] = { score: cumulative[p.id], active: hasPlayed[p.id] };
+            
+            if(hasPlayed[p.id]) {
+                let absScore = Math.abs(cumulative[p.id]);
+                if (absScore > frameMax) frameMax = absScore;
+            }
+        });
+        
+        window.ddEngine.timelineData.push(frameObj);
+        window.ddEngine.maxScorePerFrame.push(frameMax);
+    });
+
+    const track = document.getElementById('ddRaceTrack');
+    if(!track) return;
+    
+    track.innerHTML = active.map(p => {
+        let shortName = p.name ? p.name.slice(-1) : '?';
+        return `
+        <!-- 【终极重排版】：由于所有东西都在胶囊内了，我们给外侧跑道留足右侧空间防遮挡即可 -->
+        <div id="dd-row-${p.id}" class="absolute left-2 right-2 sm:right-4 opacity-0" style="height: ${window.ddEngine.settings.barHeight}px; will-change: transform, opacity;">
+            
+            <!-- 【胶囊本体】：使用 justify-between 将内容分别顶到最左和最右，min-w-max 保证数字再长也绝不超框换行！ -->
+            <div id="dd-bar-${p.id}" class="h-full rounded-[6px] border-[2.5px] sm:border-[3px] border-[#5E4B8B] shadow-[0_3px_0_#5E4B8B] flex items-center justify-between overflow-hidden px-1.5" style="background-color: ${p.color}; width: 0%; min-width: max-content; will-change: width;">
+                
+                <!-- 内部左端：名字在前，头像在后 (完全像素级对齐图1红框要求) -->
+                <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                    <span class="font-black text-white tracking-widest leading-none pb-[1px]" style="font-size: ${window.ddEngine.settings.nameSize}px; -webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${shortName}</span>
+                    <div class="rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center" style="width: ${window.ddEngine.settings.avatarSize}px; height: ${window.ddEngine.settings.avatarSize}px;">
+                        <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                </div>
+
+                <!-- 内部右端：白色分数 + 动态描边色 (完全像素级对齐图1红框要求) -->
+                <div class="shrink-0 flex items-center pl-3">
+                    <!-- 极其粗壮的游戏伤害描边：-webkit-text-stroke: 2.5px -->
+                    <span id="dd-score-${p.id}" class="font-black tracking-wider leading-none drop-shadow-sm" style="font-size: ${window.ddEngine.settings.scoreSize}px; color: #ffffff; -webkit-text-stroke: 2.5px #5c4c8b; paint-order: stroke fill;">0</span>
+                </div>
+
+            </div>
+        </div>
+        `;
+    }).join('');
+
+    window.ddEngine.currentFrame = 0;
+    window.renderDDFrame(0);
+};
+
+// 2. 渲染浮点数帧 (实时插值计算，实现 120Hz 极致丝滑过渡与数字滚动)
+window.renderDDFrame = function(progressVal) {
+    if(viewRounds.length === 0) return;
+
+    let frame1 = Math.floor(progressVal);
+    let frame2 = Math.ceil(progressVal);
+    if (frame2 >= window.ddEngine.timelineData.length) frame2 = window.ddEngine.timelineData.length - 1;
+    
+    let pRatio = progressVal - frame1; 
+
+    const data1 = window.ddEngine.timelineData[frame1];
+    const data2 = window.ddEngine.timelineData[frame2];
+    const max1 = window.ddEngine.maxScorePerFrame[frame1];
+    const max2 = window.ddEngine.maxScorePerFrame[frame2];
+    
+    const currentMax = max1 + (max2 - max1) * pRatio;
+
+    document.getElementById('ddPlayRoundText').textContent = `第${viewRounds[frame1].round}局`;
+
+    const active = gameData.players.filter(pl => pl.isActive);
+    
+    // 算出这一瞬间，所有人的实时滚动分数
+    let currentScores = {};
+    active.forEach(pl => {
+        let s1 = data1[pl.id].score;
+        let s2 = data2[pl.id].score;
+        currentScores[pl.id] = s1 + (s2 - s1) * pRatio;
+    });
+
+    let sorted1 = [...active].filter(pl => data1[pl.id].active).sort((a,b) => data1[b.id].score - data1[a.id].score);
+    let rankMap1 = {}; sorted1.forEach((pl, i) => rankMap1[pl.id] = i);
+
+    let sorted2 = [...active].filter(pl => data2[pl.id].active).sort((a,b) => data2[b.id].score - data2[a.id].score);
+    let rankMap2 = {}; sorted2.forEach((pl, i) => rankMap2[pl.id] = i);
+
+    active.forEach(pl => {
+        const rowEl = document.getElementById(`dd-row-${pl.id}`);
+        const barEl = document.getElementById(`dd-bar-${pl.id}`);
+        const scoreEl = document.getElementById(`dd-score-${pl.id}`);
+        
+        if(!rowEl || !barEl || !scoreEl) return;
+
+        if(!data1[pl.id].active && !data2[pl.id].active) {
+            rowEl.style.opacity = '0'; rowEl.style.pointerEvents = 'none';
+        } else {
+            rowEl.style.opacity = '1';
+            
+            let r1 = rankMap1[pl.id] !== undefined ? rankMap1[pl.id] : (rankMap2[pl.id] !== undefined ? rankMap2[pl.id] : 0);
+            let r2 = rankMap2[pl.id] !== undefined ? rankMap2[pl.id] : r1;
+            
+            let currentRank = r1 + (r2 - r1) * pRatio;
+            let yPos = currentRank * (window.ddEngine.settings.barHeight + window.ddEngine.settings.gap);
+            
+            rowEl.style.transform = `translateY(${yPos}px)`;
+
+            let score = currentScores[pl.id];
+            let absScore = Math.abs(score);
+            let pct = currentMax > 0 ? (absScore / currentMax) * 100 : 0;
+
+            // 【宽度自适应防断层】：去掉了以前固定的最低 2% 宽度！
+            // 因为现在有 min-width: max-content 保护，当分数为0时，胶囊会自动包裹住内部的头像名字和分数，像图1一样精致！
+            barEl.style.width = `${pct}%`;
+
+// 【数字丝滑滚动与颜色判定】：利用底层帧率，直接输出截断整数，实现天然老虎机翻页效果！
+            let displayScore = Math.floor(score);
+            
+            // 【终极UI要求】：所有分数统一使用深紫色外描边！
+            scoreEl.style.webkitTextStroke = '2.5px #5c4c8b'; 
+            
+            if (displayScore > 0) { 
+                scoreEl.style.color = '#00ff00'; // 正分：纯绿文本
+                scoreEl.textContent = `+${displayScore}`; 
+            } else if (displayScore < 0) { 
+                scoreEl.style.color = '#fb2a53'; // 负分：粉红文本
+                scoreEl.textContent = `${displayScore}`; 
+            } else { 
+                scoreEl.style.color = '#ffffff'; // 零分：纯白文本
+                scoreEl.textContent = `0`; 
+            }
+
+            window.ddEngine.lastScores[pl.id] = score;
+        }
+    });
+};
+
+// 3. 硬件级游戏循环引擎 (彻底解决卡顿抽帧问题)
+window.ddAnimationLoop = function(timestamp) {
+    if (!window.ddEngine.isPlaying) return;
+    if (!window.ddEngine.lastTime) window.ddEngine.lastTime = timestamp;
+    
+    let delta = timestamp - window.ddEngine.lastTime;
+    window.ddEngine.lastTime = timestamp;
+    
+    // 算出这一帧跑了多少局的进度
+    let speed = window.ddEngine.speeds[window.ddEngine.speedIdx]; 
+    let progressIncrement = speed * (delta / 1000);
+    
+    window.ddEngine.currentFrame += progressIncrement;
+    
+    if (window.ddEngine.currentFrame >= viewRounds.length - 1) {
+        window.ddEngine.currentFrame = viewRounds.length - 1;
+        window.renderDDFrame(window.ddEngine.currentFrame);
+        window.toggleDDPlay(); // 播完自动停
+        return;
+    }
+    
+    window.renderDDFrame(window.ddEngine.currentFrame);
+    window.ddEngine.animationRef = window.requestAnimationFrame(window.ddAnimationLoop);
+};
+
+window.toggleDDPlay = function() {
+    const btn = document.getElementById('ddPlayPauseBtn');
+    if (window.ddEngine.isPlaying) {
+        window.ddEngine.isPlaying = false;
+        window.cancelAnimationFrame(window.ddEngine.animationRef);
+        btn.innerHTML = '<i class="fa-solid fa-play text-white text-2xl sm:text-3xl ml-1"></i>';
+        btn.classList.replace('bg-[#E11D48]', 'bg-[#F59E0B]'); 
+    } else {
+        if (window.ddEngine.currentFrame >= viewRounds.length - 1) {
+            window.ddEngine.currentFrame = 0;
+        }
+        window.ddEngine.isPlaying = true;
+        window.ddEngine.lastTime = null; // 必须重置时间戳，防止突进
+        btn.innerHTML = '<i class="fa-solid fa-pause text-white text-2xl sm:text-3xl"></i>';
+        btn.classList.replace('bg-[#F59E0B]', 'bg-[#E11D48]'); 
+        
+        window.ddEngine.animationRef = window.requestAnimationFrame(window.ddAnimationLoop);
+    }
+};
+
+window.changeDDSpeed = function() {
+    window.ddEngine.speedIdx++;
+    if (window.ddEngine.speedIdx >= window.ddEngine.speeds.length) {
+        window.ddEngine.speedIdx = 0;
+    }
+    document.getElementById('ddSpeedText').textContent = `X ${window.ddEngine.speeds[window.ddEngine.speedIdx].toFixed(1)}`;
+};
+
+window.openDDSettings = function() {
+    document.getElementById('ddsHeight').value = window.ddEngine.settings.barHeight;
+    document.getElementById('ddsAvatar').value = window.ddEngine.settings.avatarSize;
+    document.getElementById('ddsName').value = window.ddEngine.settings.nameSize;
+    document.getElementById('ddsScore').value = window.ddEngine.settings.scoreSize;
+    document.getElementById('ddsGap').value = window.ddEngine.settings.gap;
+    document.getElementById('ddSettingsModal').classList.remove('hidden');
+};
+
+// 【新增功能】：恢复默认设置魔法
+window.resetDDSettings = function() {
+    document.getElementById('ddsHeight').value = 32;
+    document.getElementById('ddsAvatar').value = 22;
+    document.getElementById('ddsName').value = 14;
+    document.getElementById('ddsScore').value = 18;
+    document.getElementById('ddsGap').value = 16;
+    window.saveDDSettings(); // 自动保存并生效
+};
+
+window.saveDDSettings = function() {
+    window.ddEngine.settings.barHeight = parseInt(document.getElementById('ddsHeight').value) || 32;
+    window.ddEngine.settings.avatarSize = parseInt(document.getElementById('ddsAvatar').value) || 22;
+    window.ddEngine.settings.nameSize = parseInt(document.getElementById('ddsName').value) || 14;
+    window.ddEngine.settings.scoreSize = parseInt(document.getElementById('ddsScore').value) || 18;
+    window.ddEngine.settings.gap = parseInt(document.getElementById('ddsGap').value) || 16;
+    
+    document.getElementById('ddSettingsModal').classList.add('hidden');
+    window.initDDEngine(); // 重绘赛道
+};
+
+// 挂载拦截
+const prevDDRender = window.updateAllUI;
+window.updateAllUI = function() {
+    if(prevDDRender) prevDDRender();
+    if(typeof window.initDDEngine === 'function') window.initDDEngine();
+};
+
+const prevMobileSwitch = window.switchMobileTab;
+window.switchMobileTab = function(tabId) {
+    if(prevMobileSwitch) prevMobileSwitch(tabId);
+    
+    const ctrlBar = document.getElementById('ddControlsBar');
+    const stickyHeader = document.getElementById('detailDataStickyHeader');
+    if(ctrlBar && stickyHeader) {
+        if (tabId === 'tab9') {
+            ctrlBar.classList.remove('hidden');
+            stickyHeader.classList.remove('hidden');
+            stickyHeader.style.display = 'block';
+            if(typeof window.initDDEngine === 'function') window.initDDEngine();
+        } else {
+            ctrlBar.classList.add('hidden');
+            if(window.ddEngine && window.ddEngine.isPlaying) window.toggleDDPlay(); 
+        }
+    }
+};
+// ====================================================================
         window.onload = init;
 // ==========================================
 // 【终极纠错霸体引擎：全功能修复版】
