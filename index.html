@@ -9084,30 +9084,67 @@ window.initDDEngine = function() {
     const track = document.getElementById('ddRaceTrack');
     if(!track) return;
     
-    track.innerHTML = active.map(p => {
+track.innerHTML = active.map(p => {
         let shortName = p.name ? p.name.slice(-1) : '?';
         return `
-        <!-- 【终极重排版】：由于所有东西都在胶囊内了，我们给外侧跑道留足右侧空间防遮挡即可 -->
-        <div id="dd-row-${p.id}" class="absolute left-2 right-2 sm:right-4 opacity-0" style="height: ${window.ddEngine.settings.barHeight}px; will-change: transform, opacity;">
+        <!-- 
+          ========================================================
+          【小白调节区：动态条整行大容器】[控制代码] flex items-center
+          [使用方法] 采用了最新的 Flex 布局，把整行分为：左侧(名头)、中间(跑道)、右侧(分数) 纯净三等份！
+          ========================================================
+        -->
+        <div id="dd-row-${p.id}" class="absolute left-2 right-2 sm:right-4 opacity-0 flex items-center" style="height: ${window.ddEngine.settings.barHeight}px; will-change: transform, opacity;">
             
-            <!-- 【胶囊本体】：使用 justify-between 将内容分别顶到最左和最右，min-w-max 保证数字再长也绝不超框换行！ -->
-            <div id="dd-bar-${p.id}" class="h-full rounded-[6px] border-[2.5px] sm:border-[3px] border-[#5E4B8B] shadow-[0_3px_0_#5E4B8B] flex items-center justify-between overflow-hidden px-1.5" style="background-color: ${p.color}; width: 0%; min-width: max-content; will-change: width;">
-                
-                <!-- 内部左端：名字在前，头像在后 (完全像素级对齐图1红框要求) -->
-                <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                    <span class="font-black text-white tracking-widest leading-none pb-[1px]" style="font-size: ${window.ddEngine.settings.nameSize}px; -webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${shortName}</span>
-                    <div class="rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center" style="width: ${window.ddEngine.settings.avatarSize}px; height: ${window.ddEngine.settings.avatarSize}px;">
-                        <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
-                    </div>
+            <!-- 
+              ========================================================
+              【小白调节区：外部左侧（名字+头像）组合】
+              [控制代码] mr-2 sm:mr-3
+              [使用方法] 控制左侧名头组件与中间动态条之间的距离（间距绝对固定）。
+              [控制代码] w-[45px] sm:w-[55px][使用方法] 固定左侧组合的总宽度，防止因为人名长短不一导致中间跑道起点不平齐。
+              ========================================================
+            -->
+            <div class="flex items-center shrink-0 mr-2 sm:mr-3 justify-end w-[45px] sm:w-[55px]">
+                <span class="font-black tracking-widest leading-none drop-shadow-sm mr-1 sm:mr-1.5" style="font-size: ${window.ddEngine.settings.nameSize}px; color: ${p.color}; -webkit-text-stroke: 1.5px #5c4c8b; paint-order: stroke fill;">${shortName}</span>
+                <div class="rounded-[4px] sm:rounded-[6px] border-[1.5px] sm:border-[2px] border-[#5c4c8b] bg-black overflow-hidden flex items-center justify-center shadow-sm shrink-0" style="width: ${window.ddEngine.settings.avatarSize}px; height: ${window.ddEngine.settings.avatarSize}px;">
+                    <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
                 </div>
-
-                <!-- 内部右端：白色分数 + 动态描边色 (完全像素级对齐图1红框要求) -->
-                <div class="shrink-0 flex items-center pl-3">
-                    <!-- 极其粗壮的游戏伤害描边：-webkit-text-stroke: 2.5px -->
-                    <span id="dd-score-${p.id}" class="font-black tracking-wider leading-none drop-shadow-sm" style="font-size: ${window.ddEngine.settings.scoreSize}px; color: #ffffff; -webkit-text-stroke: 2.5px #5c4c8b; paint-order: stroke fill;">0</span>
-                </div>
-
             </div>
+
+            <!-- 
+              ========================================================
+              【小白调节区：中间纯净动态条赛道】
+              [控制代码] flex-1
+              [使用方法] 这个魔法指令会让动态条无视一切，铺满剩下的所有横向空白区域！
+              ========================================================
+            -->
+            <div class="flex-1 relative flex items-center h-full">
+                <!-- 
+                  【纯净版动态条本体】[控制代码] h-[60%] sm:h-[70%] 控制进度条的高度（占据父容器的高度的百分比，想变细就改小）。
+                  [控制代码] rounded-full 控制纯圆角，想变方角可以改成 rounded-md。
+                  [控制代码] border-[2px] border-[#5E4B8B] 控制深紫色极细描边。
+                  [特效备份代码] 若想让它像光剑一样自带扫光，在 class 双引号最后加上 sweep-light 或 magic-glow
+                -->
+                <div id="dd-bar-${p.id}" class="h-[60%] sm:h-[70%] rounded-full border-[2px] sm:border-[2.5px] border-[#5c4c8b] shadow-[0_2px_0_#5c4c8b]" 
+                     style="background-color: ${p.color}; width: 0%; will-change: width;"></div>
+            </div>
+
+            <!-- 
+              ========================================================
+              【小白调节区：外部右侧（分数独立区）】
+              [控制代码] ml-2 sm:ml-3
+              [使用方法] 控制右侧分数与中间动态条的距离（间距绝对固定）。
+              [控制代码] w-[45px] sm:w-[60px]
+              [使用方法] 固定分数的底座宽度，防止分数数字从小变大时赛道被反复向左挤压晃动。
+              ========================================================
+            -->
+            <div class="shrink-0 ml-2 sm:ml-3 flex items-center justify-start w-[45px] sm:w-[60px]">
+                <!-- 
+                  【分数样式】
+                  [说明] 分数的大小由原本的 settings 调节，分数的颜色已经在底层的动画循环里写好了(正绿/负红/零白)。
+                -->
+                <span id="dd-score-${p.id}" class="font-black tracking-wider leading-none drop-shadow-sm" style="font-size: ${window.ddEngine.settings.scoreSize}px; color: #ffffff; -webkit-text-stroke: 2.5px #5c4c8b; paint-order: stroke fill;">0</span>
+            </div>
+
         </div>
         `;
     }).join('');
