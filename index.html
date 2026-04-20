@@ -5810,27 +5810,59 @@ pointLabels: {
                 if (id) oldPositions[id] = row.getBoundingClientRect().top;
             });
 
-            els.barRanking.innerHTML = active.map(p => {
-                const rawWidth = Math.abs(p.total) / maxAbs * 100;
-                const width = rawWidth < 8 ? 8 : rawWidth.toFixed(2);
-                const displayScore = p.total >= 0 ? `+${p.total}` : p.total;
-                const scoreColor = p.total >= 0 ? '#4ADE80' : '#F87171';
+els.barRanking.innerHTML = active.map(p => {
+                const rawWidth = maxAbs === 0 ? 0 : (Math.abs(p.total) / maxAbs * 100);
+                const width = rawWidth.toFixed(2);
+
+                let scoreColor = '#ffffff';
+                let displayScore = '0';
+                if (p.total > 0) {
+                    scoreColor = '#00ff00';
+                    displayScore = `+${p.total}`;
+                } else if (p.total < 0) {
+                    scoreColor = '#fb2a53';
+                    displayScore = `${p.total}`;
+                }
+                
+                let shortName = p.name ? p.name.slice(-1) : '?';
 
                 return `
-                <div class="flex items-center rank-row mb-2 sm:mb-0" data-id="${p.id}">
-                    <span class="text-2xl sm:text-4xl font-black text-stroke w-12 sm:w-auto text-center shrink-0" style="color:${p.color}">${p.name}</span>
+                <div class="flex items-center rank-row mb-3 sm:mb-4 w-full" data-id="${p.id}">
                     
-                    <div class="ml-1 sm:ml-4 w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl border-2 sm:border-4 border-[#5E4B8B] overflow-hidden shrink-0">
-                        <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                    <!-- 左侧（名字+头像）保持不动 -->
+                    <div class="flex items-center shrink-0 mr-2 sm:mr-3 justify-end w-[65px] sm:w-[85px]">
+                        <span class="font-black tracking-widest leading-none drop-shadow-sm mr-1.5 sm:mr-2 text-[20px] sm:text-[24px]" style="color: ${p.color}; -webkit-text-stroke: 2px #5c4c8b; paint-order: stroke fill;">${shortName}</span>
+                        <div class="w-[26px] h-[26px] sm:w-[32px] sm:h-[32px] rounded-[6px] sm:rounded-[8px] border-[2px] sm:border-[2.5px] border-[#5c4c8b] bg-black overflow-hidden flex items-center justify-center shadow-sm shrink-0">
+                            <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                        </div>
                     </div>
                     
-                    <div class="flex-1 ml-2 sm:ml-6 relative h-10 sm:h-14 flex items-center">
-                        <div class="h-6 sm:h-11 rounded-full bar bar-stroke min-w-[2rem] shadow-lg" 
-                             style="background-color:${p.color}; width:0%;" 
+                    <!-- 
+                      ========================================================
+                      【小白魔法区：中间赛道与分数跟随】
+                      [核心魔法] pr-[50px] sm:pr-[70px]
+                      这句代码在右边隐形地留出了一个“安全空地”。确保当跑道达到 100% 满血时，挂在后面的分数正好落在这个空地里，绝不会爆出屏幕外！
+                      ========================================================
+                    -->
+                    <div class="flex-1 flex items-center h-[26px] sm:h-[32px] pr-[10px] sm:pr-[70px]">
+                        
+                        <!-- 动态条本体：长短根据分数变化 -->
+                        <div class="h-[22px] sm:h-[28px] rounded-full border-[2px] sm:border-[2.5px] border-[#5c4c8b] shadow-[0_2px_0_#5c4c8b] transition-all" 
+                             style="background-color: ${p.color}; width: ${width}%;" 
                              data-width="${width}%"></div>
+                        
+                        <!-- 
+                          ========================================================
+                          【分数挂载区】
+                          [控制代码] ml-2 sm:ml-3
+                          这保证了无论动态条多长，分数永远死死贴在它右边，隔着固定的小距离！
+                          ========================================================
+                        -->
+                        <div class="shrink-0 ml-2 sm:ml-3 flex items-center">
+                            <span class="font-black tracking-wider leading-none drop-shadow-sm text-[22px] sm:text-[28px]" style="color: ${scoreColor}; -webkit-text-stroke: 2.5px #5c4c8b; paint-order: stroke fill;">${displayScore}</span>
+                        </div>
+                        
                     </div>
-                    
-                    <span class="text-2xl sm:text-4xl font-black text-stroke ml-2 sm:ml-3 w-16 sm:w-auto text-right shrink-0" style="color:${scoreColor}">${displayScore}</span>
                 </div>
                 `;
             }).join('');
@@ -8484,12 +8516,14 @@ const mobileTabs = {
         'tab10': { name: '卡牌信息', color: '#E0E7FF', modules:['cardInfoSection'] }  // 原来的卡牌顺延
     };
 
-    // 【观众模式判断】：观众端隐藏 实时结算和数据备份
+// 【观众模式判断】：观众端隐藏 实时结算、数据备份、卡牌信息
     if (typeof isAudienceMode !== 'undefined' && isAudienceMode) {
         const t7 = document.querySelector('.mobile-tab-btn[data-tab="tab7"]');
         const t8 = document.querySelector('.mobile-tab-btn[data-tab="tab8"]');
+        const t10 = document.querySelector('.mobile-tab-btn[data-tab="tab10"]'); // 抓取卡牌信息模块
         if(t7) t7.style.setProperty('display', 'none', 'important');
         if(t8) t8.style.setProperty('display', 'none', 'important');
+        if(t10) t10.style.setProperty('display', 'none', 'important'); // 强制隐藏
     }
 
     let currentMobileTab = 'tab3';
@@ -8583,7 +8617,7 @@ const mobileTabs = {
         }
 const quickEditCardBtn = document.getElementById('quickEditCardBtn');
         if(quickEditCardBtn) {
-            if(tabId === 'tab9' && (typeof isAudienceMode === 'undefined' || !isAudienceMode)) {
+            if(tabId === 'tab10' && (typeof isAudienceMode === 'undefined' || !isAudienceMode)) {
                 quickEditCardBtn.classList.remove('hidden');
                 quickEditCardBtn.classList.add('flex');
             } else {
@@ -9801,18 +9835,54 @@ const originalUpdateAllUI = window.updateAllUI;
                 return `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-4 py-1 flex items-center gap-2 shadow-sm relative group" style="background-color: ${p.color};"><div class="w-7 h-7 rounded-full border-[2px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-base">${p.name}</span><button class="absolute -top-1.5 -right-1.5 bg-[#E11D48] text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-[#5E4B8B] hidden group-hover:flex hover:scale-110" onclick="removeTempElimPlayer(${id})"><i class="fa-solid fa-times text-[10px]"></i></button></div>`;
             }).join('') + `<button class="w-9 h-9 rounded-[0.6rem] bg-[#CBD5E1] border-[3px] border-[#5E4B8B] flex items-center justify-center text-[#5E4B8B] font-black text-xl hover:brightness-95 shadow-sm ml-1" onclick="openSelectPlayerDialog('elim_add')"><i class="fa-solid fa-plus"></i></button>`;
 
-            const killerBtn = document.getElementById('elimInfoKillerBtn');
-            if (window.v2App.tempElim.killerId) {
-                const p = gameData.players.find(x=>x.id===window.v2App.tempElim.killerId);
-                killerBtn.innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-5 py-1.5 flex items-center gap-3 shadow-sm cursor-pointer hover:brightness-110" style="background-color: ${p.color};" onclick="openSelectPlayerDialog('elim_killer')"><div class="w-8 h-8 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-lg">${p.name}</span></div>`;
-            } else { killerBtn.innerHTML = `<button class="bg-[#D8B4E2] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-6 font-black text-[#5E4B8B] text-sm shadow-sm hover:brightness-110 tracking-widest" onclick="openSelectPlayerDialog('elim_killer')">点击选择(必选)</button>`; }
-
+const killerBtn = document.getElementById('elimInfoKillerBtn');
+            
+            // 筛选出可以作为凶手的玩家（目前局内的活跃玩家且未被淘汰的）
+            const activeKillers = gameData.players.filter(p => p.isActive && !v2State.eliminated[p.id]);
+            
+            // 将外层容器强制接管为 Grid 栅格布局，一行绝对均分4个！
+            killerBtn.className = "grid grid-cols-4 gap-1.5 sm:gap-2 w-full px-1";
+            
+            // 动态画出每个玩家的胶囊按钮
+            killerBtn.innerHTML = activeKillers.map(p => {
+                const isSelected = window.v2App.tempElim.killerId === p.id;
+                
+                // 核心交互逻辑：如果是被选中的玩家，保持亮度并放大；如果是未被选中的，则变灰变暗缩小！
+                const opacityClass = isSelected 
+                    ? 'opacity-100 scale-105 shadow-[0_3px_0_#5E4B8B] ring-2 ring-white' 
+                    : 'opacity-50 scale-95 shadow-none grayscale-[40%] hover:opacity-80'; // 悬浮时微微变亮
+                
+                const shortName = p.name ? p.name.slice(-1) : '?';
+                
+                return `
+                <!-- 
+                  ========================================================
+                  【小白调节区：直选“被谁淘汰”头像胶囊】
+                  [1. 整体大小] py-1: 控制上下高度。
+                  [2. 头像尺寸] w-6 h-6 sm:w-7 sm:h-7: 控制中间方形小头像的宽高。
+                  [3. 字体大小] text-[11px] sm:text-xs: 控制下方单字名字的字号。[4. 动画交互] cursor-pointer transition-all: 让选中/未选中的缩放过渡丝滑如德芙！
+                  [特效说明] 选中时会放大(scale-105)并有纯白外发光白边(ring-white)加深紫底座投影；
+                            未选中时会缩小(scale-95)、半透明(opacity-50)并带点灰度丧失色彩(grayscale)！
+                  ======================================================== 
+                -->
+                <div class="flex flex-col items-center justify-center border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-xl py-1 cursor-pointer transition-all ${opacityClass}" style="background-color: ${p.color};" onclick="window.setTempElimKiller(${p.id})">
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden mb-0.5 shrink-0 flex items-center justify-center shadow-sm">
+                        <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <span class="font-black text-white text-[11px] sm:text-xs text-stroke tracking-widest leading-none pb-[1px]" style="-webkit-text-stroke: 1px #5E4B8B;">${shortName}</span>
+                </div>`;
+            }).join('');
             const methodBtn = document.getElementById('elimInfoMethodBtn');
             methodBtn.textContent = window.v2App.tempElim.methodName || '点击选择';
             methodBtn.onclick = () => openSelectMethodDialog('elim_method');
             document.getElementById('elimInfoCardsInput').value = window.v2App.tempElim.cards;
         };
         window.removeTempElimPlayer = function(id) { window.v2App.tempElim.players = window.v2App.tempElim.players.filter(pid => pid !== id); window.renderElimInfoDialog(); };
+
+window.setTempElimKiller = function(id) { 
+            window.v2App.tempElim.killerId = id; 
+            window.renderElimInfoDialog(); // 点击后立刻重绘，瞬间触发高亮暗淡特效
+        };
 
         window.createPenaltyRowHtml = function(userP, victimP, method, cardsStr) {
             const getShort = (name) => name ? name.slice(-1) : '?';
