@@ -1505,68 +1505,81 @@
   [特效备份] 如果想加外发光呼吸灯特效，可以在 class 里加上 glow-effect 
   ========================================================
 -->
-<section id="methodManagerSection" class="kawaii-card p-4 sm:p-6 mb-6 bg-[#FEFCE8]">
+<!-- 
+  ========================================================
+  【图1像素级复刻：结算方式管理（淘汰方式）】
+  ========================================================
+-->
+<section id="methodManagerSection" class="relative w-full max-w-[420px] mx-auto bg-[#FDF8E4] border-[2px] border-[#333333] pb-6 pt-4 px-2 sm:px-4 mb-6 shadow-sm">
     
-    <!-- 头部标题区：包含标题、特殊设置、切换按钮、折叠箭头 -->
-    <div class="flex justify-between items-center mb-6">
-        
-        <!-- 左侧：标题与折叠控制 -->
-        <div class="flex items-center gap-2 cursor-pointer" onclick="document.getElementById('mmFoldContent').classList.toggle('hidden'); document.getElementById('mmTitleIcon').classList.toggle('rotate-180');">
-            <!-- 
-              ========================================================
-              【小白调节区：主标题样式】
-              [控制代码] text-xl sm:text-2xl
-              [使用方法] 控制标题文字大小。[控制代码] text-[#5E4B8B]
-              [使用方法] 控制文字颜色（深紫色）。
-              [特效备份] 如果想要文字带描边，可以加上 class="text-stroke"
-              ========================================================
-            -->
-            <h2 id="methodManagerTitle" class="text-xl sm:text-2xl font-bold text-[#5E4B8B] flex items-center tracking-widest">
-                淘汰方式条目管理区
-            </h2>
-            <i id="mmTitleIcon" class="fa-solid fa-chevron-down text-2xl text-[#5E4B8B] transition-transform rotate-180"></i>
+    <!-- 头部控制区 -->
+    <div class="flex flex-col items-center relative mb-6 w-full">
+        <!-- 
+          小白调节区：折叠按钮 
+          right-2 控制靠右距离，w-8 h-8 控制圆圈大小
+        -->
+        <button onclick="document.getElementById('mmFoldContent').classList.toggle('hidden'); document.getElementById('mmTitleIcon').classList.toggle('rotate-180');" class="absolute right-0 top-0 w-8 h-8 rounded-full border-[1.5px] border-[#333333] flex items-center justify-center bg-transparent active:scale-90 transition-transform">
+            <i id="mmTitleIcon" class="fa-solid fa-chevron-up text-[#333333] text-sm transition-transform duration-300"></i>
+        </button>
+
+        <!-- 
+          小白调节区：顶部粉色大标题 
+          bg-[#EC71A1] 是粉色底色
+          text-[20px] 是文字大小
+        -->
+        <div class="bg-[#EC71A1] border-[2px] border-[#333333] px-6 py-1.5 mb-3 shadow-[2px_2px_0_#333333]">
+            <span class="font-black text-white text-[20px] tracking-widest leading-none drop-shadow-sm">结算方式管理</span>
         </div>
 
-        <!-- 右侧：功能按钮 -->
         <!-- 
-          ========================================================
-          【小白调节区：右侧功能按钮】
-          [控制代码] bg-[#FDE047] (黄色) 和 bg-white (白色)
-          [使用方法] 更改按钮底色。
-          [特效备份] class里有 hover:brightness-110 可以在手指触摸时变亮。
-          ========================================================
+          小白调节区：红色切换按钮
+          bg-[#A13434] 是暗红色底色
         -->
-        <div class="flex items-center gap-2 sm:gap-3">
-            <button id="mmSpecialSettingBtn" class="bg-[#FDE047] border-[3px] border-[#5E4B8B] rounded-full px-3 sm:px-5 py-1 sm:py-1.5 font-bold text-[#5E4B8B] text-xs sm:text-sm shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all">特殊设置</button>
-            <button id="mmToggleTabBtn" class="bg-white border-[3px] border-[#5E4B8B] rounded-full px-3 sm:px-5 py-1 sm:py-1.5 font-bold text-[#5E4B8B] text-xs sm:text-sm shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all">切换</button>
-        </div>
+        <button id="mmToggleTabBtn" class="bg-[#A13434] border-[2px] border-[#333333] px-8 py-1.5 shadow-[2px_2px_0_#333333] active:translate-y-[2px] active:shadow-none transition-all">
+            <span id="methodManagerTitle" class="font-black text-white text-[22px] tracking-widest leading-none">淘汰方式</span>
+        </button>
     </div>
 
-    <!-- 内容区的外层包裹（默认隐藏 hidden） -->
-    <div id="mmFoldContent" class="hidden">
+    <!-- 折叠内容区 -->
+    <div id="mmFoldContent" class="w-full flex flex-col items-center">
         
-        <!-- 添加按钮区 (白底圆角框) -->
-        <div class="bg-white border-[3px] border-[#5E4B8B] rounded-[2rem] p-3 mb-10 flex justify-center gap-6 mx-2">
-            <button id="mmAddCategoryBtn" class="flex-1 max-w-[200px] bg-[#E9D5FF] border-[3px] border-[#5E4B8B] rounded-full py-2 font-black text-[#5E4B8B] text-lg shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest">添加分类</button>
-            <button id="mmAddItemBtn" class="flex-1 max-w-[200px] bg-[#FED7AA] border-[3px] border-[#5E4B8B] rounded-full py-2 font-black text-[#5E4B8B] text-lg shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest">添加条目</button>
+        <!-- 添加按钮容器 (白底黑边框) -->
+        <div class="w-full bg-white border-[2px] border-[#333333] p-3 flex justify-center gap-6 mb-6">
+            <!-- 小白调节区：橙色添加分类按钮 bg-[#E28D43] -->
+            <button id="mmAddCategoryBtn" class="bg-[#E28D43] border-[2px] border-[#333333] px-4 py-1.5 shadow-[2px_2px_0_#333333] active:translate-y-[2px] active:shadow-none transition-all">
+                <span class="font-black text-white text-[16px] tracking-widest">添加分类</span>
+            </button>
+            <!-- 小白调节区：蓝色添加方式按钮 bg-[#6D82EE] -->
+            <button id="mmAddItemBtn" class="bg-[#6D82EE] border-[2px] border-[#333333] px-4 py-1.5 shadow-[2px_2px_0_#333333] active:translate-y-[2px] active:shadow-none transition-all">
+                <span class="font-black text-white text-[16px] tracking-widest">添加方式</span>
+            </button>
         </div>
 
-        <!-- 动态生成的分类与条目渲染区 -->
-        <div id="methodManagerContent" class="flex flex-col gap-10 pb-4">
+        <!-- 动态生成的分类与条目渲染区 (JS会在这里疯狂作画) -->
+        <div id="methodManagerContent" class="flex flex-col w-full gap-4 pb-6">
             <!-- JS 动态注入 -->
         </div>
 
-        <!-- 底部导出导入区 -->
-        <div class="mt-8 pt-6 flex flex-col items-center gap-4">
-            <div class="flex justify-center gap-6">
-                <button id="mmExportBtn" class="bg-[#84CC16] border-[3px] border-[#5E4B8B] rounded-xl px-5 py-2 font-black text-white text-base shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-wider">导出配置</button>
-                <button id="mmImportBtn" class="bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl px-5 py-2 font-black text-white text-base shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-wider">导入配置</button>
+        <!-- 底部导出导入与清空区 -->
+        <div class="w-full flex flex-col items-center gap-4 mt-2">
+            <div class="flex justify-center gap-6 w-full">
+                <!-- 绿色导出按钮 -->
+                <button id="mmExportBtn" class="bg-[#9BD066] border-[2px] border-[#333333] px-6 py-2 shadow-[2px_2px_0_#333333] active:translate-y-[2px] active:shadow-none transition-all">
+                    <span class="font-black text-white text-[18px] tracking-widest drop-shadow-sm">导出配置</span>
+                </button>
+                <!-- 蓝色导入按钮 -->
+                <button id="mmImportBtn" class="bg-[#617AE9] border-[2px] border-[#333333] px-6 py-2 shadow-[2px_2px_0_#333333] active:translate-y-[2px] active:shadow-none transition-all">
+                    <span class="font-black text-white text-[18px] tracking-widest drop-shadow-sm">导入配置</span>
+                </button>
                 <input type="file" id="mmFileInput" class="hidden" accept=".xlsx, .xls">
             </div>
-            <button id="mmClearBtn" class="bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-2xl px-12 py-2 font-black text-white text-xl shadow-[0_3px_0_rgba(94,75,139,1)] active:translate-y-1 active:shadow-none transition-all tracking-widest mt-2">清空数据</button>
+            <!-- 红色清空按钮 -->
+            <button id="mmClearBtn" class="bg-[#D84C53] border-[2px] border-[#333333] px-10 py-2 mt-2 shadow-[2px_2px_0_#333333] active:translate-y-[2px] active:shadow-none transition-all">
+                <span class="font-black text-white text-[20px] tracking-widest drop-shadow-sm">清空数据</span>
+            </button>
         </div>
-        
-    </div> <!-- 闭合折叠容器 -->
+
+    </div>
 </section>
 
 <!-- 【全新重构】手机端底部 8 大导航滑动栏 -->
@@ -1657,62 +1670,97 @@
             </div>
         </div>
 
-        <!-- 【图3复刻】添加/编辑分类弹窗 -->
-        <div id="mmCategoryDialog" class="fixed inset-0 bg-[#A7F3D0]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-2xl p-4 max-w-[280px] w-full text-center mx-4 shadow-[0_8px_0_rgba(94,75,139,0.2)]">
-                <div class="bg-[#D8B4E2] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-[#5E4B8B] text-lg mb-4">输入分类信息</div>
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-3 mb-4">
-                    <div class="bg-[#E11D48] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] mx-auto">输入分类名称</div>
-                    <input type="text" id="mmCatNameInput" class="w-full h-10 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-bold text-center text-[#5E4B8B] focus:outline-none focus:bg-gray-50">
-                </div>
-                <div class="flex justify-center gap-3">
-                    <button id="mmCatSaveBtn" class="bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-xl px-6 py-1 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110">添加</button>
-                    <button id="mmCatCancelBtn" class="bg-[#F87171] border-[4px] border-[#5E4B8B] rounded-xl px-6 py-1 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110">取消</button>
-                </div>
+ <!-- 
+  ========================================================
+  【图2复刻：添加/编辑 分类弹窗】
+  ========================================================
+-->
+<div id="mmCategoryDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <!-- 外层大白框，细黑边 -->
+    <div class="bg-white border-[2px] border-[#333333] p-6 max-w-[280px] w-full mx-4 shadow-xl flex flex-col gap-4 relative">
+        
+        <!-- 分类码录入行 -->
+        <div class="flex items-center gap-3">
+            <div class="bg-[#E28D43] border-[1.5px] border-[#333333] px-3 py-2 w-[100px] shrink-0 flex items-center justify-center">
+                <span class="font-black text-white text-[18px] tracking-widest">分类码</span>
             </div>
+            <!-- 小白调节区：大写限制，仅限英文字母 -->
+            <input type="text" id="mmCatCodeInput" maxlength="3" placeholder="如 S, A" class="flex-1 h-[42px] border-[1.5px] border-[#333333] px-2 font-black text-center text-[18px] text-[#333333] focus:outline-none uppercase">
         </div>
 
-        <!-- 【图4复刻】添加/编辑条目弹窗 -->
-        <div id="mmItemDialog" class="fixed inset-0 bg-[#A7F3D0]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-2xl p-4 max-w-[280px] w-full text-center mx-4 shadow-[0_8px_0_rgba(94,75,139,0.2)]">
-                <div class="bg-[#FAD0C4] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-[#5E4B8B] text-lg mb-3">输入条目信息</div>
-                
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-3 mb-2">
-                    <div class="bg-[#E11D48] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] mx-auto">输入条目名称</div>
-                    <input type="text" id="mmItemNameInput" class="w-full h-9 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-bold text-center text-[#5E4B8B] focus:outline-none focus:bg-gray-50">
-                </div>
-
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-3 mb-2">
-                    <div class="bg-[#E11D48] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] mx-auto">输入URL地址</div>
-                    <input type="text" id="mmItemUrlInput" placeholder="http://..." class="w-full h-9 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-bold text-center text-[#5E4B8B] focus:outline-none focus:bg-gray-50 text-xs">
-                </div>
-
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-3 mb-4">
-                    <div class="bg-[#E11D48] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] mx-auto">选择分类</div>
-                    <button id="mmItemCatSelectBtn" data-cid="" class="bg-[#D2A0C8] border-[3px] border-[#5E4B8B] rounded-full px-6 py-1 font-black text-[#5E4B8B] text-sm hover:brightness-110">请选择</button>
-                </div>
-
-                <div class="flex justify-center gap-3">
-                    <button id="mmItemSaveBtn" class="bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-xl px-6 py-1 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110">确定</button>
-                    <button id="mmItemCancelBtn" class="bg-[#F87171] border-[4px] border-[#5E4B8B] rounded-xl px-6 py-1 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110">取消</button>
-                </div>
+        <!-- 分类名称录入行 -->
+        <div class="flex items-center gap-3">
+            <div class="bg-[#E28D43] border-[1.5px] border-[#333333] px-3 py-2 w-[100px] shrink-0 flex items-center justify-center">
+                <span class="font-black text-white text-[18px] tracking-widest">分类名称</span>
             </div>
+            <input type="text" id="mmCatNameInput" class="flex-1 h-[42px] border-[1.5px] border-[#333333] px-2 font-black text-center text-[16px] text-[#333333] focus:outline-none">
         </div>
 
-        <!-- 【图5复刻】分类选择列表弹窗 -->
-        <div id="mmCatSelectDialog" class="fixed inset-0 bg-[#A7F3D0]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-2xl p-4 max-w-[280px] w-full text-center mx-4 shadow-[0_8px_0_rgba(94,75,139,0.2)] flex flex-col max-h-[80vh]">
-                <div class="bg-[#D8B4E2] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-[#5E4B8B] text-lg mb-3 shrink-0">选择分类</div>
-                
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-3 mb-4 flex-1 overflow-y-auto custom-scroll flex flex-col gap-2" id="mmCatSelectList">
-                    <!-- JS动态填充彩色分类按钮 -->
-                </div>
-
-                <div class="flex justify-center gap-3 shrink-0">
-                    <button id="mmCatSelectCancelBtn" class="bg-[#F87171] border-[4px] border-[#5E4B8B] rounded-xl px-10 py-1 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110">取消</button>
-                </div>
-            </div>
+        <!-- 确认/取消 按钮行 -->
+        <div class="flex justify-between gap-3 mt-2">
+            <button id="mmCatSaveBtn" class="flex-1 bg-[#A7D674] border-[1.5px] border-[#333333] py-2 active:scale-95 transition-transform">
+                <span class="font-black text-white text-[20px] tracking-widest drop-shadow-sm">确认</span>
+            </button>
+            <button id="mmCatCancelBtn" class="flex-1 bg-[#D84C53] border-[1.5px] border-[#333333] py-2 active:scale-95 transition-transform">
+                <span class="font-black text-white text-[20px] tracking-widest drop-shadow-sm">取消</span>
+            </button>
         </div>
+    </div>
+</div>
+
+<!-- 
+  ========================================================
+  【图3复刻：添加/编辑 方式弹窗】
+  ========================================================
+-->
+<div id="mmItemDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <div class="bg-white border-[2px] border-[#333333] p-6 max-w-[280px] w-full mx-4 shadow-xl flex flex-col gap-4 relative">
+        
+        <!-- 设置分类 下拉选择 -->
+        <div class="flex items-center gap-3">
+            <div class="bg-[#3A8B88] border-[1.5px] border-[#333333] px-2 py-2 w-[100px] shrink-0 flex items-center justify-center cursor-pointer active:brightness-110" id="mmItemCatSelectBtn" data-cid="">
+                <span class="font-black text-white text-[18px] tracking-widest">设置分类</span>
+            </div>
+            <!-- 这里用作显示当前选中的分类名 -->
+            <div id="mmItemCatDisplay" class="flex-1 h-[42px] border-[1.5px] border-[#333333] flex items-center justify-center font-black text-[16px] text-[#333333] bg-gray-50 overflow-hidden px-1">请选择左侧</div>
+        </div>
+
+        <!-- 设置编码 (数字) -->
+        <div class="flex items-center gap-3">
+            <div class="bg-[#3A8B88] border-[1.5px] border-[#333333] px-2 py-2 w-[100px] shrink-0 flex items-center justify-center">
+                <span class="font-black text-white text-[18px] tracking-widest">设置编码</span>
+            </div>
+            <input type="number" id="mmItemNumInput" placeholder="输入数字" class="flex-1 h-[42px] border-[1.5px] border-[#333333] px-2 font-black text-center text-[18px] text-[#333333] focus:outline-none">
+        </div>
+
+        <!-- URL -->
+        <div class="flex items-center gap-3">
+            <div class="bg-[#78D1CC] border-[1.5px] border-[#333333] px-2 py-2 w-[100px] shrink-0 flex items-center justify-center">
+                <span class="font-black text-white text-[20px] tracking-widest">URL</span>
+            </div>
+            <input type="text" id="mmItemUrlInput" placeholder="http://" class="flex-1 h-[42px] border-[1.5px] border-[#333333] px-2 font-bold text-center text-[12px] text-[#333333] focus:outline-none">
+        </div>
+
+        <!-- 确认/取消 -->
+        <div class="flex justify-between gap-3 mt-2">
+            <button id="mmItemSaveBtn" class="flex-1 bg-[#A7D674] border-[1.5px] border-[#333333] py-2 active:scale-95 transition-transform">
+                <span class="font-black text-white text-[20px] tracking-widest drop-shadow-sm">确认</span>
+            </button>
+            <button id="mmItemCancelBtn" class="flex-1 bg-[#D84C53] border-[1.5px] border-[#333333] py-2 active:scale-95 transition-transform">
+                <span class="font-black text-white text-[20px] tracking-widest drop-shadow-sm">取消</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 分类下拉选择列表 (辅助弹窗) -->
+<div id="mmCatSelectDialog" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <div class="bg-white border-[2px] border-[#333333] p-4 max-w-[240px] w-full text-center mx-4 flex flex-col max-h-[70vh]">
+        <div class="bg-[#3A8B88] border-[1.5px] border-[#333333] py-2 font-black text-white text-lg mb-3 shrink-0">请选择所属分类</div>
+        <div class="flex-1 overflow-y-auto custom-scroll flex flex-col gap-2" id="mmCatSelectList"></div>
+        <button onclick="document.getElementById('mmCatSelectDialog').classList.add('hidden')" class="bg-[#D84C53] border-[1.5px] border-[#333333] mt-3 py-1.5 font-black text-white text-lg">取消</button>
+    </div>
+</div>
 <!-- 【V2新增】淘汰方式弹窗 -->
 <div id="eliminationDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
     <div class="kawaii-card p-6 max-w-[320px] w-full text-center shadow-2xl">
@@ -1725,44 +1773,235 @@
     </div>
 </div>
 
-<!-- 【全新复刻】复活/撤销弹窗 (图1像素级复刻) -->
-<div id="reviveDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-    <div class="bg-[#E0FFC6] border-[4px] border-[#5E4B8B] rounded-[2.5rem] p-4 max-w-[290px] w-full mx-4 shadow-2xl flex flex-col items-center">
-        
-        <!-- 顶部粉色胶囊：变更状态 -->
-        <div class="bg-[#D9167F] border-[3px] border-[#5E4B8B] rounded-full py-2.5 px-6 font-black text-white text-xl mb-4 shadow-[0_4px_0_#5E4B8B] w-[80%] text-center tracking-widest leading-none mt-1">变更状态</div>
-        
-        <!-- 隐藏的玩家名字(为了代码正常运行保留，但视觉上隐藏以匹配图1) -->
-        <p id="revivePlayerName" class="hidden"></p>
+<!-- ======================================================== -->
+        <!-- ★ 图1：已淘汰玩家操作菜单弹窗 ★ -->
+        <!-- ======================================================== -->
+        <div id="v2DialogElimPlayerMenu" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+            <!-- 
+              【小白调节区：弹窗外层大框】
+              [控制代码] bg-white 白底, border-[4px] 紫色边框粗细, rounded-[2rem] 圆角弧度
+              [控制代码] w-[200px] 严格控制弹窗宽度，适配图1手机端修长比例
+            -->
+            <div class="bg-white border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 w-[200px] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-3">
+                
+                <!-- 顶部玩家胶囊 -->
+                <!-- 
+                  【小白调节区：玩家胶囊】
+                  [控制代码] px-3 py-1 控制内边距让胶囊变胖变长
+                  [控制代码] shadow-[0_4px_0_#5E4B8B] 控制底部立体投影厚度
+                -->
+                <div class="flex items-center justify-center gap-1.5 border-[3px] border-[#5E4B8B] rounded-[8px] px-3 py-1 shadow-[0_4px_0_#5E4B8B] mb-1" id="epMenuPlayerCap" style="background-color: #64C8C8;">
+                    <div class="w-[26px] h-[26px] rounded-[6px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden flex items-center justify-center shrink-0 bg-white">
+                        <img id="epMenuAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <span id="epMenuName" class="font-black text-white text-[16px] tracking-widest text-stroke leading-none pb-[1px]" style="-webkit-text-stroke: 1.5px #5E4B8B;">婷</span>
+                </div>
 
-        <!-- 中间大白框：包含复活与撤销按钮 -->
-        <div class="bg-white border-[3px] border-[#5E4B8B] rounded-[1.2rem] p-2 sm:p-2.5 w-full mb-4 flex flex-col gap-2 shadow-[0_4px_0_#5E4B8B]">
-            <!-- 复活按钮 (绿) -->
-            <button id="selectReviveActionBtn" class="w-full bg-[#7AC143] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-xl tracking-widest shadow-[0_3px_0_#5E4B8B] transition-all flex items-center justify-center leading-none">复活</button>
-            <!-- 撤销按钮 (蓝) -->
-            <button id="selectUndoActionBtn" class="w-full bg-[#3AA5ED] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-xl tracking-widest shadow-[0_3px_0_#5E4B8B] transition-all flex items-center justify-center leading-none">撤销</button>
+                <!-- 修改信息按钮 (橙色) -->
+                <!-- 
+                  【小白调节区：菜单按钮统一样式】
+                  [控制代码] w-full 占满全宽, py-2.5 上下高度
+                  [控制代码] text-[20px] 字体大小
+                  [动画控制] active:translate-y-1 active:shadow-none (点击下沉)
+                -->
+                <button onclick="window.openEpMenuAction('edit')" class="w-full bg-[#E08A00] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-stroke text-[20px] shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all active:translate-y-1 active:shadow-none hover:brightness-110">
+                    修改信息
+                </button>
+                
+                <!-- 撤销淘汰按钮 (紫色) -->
+                <button onclick="window.openEpMenuAction('undo')" class="w-full bg-[#9B79FF] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-stroke text-[20px] shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all active:translate-y-1 active:shadow-none hover:brightness-110">
+                    撤销淘汰
+                </button>
+
+                <!-- 复活按钮 (绿色) -->
+                <button id="epMenuReviveBtn" onclick="window.openEpMenuAction('revive')" class="w-full bg-[#4CD800] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-stroke text-[20px] shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all active:translate-y-1 active:shadow-none hover:brightness-110">
+                    复活
+                </button>
+
+                <!-- 毒药按钮 (深红色) -->
+                <button onclick="window.openEpMenuAction('poison')" class="w-full bg-[#8B0000] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-stroke text-[20px] shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all active:translate-y-1 active:shadow-none hover:brightness-110">
+                    毒药
+                </button>
+
+                <!-- 取消按钮 (粉红色) -->
+                <button onclick="document.getElementById('v2DialogElimPlayerMenu').classList.add('hidden')" class="w-full bg-[#E1667A] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-stroke text-[20px] shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all active:translate-y-1 active:shadow-none hover:brightness-110">
+                    取消
+                </button>
+
+            </div>
         </div>
 
-        <!-- 底部确定与取消按钮 -->
-        <div class="flex justify-center gap-3 w-full px-1 mb-1">
-            <button id="confirmReviveUIBtn" class="flex-1 bg-[#5BF100] border-[3px] border-[#5E4B8B] rounded-[1rem] py-2 font-black text-white text-xl tracking-widest shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all text-stroke leading-none">确定</button>
-            <button id="cancelReviveBtn" class="flex-1 bg-[#ED1C24] border-[3px] border-[#5E4B8B] rounded-[1rem] py-2 font-black text-white text-xl tracking-widest shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all text-stroke leading-none">取消</button>
+        <!-- ======================================================== -->
+        <!-- ★ 图2/3/4：通用的二次确认动作弹窗 ★ -->
+        <!-- ======================================================== -->
+        <div id="v2DialogEpConfirm" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+            <!-- 
+              【小白调节区：二次确认框】
+              max-w-[280px] 控制宽度。
+            -->
+            <div class="bg-white border-[4px] border-[#5E4B8B] rounded-[2rem] p-5 w-[280px] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-4">
+                
+                <!-- 动态标题条 -->
+                <div id="epConfirmTitle" class="border-[3px] border-[#5E4B8B] rounded-[8px] py-1.5 px-6 font-black text-white text-xl text-center shadow-[0_4px_0_#5E4B8B] tracking-widest w-full text-stroke" style="background-color: #9B79FF;">
+                    确认标题
+                </div>
+
+                <!-- 玩家胶囊展示区 (复用上面的样式参数) -->
+                <div class="flex items-center justify-center gap-1.5 border-[3px] border-[#5E4B8B] rounded-[8px] px-3 py-1 shadow-[0_4px_0_#5E4B8B]" id="epConfirmPlayerCap" style="background-color: #64C8C8;">
+                    <div class="w-[26px] h-[26px] rounded-[6px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden flex items-center justify-center shrink-0 bg-white">
+                        <img id="epConfirmAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <span id="epConfirmName" class="font-black text-white text-[16px] tracking-widest text-stroke leading-none pb-[1px]" style="-webkit-text-stroke: 1.5px #5E4B8B;">婷</span>
+                </div>
+
+                <div class="flex justify-between gap-3 w-full mt-2">
+                    <!-- 确认按钮：黄绿色 #96C11F -->
+                    <button id="epConfirmOkBtn" class="flex-1 bg-[#96C11F] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">确认</button>
+                    <!-- 取消按钮：粉红色 #E1667A -->
+                    <button onclick="document.getElementById('v2DialogEpConfirm').classList.add('hidden')" class="flex-1 bg-[#E1667A] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">取消</button>
+                </div>
+            </div>
         </div>
+
+<!-- ======================================================== -->
+<!-- ★ 图1：提前获胜 - 选择玩家弹窗 (1:1 像素级复刻) ★ -->
+<!-- ======================================================== -->
+<div id="earlyWinPlayerDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <!-- 
+      ========================================================
+      【小白调节区 1：弹窗主底板】
+      [控制代码] bg-[#FFF5F6] (淡粉/淡米色底色，完美复刻图1底座)
+      [控制代码] border-[4px] border-[#5E4B8B] (深紫色的极粗边框)
+      [控制代码] rounded-[2rem] (超级圆滑的四周圆角)
+      [控制代码] shadow-[0_8px_0_rgba(94,75,139,0.5)] (弹窗底部的厚重立体投影)
+      [特效说明] 如果你想让弹窗自带呼吸外发光，请在这里加上 magic-glow
+      ========================================================
+    -->
+    <div class="bg-[#FFF5F6] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 max-w-[320px] w-[95%] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-4">
         
-        <!-- 保留原本的执行按钮(隐身状态，只用来被触发) -->
-        <button id="doReviveBtn" class="hidden"></button>
-        <button id="undoEliminationBtn" class="hidden"></button>
+        <!-- 
+          ========================================================
+          【小白调节区 2：顶部绿色大标题】
+          [控制代码] bg-[#71B52D] (图1的鲜艳绿色背景)
+          [控制代码] text-[22px] (文字大小)
+          [控制代码] px-8 py-1.5 (控制这个绿色胶囊的长短和胖瘦)
+          ========================================================
+        -->
+        <div class="bg-[#71B52D] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-8 font-black text-white text-[22px] shadow-[0_3px_0_#5E4B8B] w-[90%] text-center tracking-widest text-stroke" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">
+            提前获胜
+        </div>
+
+        <!-- 
+          ========================================================
+          【小白调节区 3：包裹玩家卡片的白色大画框】
+          [控制代码] bg-white (纯白底色)
+          [控制代码] border-[3px] (边框粗细)
+          [控制代码] min-h-[120px] (保底高度，就算没人也不会扁掉)
+          ========================================================
+        -->
+        <div class="bg-white border-[3px] border-[#5E4B8B] rounded-[1rem] p-2.5 sm:p-3 w-full min-h-[120px] shadow-inner flex justify-center">
+            <!-- grid-cols-4 强制要求这里面一行必定只显示4个，超过自动换行！ -->
+            <div id="survivingPlayersContainer" class="grid grid-cols-4 gap-2 sm:gap-2.5 w-full place-items-start content-start">
+                <!-- JS 会在这里像画笔一样画出玩家的方形卡牌 -->
+            </div>
+        </div>
+
+        <!-- 底部两个操作按钮 -->
+        <div class="flex justify-between gap-3 w-full px-1 mt-1">
+            <!-- 确定按钮 (图1的绿色) -->
+            <button id="confirmEarlyWinBtn" class="flex-1 bg-[#71B52D] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-[20px] active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">确定</button>
+            <!-- 取消按钮 (图1的红色) -->
+            <button id="cancelEarlyWinBtn" class="flex-1 bg-[#E14154] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-[20px] active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">取消</button>
+        </div>
     </div>
 </div>
 
-<!-- 【V2新增】选择提前获胜玩家弹窗 -->
-<div id="earlyWinPlayerDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-    <div class="kawaii-card p-6 max-w-[320px] w-full text-center shadow-2xl">
-        <h3 class="text-xl font-black mb-4 text-[#5E4B8B]"><i class="fa-solid fa-trophy text-accent mr-2"></i>哪位玩家获胜？</h3>
-        <div id="survivingPlayersContainer" class="flex flex-col gap-2 mb-5">
-            <!-- 动态填充存活玩家 -->
+
+<!-- ======================================================== -->
+<!-- ★ 图1：赢家专属操作菜单弹窗 (1:1 像素级复刻) ★ -->
+<!-- ======================================================== -->
+<div id="v2DialogWinnerMenu" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <!-- 
+      ========================================================
+      【小白调节区 1：弹窗外层大白框】
+      [控制代码] bg-white 白底, border-[4px] 紫色边框粗细, rounded-[2rem] 圆角弧度
+      [控制代码] w-[200px] 严格控制弹窗宽度，适配图1手机端修长比例
+      ========================================================
+    -->
+    <div class="bg-white border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 w-[200px] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-4">
+        
+        <!-- 顶部：玩家胶囊展示区 -->
+        <!-- 
+          ========================================================
+          【小白调节区 2：顶部玩家胶囊】
+          [控制代码] px-3 py-1 控制内边距让胶囊变胖变长
+          [控制代码] shadow-[0_4px_0_#5E4B8B] 控制底部立体投影厚度
+          ========================================================
+        -->
+        <div id="winnerMenuPlayerCap" class="flex items-center justify-center gap-1.5 border-[3px] border-[#5E4B8B] rounded-[8px] px-3 py-1 shadow-[0_4px_0_#5E4B8B] w-fit" style="background-color: #64C8C8;">
+            <div class="w-[26px] h-[26px] rounded-[4px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden flex items-center justify-center shrink-0">
+                <img id="winnerMenuAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
+            </div>
+            <span id="winnerMenuName" class="font-black text-white text-[16px] tracking-widest text-stroke leading-none pb-[1px]" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">婷</span>
         </div>
-        <button id="cancelEarlyWinBtn" class="kawaii-btn bg-gray-200 text-gray-500 py-2 px-6 w-full shadow-none border-gray-300 hover:bg-gray-300">取消</button>
+
+        <!-- 
+          ========================================================
+          【小白调节区 3：修改信息 按钮】
+          [控制代码] bg-[#E08A00] (图1的橙黄色背景)
+          [控制代码] text-[20px] 字体大小
+          [动画控制] active:translate-y-1 (点击下沉)
+          ========================================================
+        -->
+        <button id="winnerMenuEditBtn" class="w-full bg-[#E08A00] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-stroke text-[20px] shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all active:translate-y-1 active:shadow-none hover:brightness-110">
+            修改信息
+        </button>
+        
+        <!-- 
+          ========================================================
+          【小白调节区 4：取消 按钮】
+          [控制代码] bg-[#D65565] (图1的粉红色背景)
+          ========================================================
+        -->
+        <button id="winnerMenuCancelBtn" class="w-full bg-[#D65565] border-[3px] border-[#5E4B8B] rounded-xl py-2.5 font-black text-white text-stroke text-[20px] shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all active:translate-y-1 active:shadow-none hover:brightness-110">
+            取消
+        </button>
+
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- ★ 图2：提前获胜 - 二次确认胜出弹窗 (1:1 像素级复刻) ★ -->
+<!-- ======================================================== -->
+<div id="earlyWinConfirmDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+    <div class="bg-[#FFF5F6] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 max-w-[280px] w-[90%] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-4">
+        
+        <!-- 图2的绿色标题 -->
+        <div class="bg-[#71B52D] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-6 font-black text-white text-[20px] shadow-[0_3px_0_#5E4B8B] w-[95%] text-center tracking-widest text-stroke" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">
+            确认玩家胜出
+        </div>
+
+        <!-- 中间展示选中的玩家小胶囊 -->
+        <div class="flex justify-center w-full py-2">
+            <!-- 
+              ========================================================
+              【小白调节区 4：图2居中的横向玩家胶囊】
+              [控制代码] px-3 py-1 控制胶囊长短和胖瘦
+              ========================================================
+            -->
+            <div id="earlyWinConfirmPlayerCap" class="flex items-center gap-2 border-[3px] border-[#5E4B8B] rounded-[8px] px-3 py-1 shadow-[0_4px_0_#5E4B8B] transform scale-110" style="background-color: #ccc;">
+                <div class="w-[28px] h-[28px] rounded-[4px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+                    <img id="earlyWinConfirmAvatar" src="" class="w-full h-full object-cover" crossorigin="anonymous">
+                </div>
+                <span id="earlyWinConfirmName" class="font-black text-white text-[18px] tracking-widest text-stroke leading-none pb-[1px]" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">名</span>
+            </div>
+        </div>
+
+        <!-- 底部两个操作按钮 -->
+        <div class="flex justify-between gap-3 w-full px-1">
+            <button id="finalConfirmEarlyWinBtn" class="flex-1 bg-[#71B52D] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-[20px] active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">确认</button>
+            <button id="finalCancelEarlyWinBtn" class="flex-1 bg-[#E14154] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-[20px] active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">取消</button>
+        </div>
     </div>
 </div>
 
@@ -2370,13 +2609,7 @@ badgeInfoRarityText: document.getElementById('badgeInfoRarityText'),
             eliminationPlayerName: document.getElementById('eliminationPlayerName'),
             eliminationMethodsContainer: document.getElementById('eliminationMethodsContainer'),
             cancelEliminationBtn: document.getElementById('cancelEliminationBtn'),
-            
-            reviveDialog: document.getElementById('reviveDialog'),
-            revivePlayerName: document.getElementById('revivePlayerName'),
-            doReviveBtn: document.getElementById('doReviveBtn'),
-            undoEliminationBtn: document.getElementById('undoEliminationBtn'),
-            cancelReviveBtn: document.getElementById('cancelReviveBtn'),
-            
+                    
             earlyWinPlayerDialog: document.getElementById('earlyWinPlayerDialog'),
             survivingPlayersContainer: document.getElementById('survivingPlayersContainer'),
             cancelEarlyWinBtn: document.getElementById('cancelEarlyWinBtn'),
@@ -2535,6 +2768,112 @@ let chartInstance = null;
             </div>
             `).join('');
         }
+
+// ========================================================
+        // ★ 核心引擎：图1菜单派发与图2/3/4二次确认处理 ★
+        // ========================================================
+        window.openEpMenuAction = function(actionType) {
+            // 先隐藏图1菜单
+            document.getElementById('v2DialogElimPlayerMenu').classList.add('hidden');
+            
+            const pid = v2TargetPlayerId;
+            const p = gameData.players.find(x => x.id === pid);
+            
+            // 1. 如果点击的是【修改信息】 (不弹二次确认，直接呼叫填写窗)
+            if (actionType === 'edit') {
+                // 把该玩家当前已有的信息读入临时内存
+                const detail = v2State.eliminationDetails[pid] || {};
+                window.v2App.tempElim = { 
+                    players: [pid], 
+                    killerId: detail.killerId, 
+                    methodName: v2State.eliminated[pid], 
+                    score: '', // 分数会由弹窗自身通过 DOM 获取
+                    freezeTime: detail.time || 0 
+                };
+                window.renderElimInfoDialog();
+                document.getElementById('v2DialogSetElimInfo').classList.remove('hidden');
+                return;
+            }
+
+            // 2. 如果点击的是【撤销淘汰】/【复活】/【毒药】，准备二次确认框信息
+            const confirmBox = document.getElementById('v2DialogEpConfirm');
+            const titleEl = document.getElementById('epConfirmTitle');
+            const okBtn = document.getElementById('epConfirmOkBtn');
+            
+            // 填充玩家胶囊信息
+            document.getElementById('epConfirmAvatar').src = p.avatar;
+            document.getElementById('epConfirmName').textContent = p.name.slice(-1);
+            document.getElementById('epConfirmPlayerCap').style.backgroundColor = p.color;
+
+            // 根据不同的动作，改变标题颜色和文字，并绑定执行逻辑
+            if (actionType === 'undo') {
+                titleEl.textContent = '确认撤销淘汰';
+                titleEl.style.backgroundColor = '#9B79FF'; // 紫色 (图2)
+                
+                okBtn.onclick = () => {
+                    // 执行撤销逻辑：清空数据，重置状态
+                    v2State.winnerId = null; v2State.winMethod = null; 
+                    const calcBtn = document.getElementById('v2CalculateBtn');
+                    if (calcBtn) { calcBtn.disabled = true; calcBtn.classList.replace('bg-primary', 'bg-gray-400'); calcBtn.classList.add('opacity-50', 'cursor-not-allowed'); }
+                    
+                    delete v2State.eliminated[pid];
+                    if (v2State.eliminationDetails) delete v2State.eliminationDetails[pid];
+                    
+                    v2State.eliminationEvents = v2State.eliminationEvents.map(g => g.filter(id => id !== pid)).filter(g => g.length > 0); 
+                    
+                    confirmBox.classList.add('hidden');
+                    checkResetTimer();
+                    renderV2ScoreArea();
+                };
+            } 
+            else if (actionType === 'revive') {
+                titleEl.textContent = '确认复活';
+                titleEl.style.backgroundColor = '#4CD800'; // 绿色 (图3)
+                
+                okBtn.onclick = () => {
+                    // 执行复活逻辑：占用名额，清空死法，回场继续战
+                    v2State.winnerId = null; v2State.winMethod = null; 
+                    const calcBtn = document.getElementById('v2CalculateBtn');
+                    if (calcBtn) { calcBtn.disabled = true; calcBtn.classList.replace('bg-primary', 'bg-gray-400'); calcBtn.classList.add('opacity-50', 'cursor-not-allowed'); }
+                    
+                    v2State.revivedUsed = true;
+                    v2State.revivedPlayerId = pid; 
+                    
+                    delete v2State.eliminated[pid];
+                    if (v2State.eliminationDetails) delete v2State.eliminationDetails[pid];
+                    
+                    v2State.eliminationEvents = v2State.eliminationEvents.map(g => g.filter(id => id !== pid)).filter(g => g.length > 0); 
+                    
+                    confirmBox.classList.add('hidden');
+                    checkResetTimer();
+                    renderV2ScoreArea();
+                };
+            }
+            else if (actionType === 'poison') {
+                titleEl.textContent = '确认毒药';
+                titleEl.style.backgroundColor = '#8B0000'; // 深红色 (图4)
+                
+                okBtn.onclick = () => {
+                    // 执行毒药逻辑：人依旧保持淘汰，但他消耗了这局的复活名额，并且死法被强行改为毒药
+                    
+                    v2State.revivedUsed = true;
+                    v2State.revivedPlayerId = pid; 
+                    
+                    // 获取特殊方式名字的工具
+                    let poisonMethodName = typeof window.getSpecialMethodName === 'function' ? window.getSpecialMethodName('lose', 3) : '特殊淘汰3(未设置)';
+                    
+                    // 强行覆盖为被毒死
+                    v2State.eliminated[pid] = poisonMethodName;
+                    
+                    confirmBox.classList.add('hidden');
+                    renderV2ScoreArea();
+                };
+            }
+
+            // 呼出二次确认框
+            confirmBox.classList.remove('hidden');
+        };
+
 
         // 【图2专属引擎】计算并弹出单局详细存活数据
         window.openTrDetailModal = function(roundNum) {
@@ -8299,63 +8638,122 @@ function bindV2Events() {
 
     els.cancelEliminationBtn.onclick = () => els.eliminationDialog.classList.add('hidden');
 
-    els.doReviveBtn.onclick = () => {
-v2State.winnerId = null; v2State.winMethod = null; // 【修复】一旦复活，重置胜者状态
-        els.v2CalculateBtn.disabled = true; els.v2CalculateBtn.classList.replace('bg-primary', 'bg-gray-400'); els.v2CalculateBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        v2State.revivedUsed = true;
-        v2State.revivedPlayerId = v2TargetPlayerId; // 【新增】标记复活
-        delete v2State.eliminated[v2TargetPlayerId];
-        v2State.eliminationEvents = v2State.eliminationEvents.map(g => g.filter(id => id !== v2TargetPlayerId)).filter(g => g.length > 0); // 【新增】撤销顺序
-        els.reviveDialog.classList.add('hidden');
-        checkResetTimer();
-        renderV2ScoreArea();
-    };
-
-    els.undoEliminationBtn.onclick = () => {
-v2State.winnerId = null; v2State.winMethod = null; // 【修复】一旦撤销，重置胜者状态
-        els.v2CalculateBtn.disabled = true; els.v2CalculateBtn.classList.replace('bg-primary', 'bg-gray-400'); els.v2CalculateBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        delete v2State.eliminated[v2TargetPlayerId];
-        v2State.eliminationEvents = v2State.eliminationEvents.map(g => g.filter(id => id !== v2TargetPlayerId)).filter(g => g.length > 0); // 【新增】撤销顺序
-        els.reviveDialog.classList.add('hidden');
-        checkResetTimer();
-        renderV2ScoreArea();
-    };
-    els.cancelReviveBtn.onclick = () => els.reviveDialog.classList.add('hidden');
-
     let savedEliminations = null;
     let savedEliminationEvents = null; // 【新增】
 
-    els.earlyWinBtn.onclick = () => {
+// ====================================================================
+    // ★ 核心引擎：图1 & 图2 提前获胜高亮选中逻辑 ★
+    // ====================================================================
+    window.tempEarlyWinPlayerId = null; // 这是一个隐形的小助手，专门帮你记住当前点中了谁
+
+    // 核心画笔函数：负责实时重绘网格，表现出“点中高亮，其他人变暗”的特效
+    window.renderEarlyWinGrid = function() {
         const active = gameData.players.filter(p => p.isActive);
         const alive = active.filter(p => !v2State.eliminated[p.id]);
-        els.survivingPlayersContainer.innerHTML = alive.map(p => `
-            <button class="kawaii-btn bg-white text-lg py-2 px-4 hover:bg-gray-50 surv-btn" data-id="${p.id}" style="color:${p.color}; border-color:${p.color}">${p.name}</button>
-        `).join('');
-        els.earlyWinPlayerDialog.classList.remove('hidden');
+
+        document.getElementById('survivingPlayersContainer').innerHTML = alive.map(p => {
+            const isSelected = window.tempEarlyWinPlayerId === p.id;
+            const hasSelection = window.tempEarlyWinPlayerId !== null;
+            
+            let stateClass = "";
+            // 状态 1：还没点任何人时，大家都是正常状态
+            if (!hasSelection) {
+                stateClass = "opacity-100 scale-100 hover:scale-105 shadow-[0_2px_0_#5E4B8B]";
+            } 
+            // 状态 2：点中了这个人，他会被强行放大，加白色外发光，并弹出底层投影！
+            else if (isSelected) {
+                stateClass = "opacity-100 scale-110 shadow-[0_4px_0_#5E4B8B] ring-[3px] ring-white z-10";
+            } 
+            // 状态 3：点中了别人，这个人立刻变灰变暗缩小，沦为背景板
+            else {
+                stateClass = "opacity-40 grayscale-[60%] scale-95 shadow-none";
+            }
+
+            return `
+            <!-- 
+              ========================================================
+              【小白调节区 5：网格内的单张玩家方形卡牌】
+              [尺寸比例] aspect-square 强制正方形。
+              [互动动画] onclick 绑定点击事件。
+              ========================================================
+            -->
+            <div class="flex flex-col items-center justify-center border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[8px] py-1.5 px-1 cursor-pointer transition-all duration-300 w-full aspect-square early-win-opt-btn ${stateClass}" data-id="${p.id}" style="background-color: ${p.color};" onclick="window.selectEarlyWinPlayer(${p.id})">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden mb-1 flex items-center justify-center shadow-sm pointer-events-none">
+                    <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                </div>
+                <span class="font-black text-white text-[12px] sm:text-[14px] text-stroke tracking-widest leading-none pb-[1px] pointer-events-none" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
+            </div>
+            `;
+        }).join('');
     };
 
-    els.survivingPlayersContainer.addEventListener('click', e => {
-        const btn = e.target.closest('.surv-btn');
-        if(!btn) return;
-        v2TargetPlayerId = parseInt(btn.dataset.id);
-        els.earlyWinPlayerDialog.classList.add('hidden');
+    // 点击单个卡牌时触发的函数
+    window.selectEarlyWinPlayer = function(id) {
+        window.tempEarlyWinPlayerId = id; // 记录下被点击的ID
+        window.renderEarlyWinGrid();      // 立刻命令画笔重绘画板！
+    };
+
+    // 当在主界面点击“提前获胜”按钮时触发
+    els.earlyWinBtn.onclick = () => {
+        window.tempEarlyWinPlayerId = null; // 每次打开，先清除上次的记忆
+        window.renderEarlyWinGrid();        // 画出全新网格
+        document.getElementById('earlyWinPlayerDialog').classList.remove('hidden'); // 显示图1
+    };
+
+    // --- 图1弹窗的底部按钮功能 ---
+    document.getElementById('confirmEarlyWinBtn').onclick = () => {
+        if (window.tempEarlyWinPlayerId === null) {
+            alert("请先点击选中一位获胜的玩家！");
+            return;
+        }
+        
+        // 1. 关闭图1
+        document.getElementById('earlyWinPlayerDialog').classList.add('hidden');
+        
+        // 2. 把选中的玩家信息提取出来，塞给图2
+        const p = gameData.players.find(x => x.id === window.tempEarlyWinPlayerId);
+        document.getElementById('earlyWinConfirmAvatar').src = p.avatar;
+        document.getElementById('earlyWinConfirmName').textContent = p.name.slice(-1);
+        document.getElementById('earlyWinConfirmPlayerCap').style.backgroundColor = p.color;
+
+        // 3. 弹出图2
+        document.getElementById('earlyWinConfirmDialog').classList.remove('hidden');
+    };
+
+    document.getElementById('cancelEarlyWinBtn').onclick = () => {
+        document.getElementById('earlyWinPlayerDialog').classList.add('hidden');
+    };
+
+    // --- 图2弹窗的底部按钮功能 ---
+    document.getElementById('finalConfirmEarlyWinBtn').onclick = () => {
+        // 1. 关闭图2
+        document.getElementById('earlyWinConfirmDialog').classList.add('hidden');
+
+        // 2. 执行核心的游戏结算逻辑！
+        v2TargetPlayerId = window.tempEarlyWinPlayerId;
 
         savedEliminations = {...v2State.eliminated};
-        savedEliminationEvents = JSON.parse(JSON.stringify(v2State.eliminationEvents)); // 【新增】备份
+        savedEliminationEvents = JSON.parse(JSON.stringify(v2State.eliminationEvents));
 
         const active = gameData.players.filter(p => p.isActive);
-        let simultaneous =[]; // 【新增】
-            active.forEach(p => { 
-                if(p.id !== v2TargetPlayerId && !v2State.eliminated[p.id]) {
-                    v2State.eliminated[p.id] = window.getSpecialMethodName('lose', 1);
-                    simultaneous.push(p.id);
-                }
-            });
-        if (simultaneous.length > 0) v2State.eliminationEvents.push(simultaneous); // 【新增】加入顺序
+        let simultaneous = [];
+        // 把其他还活着的人，强制标记为默认方式淘汰
+        active.forEach(p => {
+            if(p.id !== v2TargetPlayerId && !v2State.eliminated[p.id]) {
+                v2State.eliminated[p.id] = window.getSpecialMethodName('lose', 1);
+                simultaneous.push(p.id);
+            }
+        });
+        if (simultaneous.length > 0) v2State.eliminationEvents.push(simultaneous);
 
+        // 弹出最后设置分数的那个确认窗
         triggerWinSelection(v2TargetPlayerId);
-    });
-    els.cancelEarlyWinBtn.onclick = () => els.earlyWinPlayerDialog.classList.add('hidden');
+    };
+
+    document.getElementById('finalCancelEarlyWinBtn').onclick = () => {
+        // 取消就直接关掉即可
+        document.getElementById('earlyWinConfirmDialog').classList.add('hidden');
+    };
 
     els.winMethodsContainer.addEventListener('click', e => {
         const btn = e.target.closest('.method-btn');
@@ -9368,8 +9766,8 @@ window.switchMobileTab = function(tabId) {
             mmTargetId: null,
             isSettingSpecialRule: false,
             collapsedCats: new Set(['cl_def', 'cw_def']),
-            tempElim: { players:[], killerId: null, methodName: null, cards: '' },
-            tempWin: { playerId: null, methodName: null },
+            tempElim: { players:[], killerId: null, methodName: null, cards: '', score: '', freezeTime: 0 },
+            tempWin: { playerId: null, methodName: null, score: '' },
             tempPenalty: { user: null, victim: null, methodName: null, cards: '' }, 
             confirmCallback: null
         };
@@ -9404,28 +9802,139 @@ window.switchMobileTab = function(tabId) {
         document.getElementById('v2DialogSetPenalty')?.remove();
         
         const newDialogsHTML = `
+<!-- ======================================================== -->
+        <!-- ★ 全新：图1弹窗 (首次点击玩家胶囊时弹出) ★ -->
+        <!-- ======================================================== -->
+        <div id="v2DialogQuickElimOptions" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+            <!-- 
+              【小白调节区：外围大白框】
+              bg-[#FEFCE8]: 护眼淡黄色底色
+              border-[4px]: 紫色边框粗细
+              rounded-[2rem]: 圆角弧度
+              max-w-[260px]: 弹窗最大宽度
+            -->
+            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-5 max-w-[260px] w-full mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-4">
+                
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <div class="w-8 h-8 rounded-full border-[2.5px] border-[#5E4B8B] bg-black overflow-hidden flex items-center justify-center shadow-sm">
+                        <img id="quickElimAvatar" src="" class="w-full h-full object-cover">
+                    </div>
+                    <span id="quickElimName" class="font-black text-[#5E4B8B] text-xl tracking-widest">玩家名</span>
+                </div>
+
+                <!-- 
+                  【小白调节区：淘汰按钮】
+                  bg-[#E11D48]: 红色底色
+                  shadow-[0_4px_0_#5E4B8B]: 立体投影厚度
+                  hover:brightness-110: 鼠标悬浮变亮
+                  active:translate-y-1: 点击下沉动画
+                  [特效备份] 如果想加仙气发光，在最后加上 magic-glow
+                -->
+                <button id="quickElimBtn" class="w-full bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-2xl py-2.5 font-black text-white text-stroke text-xl active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">
+                    淘汰
+                </button>
+                
+                <!-- 
+                  【小白调节区：取消按钮】
+                  bg-[#9CA3AF]: 灰色底色
+                -->
+                <button onclick="document.getElementById('v2DialogQuickElimOptions').classList.add('hidden')" class="w-full bg-[#9CA3AF] border-[3px] border-[#5E4B8B] rounded-2xl py-2.5 font-black text-white text-stroke text-xl active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- ★ 全新：图2弹窗 (二次确认并瞬间冻结时间) ★ -->
+        <!-- ======================================================== -->
+        <div id="v2DialogQuickElimConfirm" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-5 max-w-[260px] w-full mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-4">
+                
+                <div class="bg-[#E11D48] rounded-xl py-1.5 px-4 font-bold text-white text-base text-center shadow-sm tracking-widest border-[2px] border-[#5E4B8B] w-full">确认淘汰此玩家？</div>
+
+                <div class="flex justify-between gap-3 w-full mt-2">
+                    <!-- 确认按钮：bg-[#4ADE80] 为绿色 -->
+                    <button id="quickElimConfirmBtn" class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-lg active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">确认</button>
+                    <!-- 取消按钮：bg-[#9CA3AF] 为灰色 -->
+                    <button onclick="document.getElementById('v2DialogQuickElimConfirm').classList.add('hidden')" class="flex-1 bg-[#9CA3AF] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-lg active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- ★ 图3：淘汰详情录入窗口 (左图右下拉框版) ★ -->
+        <!-- ======================================================== -->
         <div id="v2DialogSetElimInfo" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 max-w-[320px] w-full mx-4 shadow-2xl flex flex-col items-center">
-                <div class="bg-[#9F1239] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-4 shadow-sm w-[95%] text-center tracking-widest">设置淘汰者信息</div>
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-3 flex flex-col items-center shadow-sm">
-                    <div class="bg-[#E11D48] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest">淘汰者</div>
-                    <div class="flex items-center justify-center gap-2 flex-wrap w-full px-1 min-h-[40px]" id="elimInfoPlayersList"></div>
+            <!-- 
+              【小白调节区：弹窗主容器】
+              max-w-[340px] 保证弹窗在手机上不要太宽。如果觉得拥挤，可以改成 max-w-[360px]
+            -->
+            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 max-w-[340px] w-full mx-4 shadow-2xl flex flex-col items-center">
+                
+                <!-- 顶部标题 -->
+                <div class="bg-[#9F1239] border-[3px] border-[#5E4B8B] rounded-2xl py-1.5 px-6 font-black text-white text-lg mb-3 shadow-sm w-[90%] text-center tracking-widest">设置淘汰者信息</div>
+                
+                <!-- 第一区：被谁淘汰 (保留原有样式) -->
+                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-2 w-full mb-3 flex flex-col items-center shadow-sm">
+                    <div class="bg-[#E11D48] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] text-center shadow-sm tracking-widest">被谁淘汰？</div>
+                    <div class="flex items-center justify-center w-full px-1 min-h-[40px]" id="elimInfoKillerBtn"></div>
                 </div>
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-3 flex flex-col items-center shadow-sm">
-                    <div class="bg-[#E11D48] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest">被谁淘汰？</div>
-                    <div class="flex items-center justify-center w-full px-2 min-h-[40px]" id="elimInfoKillerBtn"></div>
+
+                <!-- 第二区：★ 全新淘汰方式 (左图右框) ★ -->
+                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-2 w-full mb-3 flex flex-col items-center shadow-sm">
+                    <div class="bg-[#E11D48] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] text-center shadow-sm tracking-widest">淘汰方式</div>
+                    
+                    <!-- 核心左右排版容器 -->
+                    <div class="flex w-full gap-2 px-1 items-stretch">
+                        
+                        <!-- 左侧：图片展示区 -->
+                        <!-- 
+                          【小白调节区：图片展示】
+                          w-[35%] 控制左边占用的宽度。
+                          aspect-[2/3] 保证图片比例是卡牌比例。
+                          bg-[#111111] 黑底框。
+                        -->
+                        <div class="w-[35%] aspect-[2/3] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[6px] overflow-hidden bg-[#111111] flex items-center justify-center shadow-sm shrink-0">
+                            <img id="elimInfoMethodImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>--</text></svg>" class="w-full h-full object-contain">
+                        </div>
+
+                        <!-- 右侧：两个下拉框 -->
+                        <div class="w-[65%] flex flex-col justify-center gap-2">
+                            
+                            <!-- 分类编码下拉框 -->
+                            <div class="relative w-full">
+                                <span class="absolute -top-2 left-2 bg-white px-1 text-[10px] font-black text-[#E11D48] z-10">分类编码</span>
+                                <!-- focus:ring-[#4ADE80] 控制点击选中时的绿色外发光 -->
+                                <select id="elimCatSelect" class="w-full h-10 bg-gray-50 border-[2px] border-[#5E4B8B] rounded-lg px-2 text-[#5E4B8B] font-black text-sm outline-none focus:ring-2 focus:ring-[#4ADE80] cursor-pointer appearance-none shadow-inner">
+                                    <option value="">-- 请选择 --</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-[#5E4B8B] text-xs pointer-events-none"></i>
+                            </div>
+
+                            <!-- 编号下拉框 -->
+                            <div class="relative w-full">
+                                <span class="absolute -top-2 left-2 bg-white px-1 text-[10px] font-black text-[#E11D48] z-10">编号</span>
+                                <select id="elimNumSelect" class="w-full h-10 bg-gray-50 border-[2px] border-[#5E4B8B] rounded-lg px-2 text-[#5E4B8B] font-black text-sm outline-none focus:ring-2 focus:ring-[#4ADE80] cursor-pointer appearance-none shadow-inner disabled:opacity-50">
+                                    <option value="">--</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-[#5E4B8B] text-xs pointer-events-none"></i>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-3 flex flex-col items-center shadow-sm">
-                    <div class="bg-[#E11D48] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest">淘汰方式</div>
-                    <button id="elimInfoMethodBtn" class="bg-[#9BA4C5] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-6 font-black text-white text-stroke text-lg w-[85%] shadow-sm hover:brightness-110 truncate">点击选择</button>
+
+                <!-- 第三区：★ 罚牌改分记录区 ★ -->
+                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-2 w-full mb-4 flex flex-col items-center shadow-sm">
+                    <div class="bg-[#E11D48] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] text-center shadow-sm tracking-widest">本局得分录入</div>
+                    <!-- 这里的数值将和外部的玩家分数框双向同步！ -->
+                    <input type="number" id="elimInfoScoreInput" placeholder="填充分数(可选)" class="w-[85%] h-10 border-[2.5px] border-[#5E4B8B] rounded-xl px-2 font-black text-center text-[#5E4B8B] text-xl focus:outline-none focus:bg-gray-50 shadow-inner">
                 </div>
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-2.5 w-full mb-5 flex flex-col items-center shadow-sm">
-                    <div class="bg-[#E11D48] rounded-xl py-1 font-bold text-white text-base mb-2 w-[90%] text-center shadow-sm tracking-widest">输入罚牌张数</div>
-                    <input type="number" id="elimInfoCardsInput" class="w-[85%] h-10 border-[3px] border-[#5E4B8B] rounded-xl px-2 font-black text-center text-[#5E4B8B] text-xl focus:outline-none focus:bg-gray-50 shadow-inner">
-                </div>
-                <div class="flex justify-center gap-4 w-full px-2 mb-2">
-                    <button id="elimInfoConfirmBtn" class="flex-1 bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-2xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest">确定</button>
-                    <button id="elimInfoCancelBtn" class="flex-1 bg-[#E11D48] border-[4px] border-[#5E4B8B] rounded-2xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest">取消</button>
+
+                <!-- 底部：确定与取消 -->
+                <div class="flex justify-center gap-3 w-full px-1 mb-1">
+                    <button id="elimInfoConfirmBtn" class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">完成</button>
+                    <button id="elimInfoCancelBtn" class="flex-1 bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">以后再填</button>
                 </div>
             </div>
         </div>
@@ -9446,20 +9955,78 @@ window.switchMobileTab = function(tabId) {
             </div>
         </div>
 
+<!-- ★ 图1：胜利详情录入窗口 (左图右下拉框版) ★ -->
         <div id="v2DialogSetWinInfo" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-5 max-w-[320px] w-full mx-4 shadow-2xl flex flex-col items-center">
-                <div class="bg-[#4D7C0F] border-[3px] border-[#5E4B8B] rounded-2xl py-2 px-6 font-black text-white text-xl mb-5 shadow-sm w-[95%] text-center tracking-widest">设置胜利者信息</div>
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-3 w-full mb-4 flex flex-col items-center shadow-sm">
-                    <div class="bg-[#65A30D] rounded-xl py-1 font-bold text-white text-base mb-3 w-[90%] text-center shadow-sm tracking-widest">胜利者</div>
-                    <div class="flex items-center justify-center w-full px-2" id="winInfoPlayerBtn"></div>
+            <!-- 
+              【小白调节区：弹窗主容器】
+              max-w-[340px] 保证弹窗在手机上不要太宽。如果觉得拥挤，可以改成 max-w-[360px]
+            -->
+            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 max-w-[340px] w-full mx-4 shadow-2xl flex flex-col items-center">
+                
+                <!-- 顶部标题 -->
+                <div class="bg-[#658a16] border-[3px] border-[#5E4B8B] rounded-2xl py-1.5 px-6 font-black text-white text-lg mb-3 shadow-sm w-[90%] text-center tracking-widest">设置胜利者信息</div>
+                
+                <!-- 第一区：胜利者 (保留原有交互，仅换色) -->
+                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-2 w-full mb-3 flex flex-col items-center shadow-sm">
+                    <div class="bg-[#78a51a] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] text-center shadow-sm tracking-widest">胜利者</div>
+                    <div class="flex items-center justify-center w-full px-1 min-h-[40px]" id="winInfoPlayerBtn"></div>
                 </div>
-                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-2xl p-3 w-full mb-8 flex flex-col items-center shadow-sm">
-                    <div class="bg-[#65A30D] rounded-xl py-1 font-bold text-white text-base mb-3 w-[90%] text-center shadow-sm tracking-widest">胜利方式</div>
-                    <button id="winInfoMethodBtn" class="bg-[#9BA4C5] border-[3px] border-[#5E4B8B] rounded-xl py-2 px-6 font-black text-white text-stroke text-lg w-[85%] shadow-sm hover:brightness-110 truncate">点击选择</button>
+
+                <!-- 第二区：★ 全新胜利方式 (左图右框) ★ -->
+                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-2 w-full mb-3 flex flex-col items-center shadow-sm">
+                    <div class="bg-[#78a51a] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] text-center shadow-sm tracking-widest">胜利方式</div>
+                    
+                    <!-- 核心左右排版容器 -->
+                    <div class="flex w-full gap-2 px-1 items-stretch">
+                        
+                        <!-- 左侧：图片展示区 -->
+                        <!-- 
+                          【小白调节区：图片展示】
+                          w-[35%] 控制左边占用的宽度。
+                          aspect-[2/3] 保证图片比例是卡牌比例。
+                          bg-[#111111] 黑底框。
+                        -->
+                        <div class="w-[35%] aspect-[2/3] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[6px] overflow-hidden bg-[#111111] flex items-center justify-center shadow-sm shrink-0">
+                            <img id="winInfoMethodImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>--</text></svg>" class="w-full h-full object-contain">
+                        </div>
+
+                        <!-- 右侧：两个下拉框 -->
+                        <div class="w-[65%] flex flex-col justify-center gap-2">
+                            
+                            <!-- 分类编码下拉框 -->
+                            <div class="relative w-full">
+                                <span class="absolute -top-2 left-2 bg-white px-1 text-[10px] font-black text-[#658a16] z-10">分类编码</span>
+                                <!-- focus:ring-[#78a51a] 控制点击选中时的绿色外发光 -->
+                                <select id="winCatSelect" class="w-full h-10 bg-gray-50 border-[2px] border-[#5E4B8B] rounded-lg px-2 text-[#5E4B8B] font-black text-sm outline-none focus:ring-2 focus:ring-[#78a51a] cursor-pointer appearance-none shadow-inner">
+                                    <option value="">-- 选分类 --</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-[#5E4B8B] text-xs pointer-events-none"></i>
+                            </div>
+
+                            <!-- 编号下拉框 -->
+                            <div class="relative w-full">
+                                <span class="absolute -top-2 left-2 bg-white px-1 text-[10px] font-black text-[#658a16] z-10">编号</span>
+                                <select id="winNumSelect" class="w-full h-10 bg-gray-50 border-[2px] border-[#5E4B8B] rounded-lg px-2 text-[#5E4B8B] font-black text-sm outline-none focus:ring-2 focus:ring-[#78a51a] cursor-pointer appearance-none shadow-inner disabled:opacity-50">
+                                    <option value="">--</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-3.5 text-[#5E4B8B] text-xs pointer-events-none"></i>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
-                <div class="flex justify-center gap-4 w-full px-2 mb-2">
-                    <button id="winInfoConfirmBtn" class="flex-1 bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-2xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest">确定</button>
-                    <button id="winInfoCancelBtn" class="flex-1 bg-[#E11D48] border-[4px] border-[#5E4B8B] rounded-2xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 hover:brightness-110 shadow-sm tracking-widest">取消</button>
+
+                <!-- 第三区：★ 本局得分录入区 ★ -->
+                <div class="bg-white border-[3px] border-[#5E4B8B] rounded-xl p-2 w-full mb-4 flex flex-col items-center shadow-sm">
+                    <div class="bg-[#78a51a] rounded-lg py-1 font-bold text-white text-sm mb-2 w-[80%] text-center shadow-sm tracking-widest">本局得分录入</div>
+                    <!-- 这里的数值将和外部的玩家分数框双向同步！ -->
+                    <input type="number" id="winInfoScoreInput" placeholder="填充分数(可选)" class="w-[85%] h-10 border-[2.5px] border-[#5E4B8B] rounded-xl px-2 font-black text-center text-[#5E4B8B] text-xl focus:outline-none focus:bg-gray-50 shadow-inner">
+                </div>
+
+                <!-- 底部：确定与取消 -->
+                <div class="flex justify-center gap-3 w-full px-1 mb-1">
+                    <button id="winInfoConfirmBtn" class="flex-1 bg-[#81e176] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">确定</button>
+                    <button id="winInfoCancelBtn" class="flex-1 bg-[#cd0d43] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-lg active:translate-y-1 hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">取消</button>
                 </div>
             </div>
         </div>
@@ -9548,73 +10115,91 @@ const originalUpdateAllUI = window.updateAllUI;
             if(typeof window.renderRandomSelector === 'function') window.renderRandomSelector();
         };
 
-        window.renderMethodManager = function() {
+window.renderMethodManager = function() {
             if(!gameData.customMethods) return;
             const isLose = window.v2App.currentMethodTab === 'lose';
             const data = isLose ? gameData.customMethods.lose : gameData.customMethods.win;
             
             const titleEl = document.getElementById('methodManagerTitle');
-            if(titleEl) titleEl.innerHTML = isLose ? '淘汰方式条目管理区' : '胜利方式条目管理区';
-            const specBtn = document.getElementById('mmSpecialSettingBtn');
-            if(specBtn) specBtn.style.display = 'block';
+            if(titleEl) titleEl.innerHTML = isLose ? '淘汰方式' : '胜利方式';
+
+            // 1. 数据结构升级与兜底：确保S类和D类绝对存在
+            let specialCat = data.categories.find(c => c.code === 'S');
+            if (!specialCat) {
+                specialCat = { id: (isLose ? 'cl_s' : 'cw_s') + Date.now(), code: 'S', name: '特殊类', color: '#E68A8A' };
+                data.categories.unshift(specialCat);
+            }
+            let defaultCat = data.categories.find(c => c.code === 'D');
+            if (!defaultCat) {
+                defaultCat = data.categories.find(c => c.id.endsWith('_def')); // 兼容旧版
+                if (defaultCat) {
+                    defaultCat.code = 'D'; defaultCat.name = '未分类'; defaultCat.color = '#A6D776';
+                } else {
+                    defaultCat = { id: (isLose ? 'cl_def' : 'cw_def'), code: 'D', name: '未分类', color: '#A6D776' };
+                    data.categories.push(defaultCat);
+                }
+            }
 
             let html = '';
-            const normalCats = data.categories.filter(c => !c.id.endsWith('_def'));
-            const defaultCat = data.categories.filter(c => c.id.endsWith('_def'));
-            const sortedCats = [...normalCats, ...defaultCat];
+            // 排序：S排第一，D排最后，其他的按添加顺序
+            const normalCats = data.categories.filter(c => c.code !== 'S' && c.code !== 'D');
+            const sortedCats = [specialCat, ...normalCats, defaultCat];
 
             sortedCats.forEach(cat => {
                 const catItems = data.items.filter(item => item.categoryId === cat.id);
-                const isDefaultCat = cat.id.endsWith('_def');
-                const isCollapsed = window.v2App.collapsedCats.has(cat.id);
-                
+                const isProtected = (cat.code === 'S' || cat.code === 'D');
+
+                // 小白调节区：这里控制主界面分类和卡片的UI排版
                 html += `
-                <div class="mb-4">
-                    <div class="flex items-center gap-2 mb-2 ml-1 sm:ml-4">
-                        <div class="border-[3px] border-[#5E4B8B] rounded-full px-6 py-1 flex items-center justify-center cursor-pointer mm-cat-cap shadow-sm" data-id="${cat.id}" style="background-color: ${cat.color};">
-                            <span class="font-bold text-[#5E4B8B] text-[15px] tracking-widest leading-tight">${cat.name}</span>
+                <div class="mb-3 w-full px-1">
+                    <!-- 分类标题行 -->
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center gap-1.5">
+                            <!-- 分类码 (正方形) -->
+                            <div class="w-8 h-8 border-[1.5px] border-[#333333] flex items-center justify-center shadow-[1.5px_1.5px_0_#333333] rounded-sm" style="background-color: ${cat.color};">
+                                <span class="font-black text-white text-[20px] drop-shadow-sm">${cat.code}</span>
+                            </div>
+                            <!-- 分类名称 (长方形) -->
+                            <div class="h-8 px-4 border-[1.5px] border-[#333333] flex items-center justify-center shadow-[1.5px_1.5px_0_#333333] rounded-sm min-w-[80px]" style="background-color: ${cat.color};">
+                                <span class="font-black text-white text-[16px] tracking-widest drop-shadow-sm">${cat.name}</span>
+                            </div>
                         </div>
-                        <button onclick="mmToggleCat('${cat.id}')" class="bg-white text-[#5E4B8B] rounded-full w-[30px] h-[30px] flex items-center justify-center hover:scale-110 transition-transform shadow-sm border-[3px] border-[#5E4B8B]">
-                            <i class="fa-solid ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'} text-sm pointer-events-none"></i>
+                        <!-- 删除按钮 (受保护的S和D绝对不显示X号) -->
+                        ${isProtected ? '' : `
+                        <button class="w-[26px] h-[26px] rounded-full border-[1.5px] border-[#333333] flex items-center justify-center bg-white active:scale-90 mm-del-cat-btn shadow-sm" data-id="${cat.id}">
+                            <i class="fa-solid fa-times text-[#333333] text-[13px] pointer-events-none"></i>
                         </button>
-                        ${isDefaultCat ? '' : `<button class="bg-[#F43F5E] text-white rounded-full w-[30px] h-[30px] flex items-center justify-center hover:scale-110 transition-transform mm-del-cat-btn shadow-sm" data-id="${cat.id}"><i class="fa-solid fa-times text-sm pointer-events-none"></i></button>`}
+                        `}
                     </div>
-                    <div class="border-[4px] border-[#5E4B8B] rounded-[2rem] bg-white p-3 sm:p-5 shadow-sm ${isCollapsed ? 'hidden' : ''}">
-                        <div class="grid grid-cols-6 gap-2 sm:gap-4 mm-cat-grid min-h-[140px]" data-cat-id="${cat.id}">
-                            ${catItems.map(item => {
-                                const isDefaultMethod = (isLose && item.id === data.defaultMethodId);
-                                let specialLabel = '';
-                                if (data.specialRules) {
-                                    for (let sNum in data.specialRules) {
-                                        if (data.specialRules[sNum] === item.id) {
-                                            specialLabel = `<div class="absolute top-0 right-0 bg-[#FDE047] border-b-[2px] border-l-[2px] border-[#5E4B8B] px-1.5 py-0.5 text-[10px] font-black text-[#5E4B8B] leading-none z-10 shadow-sm">特殊 `+sNum+`</div>`;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (!specialLabel && isDefaultMethod) {
-                                    specialLabel = `<div class="absolute top-0 right-0 bg-[#FDE047] border-b-[2px] border-l-[2px] border-[#5E4B8B] px-1.5 py-0.5 text-[10px] font-black text-[#5E4B8B] leading-none z-10 shadow-sm">默认</div>`;
-                                }
-                                return `
-                                <div class="flex flex-col items-center w-full mm-item-cap cursor-move" data-id="${item.id}">
-                                    <div class="h-8 flex items-end justify-center w-full mb-1.5">
-                                        <div class="border-[3px] border-[#5E4B8B] rounded-full px-2 sm:px-3 py-0.5 inline-flex items-center justify-center max-w-[115%] shadow-sm" style="background-color: ${cat.color};">
-                                            <span class="mm-auto-text font-black text-[#5E4B8B] whitespace-nowrap overflow-hidden" style="font-size: 13px;">${item.name}</span>
-                                        </div>
-                                    </div>
-                                    <div class="w-full aspect-[2/3] border-[3px] border-[#5E4B8B] rounded-none overflow-hidden relative shadow-sm bg-white hover:brightness-95 transition-all flex justify-center items-center">
-                                        ${specialLabel}
-                                        <img src="${item.url || 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%23f3f4f6\'/><text x=\'50%\' y=\'50%\' fill=\'%239ca3af\' font-size=\'20\' font-family=\'sans-serif\' text-anchor=\'middle\' dy=\'.3em\'>无图</text></svg>'}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'150\'><rect width=\'100%\' height=\'100%\' fill=\'%23f3f4f6\'/><text x=\'50%\' y=\'50%\' fill=\'%239ca3af\' font-size=\'20\' font-family=\'sans-serif\' text-anchor=\'middle\' dy=\'.3em\'>无图</text></svg>';">
-                                    </div>
-                                    <div class="h-8 flex items-start justify-center w-full mt-1.5">
-                                        <button class="bg-[#F43F5E] text-white rounded-full px-5 py-0.5 flex items-center justify-center hover:scale-110 transition-transform mm-del-item-btn shadow-sm cursor-pointer" data-id="${item.id}">
-                                            <i class="fa-solid fa-times text-[13px] pointer-events-none"></i>
-                                        </button>
-                                    </div>
+                    
+                    <!-- 卡片存放白框 -->
+                    <!-- min-h-[90px] 保证就算里面没卡片，也有一个基础高度的白框 -->
+                    <div class="w-full bg-white border-[1.5px] border-[#333333] min-h-[90px] p-2 flex flex-wrap gap-[6px] mm-cat-grid rounded-sm" data-cat-id="${cat.id}">
+                        ${catItems.map((item, index) => {
+                            // 【核心魔法】动态生成展示编码：分类码 + (如果是特殊或填了编号就用item.num，否则用index+1)
+                            let displayNum = item.num || (index + 1);
+                            let displayCode = cat.code + displayNum;
+
+                            return `
+                            <!-- 卡片本体 -->
+                            <div class="flex flex-col items-center w-[50px] mm-item-cap cursor-move relative group" data-id="${item.id}">
+                                <!-- 隐藏式删除小按钮 (极小巧的X) -->
+                                <button class="absolute -top-1.5 -right-1.5 bg-white border-[1px] border-[#333333] rounded-full w-[15px] h-[15px] flex items-center justify-center z-10 mm-del-item-btn shadow-sm" data-id="${item.id}">
+                                    <i class="fa-solid fa-times text-[8px] text-[#333333] pointer-events-none"></i>
+                                </button>
+                                
+                                <!-- 黑底图片框 (严格1:1正方形，适配图1排版) -->
+                                <div class="w-full aspect-square border-[1.5px] border-[#333333] bg-black flex items-center justify-center overflow-hidden mb-[3px] rounded-sm shadow-sm cursor-pointer active:scale-95 transition-transform" onclick="window.openMmItemDialog('${item.id}')">
+                                    <img src="${item.url || 'data:image/svg+xml;utf8,<svg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'150\\\' height=\\\'150\\\'><rect width=\\\'100%\\\' height=\\\'100%\\\' fill=\\\'%23f3f4f6\\\'/><text x=\\\'50%\\\' y=\\\'50%\\\' fill=\\\'%239ca3af\\\' font-size=\\\'20\\\' font-family=\\\'sans-serif\\\' text-anchor=\\\'middle\\\' dy=\\\'.3em\\\'>无图</text></svg>'}" class="w-full h-full object-contain bg-[#111111]" crossorigin="anonymous">
                                 </div>
-                                `;
-                            }).join('')}
-                        </div>
+
+                                <!-- 底部编号胶囊 -->
+                                <div class="w-full h-[16px] border-[1px] border-[#333333] flex items-center justify-center rounded-sm shadow-sm" style="background-color: ${cat.color};">
+                                    <span class="font-black text-white text-[10px] leading-none drop-shadow-sm pt-[1px] tracking-tighter">${displayCode}</span>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
                 `;
@@ -9624,122 +10209,166 @@ const originalUpdateAllUI = window.updateAllUI;
             if(container) container.innerHTML = html;
             window.syncMethodsLists(); 
             window.initMmSortable(); 
-
-            setTimeout(() => {
-                document.querySelectorAll('.mm-auto-text').forEach(el => {
-                    let fontSize = 13; el.style.fontSize = fontSize + 'px';
-                    while (el.scrollWidth > el.clientWidth && fontSize > 7) { fontSize -= 0.5; el.style.fontSize = fontSize + 'px'; }
-                });
-            }, 10);
         };
 
-        // --- 5. 安全事件绑定 ---
+        // --- 5. 安全事件绑定 (针对新UI，杜绝弹窗失效Bug) ---
         function safeBind(id, fn) { 
             const el = document.getElementById(id);
             if(el) { el.onclick = null; el.onclick = fn; }
         }
 
+        // 小工具：生成其他分类颜色的色库
+        const getCatColor = () => {
+            const colors =['#9FD5D2', '#F2C867', '#A89CE6', '#F4A261', '#74BDE0', '#83C98E'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        };
+
         safeBind('mmToggleTabBtn', () => { window.v2App.currentMethodTab = window.v2App.currentMethodTab === 'lose' ? 'win' : 'lose'; window.renderMethodManager(); });
-        safeBind('mmAddCategoryBtn', () => { window.v2App.mmTargetId = null; document.getElementById('mmCatNameInput').value = ''; document.getElementById('mmCategoryDialog').classList.remove('hidden'); });
+        
+        safeBind('mmAddCategoryBtn', () => { 
+            window.v2App.mmTargetId = null; 
+            document.getElementById('mmCatCodeInput').value = ''; 
+            document.getElementById('mmCatNameInput').value = ''; 
+            document.getElementById('mmCategoryDialog').classList.remove('hidden'); 
+        });
+        
         safeBind('mmCatCancelBtn', () => document.getElementById('mmCategoryDialog').classList.add('hidden'));
+        
         safeBind('mmCatSaveBtn', () => {
-            const name = document.getElementById('mmCatNameInput').value.trim();
-            if (!name) return alert("请输入分类名称！");
+            let code = document.getElementById('mmCatCodeInput').value.trim().toUpperCase();
+            let name = document.getElementById('mmCatNameInput').value.trim();
+            if (!code || !name) return alert("分类码和名称不能为空！");
+            if (code.length > 3) return alert("分类码最多3位字母！");
+            if (!/^[A-Z]+$/.test(code)) return alert("分类码只能是纯英文字母！");
+
             const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
+            
+            // 严防死守：防止创建重复的分类码
+            const existCode = data.categories.find(c => c.code === code && c.id !== window.v2App.mmTargetId);
+            if(existCode) return alert("该分类码已存在，请换一个字母！");
+
             if (window.v2App.mmTargetId) {
                 const cat = data.categories.find(c => c.id === window.v2App.mmTargetId);
-                if(cat) cat.name = name;
+                if(cat) { cat.code = code; cat.name = name; }
             } else {
-                const color =['#FAD0C4', '#A1C4FD', '#FFECD2', '#D4FC79', '#E0C3FC', '#84FAB0', '#FD999A', '#D2A0C8'][data.categories.length % 8];
-                data.categories.push({ id: 'c_' + Date.now(), name, color });
+                data.categories.push({ id: 'c_' + Date.now(), code: code, name: name, color: getCatColor() });
             }
             saveData(); window.renderMethodManager(); document.getElementById('mmCategoryDialog').classList.add('hidden');
         });
 
-        safeBind('mmAddItemBtn', () => {
-            window.v2App.mmTargetId = null;
-            document.getElementById('mmItemNameInput').value = ''; document.getElementById('mmItemUrlInput').value = '';
-            document.getElementById('mmItemCatSelectBtn').dataset.cid = window.v2App.currentMethodTab === 'lose' ? 'cl_def' : 'cw_def';
-            document.getElementById('mmItemCatSelectBtn').textContent = '无分类';
-            document.getElementById('mmItemDialog').classList.remove('hidden');
-        });
-        safeBind('mmItemCancelBtn', () => document.getElementById('mmItemDialog').classList.add('hidden'));
-        safeBind('mmItemSaveBtn', () => {
-            const name = document.getElementById('mmItemNameInput').value.trim();
-            const url = document.getElementById('mmItemUrlInput').value.trim();
-            const catId = document.getElementById('mmItemCatSelectBtn').dataset.cid;
-            if (!name) return alert("请输入条目名称！");
+        // 辅助魔法：打开添加方式/编辑方式的窗口
+        window.openMmItemDialog = function(itemId = null) {
+            window.v2App.mmTargetId = itemId;
             const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
+            
+            if(itemId) {
+                const item = data.items.find(i => i.id === itemId);
+                const cat = data.categories.find(c => c.id === item.categoryId);
+                document.getElementById('mmItemCatSelectBtn').dataset.cid = item.categoryId;
+                document.getElementById('mmItemCatDisplay').textContent = cat ? cat.name : '未知分类';
+                document.getElementById('mmItemNumInput').value = item.num || '';
+                document.getElementById('mmItemUrlInput').value = item.url || '';
+            } else {
+                // 如果是新建，默认选 D未分类
+                let cat = data.categories.find(c => c.code === 'D') || data.categories[0];
+                document.getElementById('mmItemCatSelectBtn').dataset.cid = cat.id;
+                document.getElementById('mmItemCatDisplay').textContent = cat.name;
+                document.getElementById('mmItemNumInput').value = '';
+                document.getElementById('mmItemUrlInput').value = '';
+            }
+            document.getElementById('mmItemDialog').classList.remove('hidden');
+        };
+
+        safeBind('mmAddItemBtn', () => window.openMmItemDialog());
+        safeBind('mmItemCancelBtn', () => document.getElementById('mmItemDialog').classList.add('hidden'));
+        
+        safeBind('mmItemSaveBtn', () => {
+            const catId = document.getElementById('mmItemCatSelectBtn').dataset.cid;
+            const num = document.getElementById('mmItemNumInput').value.trim();
+            const url = document.getElementById('mmItemUrlInput').value.trim();
+            if (!num) return alert("请设置此方式的编号数字！");
+
+            const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
+            const cat = data.categories.find(c => c.id === catId);
+            
+            // 核心合并：分类码 + 数字
+            const finalName = cat.code + num;
+
             if (window.v2App.mmTargetId) {
                 const item = data.items.find(i => i.id === window.v2App.mmTargetId);
-                if(item) { item.name = name; item.url = url; item.categoryId = catId; }
-            } else { data.items.push({ id: 'i_' + Date.now(), name, url, categoryId: catId }); }
+                if(item) { item.categoryId = catId; item.num = num; item.name = finalName; item.url = url; }
+            } else { 
+                data.items.push({ id: 'i_' + Date.now(), categoryId: catId, num: num, name: finalName, url: url }); 
+            }
             saveData(); window.renderMethodManager(); document.getElementById('mmItemDialog').classList.add('hidden');
         });
 
-        let isEditingCategory = false;
+        // 辅助下拉菜单：弹出分类选择列表
         safeBind('mmItemCatSelectBtn', () => {
-            isEditingCategory = true;
             const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
-            document.getElementById('mmCatSelectList').innerHTML = data.categories.map(c => `<button class="w-full border-[3px] border-[#5E4B8B] rounded-full py-1.5 font-black text-[#5E4B8B] text-sm mm-select-opt-btn" data-id="${c.id}" style="background-color: ${c.color};">${c.name}</button>`).join('');
-            document.getElementById('mmCatSelectDialog').querySelector('.bg-\\[\\#D8B4E2\\]').textContent = '选择分类';
+            document.getElementById('mmCatSelectList').innerHTML = data.categories.map(c => 
+                `<button class="w-full border-[1.5px] border-[#333333] py-2 font-black text-white text-[16px] tracking-widest mm-select-opt-btn active:scale-95 shadow-sm mb-1" data-id="${c.id}" data-name="${c.name}" style="background-color: ${c.color};">${c.code} - ${c.name}</button>`
+            ).join('');
             document.getElementById('mmCatSelectDialog').classList.remove('hidden');
         });
 
-        safeBind('mmSpecialSettingBtn', () => {
-            isEditingCategory = false;
-            window.v2App.isSettingSpecialRule = true;
-            const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
-            document.getElementById('mmCatSelectList').innerHTML = data.items.map(item => {
-                const cat = data.categories.find(c => c.id === item.categoryId) || {color: '#fff'};
-                return `<button class="w-full border-[3px] border-[#5E4B8B] rounded-full py-1.5 font-black text-[#5E4B8B] text-sm mm-select-opt-btn" data-id="${item.id}" style="background-color: ${cat.color};">${item.name}</button>`;
-            }).join('');
-            document.getElementById('mmCatSelectDialog').querySelector('.bg-\\[\\#D8B4E2\\]').textContent = '点击要设为【特殊】的条目';
-            document.getElementById('mmCatSelectDialog').classList.remove('hidden');
-        });
-
-        document.getElementById('mmCatSelectList').onclick = (e) => {
-            const btn = e.target.closest('.mm-select-opt-btn');
-            if (!btn) return;
-            if (isEditingCategory) {
-                const selectBtn = document.getElementById('mmItemCatSelectBtn');
-                selectBtn.dataset.cid = btn.dataset.id; selectBtn.textContent = btn.textContent;
+        // ==========================================
+        // 全局事件委派：处理网格内点击 (包含删除按钮、卡牌编辑、下拉选项)
+        // ==========================================
+        document.addEventListener('click', (e) => {
+            // 处理分类下拉菜单的选项被点击
+            const selectBtn = e.target.closest('.mm-select-opt-btn');
+            if (selectBtn) {
+                document.getElementById('mmItemCatSelectBtn').dataset.cid = selectBtn.dataset.id;
+                document.getElementById('mmItemCatDisplay').textContent = selectBtn.dataset.name;
                 document.getElementById('mmCatSelectDialog').classList.add('hidden');
-            } else if (window.v2App.isSettingSpecialRule) {
-                let num = prompt("请输入要分配的特殊编号\n(例如填 1 代表特殊方式1，填 2 代表特殊方式2。填 0 可取消该条目的特殊身份)：", "1");
-                if (num !== null) {
-                    num = num.trim();
-                    const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
-                    if (!data.specialRules) data.specialRules = {};
-                    
-                    if (num === "0" || num === "") {
-                        for (let k in data.specialRules) {
-                            if (data.specialRules[k] === btn.dataset.id) delete data.specialRules[k];
-                        }
-                    } else {
-                        data.specialRules[num] = btn.dataset.id;
-                    }
-                    saveData(); window.renderMethodManager();
-                    document.getElementById('mmCatSelectDialog').classList.add('hidden');
-                }
-            } else {
-                gameData.customMethods.lose.defaultMethodId = btn.dataset.id;
-                saveData(); window.renderMethodManager();
-                document.getElementById('mmCatSelectDialog').classList.add('hidden');
+                return;
             }
-        };
 
-        window.showMmConfirm = function(cb) { window.v2App.confirmCallback = cb; document.getElementById('mmConfirmDialog').classList.remove('hidden'); };
-        safeBind('mmConfirmOk', () => { document.getElementById('mmConfirmDialog').classList.add('hidden'); if(window.v2App.confirmCallback) window.v2App.confirmCallback(); });
-        safeBind('mmConfirmCancel', () => document.getElementById('mmConfirmDialog').classList.add('hidden'));
+            const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
+            
+            // 删除单张卡片
+            const delItemBtn = e.target.closest('.mm-del-item-btn');
+            if (delItemBtn) {
+                e.stopPropagation();
+                if(confirm("确定删除这张卡牌方式吗？")) {
+                    data.items = data.items.filter(i => i.id !== delItemBtn.dataset.id);
+                    saveData(); window.renderMethodManager();
+                }
+                return;
+            }
+
+            // 删除整个分类 (并实现自动收纳到未分类逻辑)
+            const delCatBtn = e.target.closest('.mm-del-cat-btn');
+            if (delCatBtn) {
+                e.stopPropagation(); 
+                if(confirm("确定删除此分类吗？\n放心，该分类下的卡片不会丢失，它们会自动移入【D 未分类】中。")) {
+                    const catId = delCatBtn.dataset.id; 
+                    const defId = data.categories.find(c => c.code === 'D').id;
+                    data.items.forEach(i => { 
+                        if(i.categoryId === catId) {
+                            i.categoryId = defId;
+                            // 将名称重新组合为 D+原数字
+                            i.name = 'D' + i.num; 
+                        } 
+                    });
+                    data.categories = data.categories.filter(c => c.id !== catId); 
+                    saveData(); window.renderMethodManager();
+                }
+                return;
+            }
+        });
 
         safeBind('mmClearBtn', () => {
-            window.showMmConfirm(() => {
-                gameData.customMethods = { win: { categories:[{ id: 'cw_def', name: '无分类', color: '#A1A1AA' }], items:[] }, lose: { categories:[{ id: 'cl_def', name: '无分类', color: '#A1A1AA' }], items:[], defaultMethodId: null } };
+            if(confirm("确定清空【当前页面】所有的条目吗？\n(S类和D类本身不会被删除，但里面的卡片会被全部清空！)")) {
+                const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
+                data.items =[];
+                data.categories = data.categories.filter(c => c.code === 'S' || c.code === 'D');
                 saveData(); window.renderMethodManager();
-            });
+            }
         });
 
+        // 导出导入保持原逻辑
         safeBind('mmExportBtn', () => {
             if (typeof XLSX === 'undefined') return alert('请等待 Excel 库加载完成！');
             const wb = XLSX.utils.book_new();
@@ -9792,79 +10421,23 @@ const originalUpdateAllUI = window.updateAllUI;
             };
         }
 
-        document.getElementById('methodManagerContent').onclick = (e) => {
-            const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
-            const delItemBtn = e.target.closest('.mm-del-item-btn');
-            if (delItemBtn) {
-                e.stopPropagation(); window.showMmConfirm(() => {
-                    data.items = data.items.filter(i => i.id !== delItemBtn.dataset.id);
-                    if(data.defaultMethodId === delItemBtn.dataset.id) data.defaultMethodId = null;
-                    saveData(); window.renderMethodManager();
-                }); return;
-            }
-            const delCatBtn = e.target.closest('.mm-del-cat-btn');
-            if (delCatBtn) {
-                e.stopPropagation(); window.showMmConfirm(() => {
-                    const catId = delCatBtn.dataset.id; const defId = window.v2App.currentMethodTab === 'lose' ? 'cl_def' : 'cw_def';
-                    data.items.forEach(i => { if(i.categoryId === catId) i.categoryId = defId; });
-                    data.categories = data.categories.filter(c => c.id !== catId); saveData(); window.renderMethodManager();
-                }); return;
-            }
-            const itemCap = e.target.closest('.mm-item-cap');
-            if (itemCap) {
-                const id = itemCap.dataset.id; const item = data.items.find(i => i.id === id); if(!item) return;
-                window.v2App.mmTargetId = id; document.getElementById('mmItemNameInput').value = item.name; document.getElementById('mmItemUrlInput').value = item.url;
-                const cat = data.categories.find(c => c.id === item.categoryId);
-                const selectBtn = document.getElementById('mmItemCatSelectBtn');
-                selectBtn.dataset.cid = item.categoryId; selectBtn.textContent = cat ? cat.name : '无分类';
-                document.getElementById('mmItemDialog').classList.remove('hidden'); return;
-            }
-            const catCap = e.target.closest('.mm-cat-cap');
-            if (catCap) {
-                const id = catCap.dataset.id; if (id.endsWith('_def')) return;
-                const cat = data.categories.find(c => c.id === id); if(!cat) return;
-                window.v2App.mmTargetId = id; document.getElementById('mmCatNameInput').value = cat.name; document.getElementById('mmCategoryDialog').classList.remove('hidden');
-            }
-        };
-
         // --- 6. V2 Game 弹窗渲染与逻辑 ---
-        window.renderElimInfoDialog = function() {
-            const playersList = document.getElementById('elimInfoPlayersList');
-            playersList.innerHTML = window.v2App.tempElim.players.map(id => {
-                const p = gameData.players.find(x=>x.id===id);
-                return `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-4 py-1 flex items-center gap-2 shadow-sm relative group" style="background-color: ${p.color};"><div class="w-7 h-7 rounded-full border-[2px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-base">${p.name}</span><button class="absolute -top-1.5 -right-1.5 bg-[#E11D48] text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-[#5E4B8B] hidden group-hover:flex hover:scale-110" onclick="removeTempElimPlayer(${id})"><i class="fa-solid fa-times text-[10px]"></i></button></div>`;
-            }).join('') + `<button class="w-9 h-9 rounded-[0.6rem] bg-[#CBD5E1] border-[3px] border-[#5E4B8B] flex items-center justify-center text-[#5E4B8B] font-black text-xl hover:brightness-95 shadow-sm ml-1" onclick="openSelectPlayerDialog('elim_add')"><i class="fa-solid fa-plus"></i></button>`;
+window.renderElimInfoDialog = function() {
+            // 获取当前操作的玩家
+            const targetPid = window.v2App.tempElim.players[0];
+            if(!targetPid) return;
 
-const killerBtn = document.getElementById('elimInfoKillerBtn');
-            
-            // 筛选出可以作为凶手的玩家（目前局内的活跃玩家且未被淘汰的）
+            // 1. 渲染凶手选择区 (保持原逻辑)
+            const killerBtn = document.getElementById('elimInfoKillerBtn');
             const activeKillers = gameData.players.filter(p => p.isActive && !v2State.eliminated[p.id]);
-            
-            // 将外层容器强制接管为 Grid 栅格布局，一行绝对均分4个！
             killerBtn.className = "grid grid-cols-4 gap-1.5 sm:gap-2 w-full px-1";
-            
-            // 动态画出每个玩家的胶囊按钮
             killerBtn.innerHTML = activeKillers.map(p => {
                 const isSelected = window.v2App.tempElim.killerId === p.id;
-                
-                // 核心交互逻辑：如果是被选中的玩家，保持亮度并放大；如果是未被选中的，则变灰变暗缩小！
                 const opacityClass = isSelected 
                     ? 'opacity-100 scale-105 shadow-[0_3px_0_#5E4B8B] ring-2 ring-white' 
-                    : 'opacity-50 scale-95 shadow-none grayscale-[40%] hover:opacity-80'; // 悬浮时微微变亮
-                
+                    : 'opacity-50 scale-95 shadow-none grayscale-[40%] hover:opacity-80'; 
                 const shortName = p.name ? p.name.slice(-1) : '?';
-                
                 return `
-                <!-- 
-                  ========================================================
-                  【小白调节区：直选“被谁淘汰”头像胶囊】
-                  [1. 整体大小] py-1: 控制上下高度。
-                  [2. 头像尺寸] w-6 h-6 sm:w-7 sm:h-7: 控制中间方形小头像的宽高。
-                  [3. 字体大小] text-[11px] sm:text-xs: 控制下方单字名字的字号。[4. 动画交互] cursor-pointer transition-all: 让选中/未选中的缩放过渡丝滑如德芙！
-                  [特效说明] 选中时会放大(scale-105)并有纯白外发光白边(ring-white)加深紫底座投影；
-                            未选中时会缩小(scale-95)、半透明(opacity-50)并带点灰度丧失色彩(grayscale)！
-                  ======================================================== 
-                -->
                 <div class="flex flex-col items-center justify-center border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-xl py-1 cursor-pointer transition-all ${opacityClass}" style="background-color: ${p.color};" onclick="window.setTempElimKiller(${p.id})">
                     <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden mb-0.5 shrink-0 flex items-center justify-center shadow-sm">
                         <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
@@ -9872,10 +10445,84 @@ const killerBtn = document.getElementById('elimInfoKillerBtn');
                     <span class="font-black text-white text-[11px] sm:text-xs text-stroke tracking-widest leading-none pb-[1px]" style="-webkit-text-stroke: 1px #5E4B8B;">${shortName}</span>
                 </div>`;
             }).join('');
-            const methodBtn = document.getElementById('elimInfoMethodBtn');
-            methodBtn.textContent = window.v2App.tempElim.methodName || '点击选择';
-            methodBtn.onclick = () => openSelectMethodDialog('elim_method');
-            document.getElementById('elimInfoCardsInput').value = window.v2App.tempElim.cards;
+
+            // 2. ★ 全新：处理分类下拉框与编号下拉框 ★
+            const catSelect = document.getElementById('elimCatSelect');
+            const numSelect = document.getElementById('elimNumSelect');
+            const imgDisplay = document.getElementById('elimInfoMethodImg');
+            const loseData = gameData.customMethods && gameData.customMethods.lose ? gameData.customMethods.lose : { categories: [], items: [] };
+
+            // 初始化：把分类灌入第一个下拉框 (剔除"无分类"这种没用的)
+            const validCats = loseData.categories.filter(c => c.code !== 'D' && c.id !== 'cl_def');
+            catSelect.innerHTML = '<option value="">-- 选分类 --</option>' + 
+                validCats.map(c => `<option value="${c.id}">${c.code} (${c.name})</option>`).join('');
+
+            const updateImage = (methodName) => {
+                let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>--</text></svg>";
+                if(!methodName) { imgDisplay.src = defaultUrl; return; }
+                let item = loseData.items.find(i => i.name === methodName);
+                imgDisplay.src = item && item.url ? item.url : defaultUrl;
+            };
+
+            // 当“分类”改变时，联动“编号”下拉框
+            catSelect.onchange = () => {
+                const cid = catSelect.value;
+                if (!cid) {
+                    numSelect.innerHTML = '<option value="">--</option>';
+                    numSelect.disabled = true;
+                    window.v2App.tempElim.methodName = null;
+                    updateImage(null);
+                    return;
+                }
+                
+                const catItems = loseData.items.filter(i => i.categoryId === cid);
+                numSelect.innerHTML = '<option value="">-- 选编号 --</option>' + 
+                    catItems.map(i => `<option value="${i.name}">${i.num || i.name}</option>`).join('');
+                numSelect.disabled = false;
+                window.v2App.tempElim.methodName = null; // 清空方式，等选编号
+                updateImage(null);
+            };
+
+            // 当“编号”改变时，锁定淘汰方式并显示图片
+            numSelect.onchange = () => {
+                const mName = numSelect.value;
+                if (!mName) {
+                    window.v2App.tempElim.methodName = null;
+                    updateImage(null);
+                } else {
+                    window.v2App.tempElim.methodName = mName;
+                    updateImage(mName);
+                }
+            };
+
+            // 如果之前已经记住了某个方式，自动反向推导选中对应选项
+            if (window.v2App.tempElim.methodName) {
+                let item = loseData.items.find(i => i.name === window.v2App.tempElim.methodName);
+                if (item) {
+                    catSelect.value = item.categoryId;
+                    catSelect.onchange(); // 触发联动加载编号
+                    numSelect.value = item.name;
+                    updateImage(item.name);
+                }
+            } else {
+                catSelect.value = ""; catSelect.onchange();
+            }
+
+            // 3. ★ 同步外界的主分数框 ★
+            const mainScoreInput = document.querySelector(`.v2-score-input[data-id="${targetPid}"]`);
+            const diagScoreInput = document.getElementById('elimInfoScoreInput');
+            
+            // 把外部已填写的分数，复制到弹窗里显示
+            if (mainScoreInput && mainScoreInput.value !== '') {
+                diagScoreInput.value = mainScoreInput.value;
+            } else {
+                diagScoreInput.value = '';
+            }
+            
+            // 实时监听弹窗里的输入，自动保存进 tempElim
+            diagScoreInput.oninput = () => {
+                window.v2App.tempElim.score = diagScoreInput.value;
+            };
         };
         window.removeTempElimPlayer = function(id) { window.v2App.tempElim.players = window.v2App.tempElim.players.filter(pid => pid !== id); window.renderElimInfoDialog(); };
 
@@ -9987,12 +10634,92 @@ window.setTempElimKiller = function(id) {
             document.getElementById('penaltyInfoCardsInput').value = window.v2App.tempPenalty.cards;
         };
         
-        window.renderWinInfoDialog = function() {
-            const p = gameData.players.find(x=>x.id===window.v2App.tempWin.playerId);
+window.renderWinInfoDialog = function() {
+            // 获取当前操作的胜利玩家
+            const targetPid = window.v2App.tempWin.playerId;
+            if(!targetPid) return;
+
+            // 1. 渲染胜利者选择区
+            const p = gameData.players.find(x=>x.id===targetPid);
             document.getElementById('winInfoPlayerBtn').innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-6 py-1.5 flex items-center gap-3 shadow-sm cursor-pointer hover:brightness-110" style="background-color: ${p.color};" onclick="openSelectPlayerDialog('win_select'); document.getElementById('v2DialogSetWinInfo').classList.add('hidden');"><div class="w-9 h-9 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl">${p.name}</span></div>`;
-            const methodBtn = document.getElementById('winInfoMethodBtn');
-            methodBtn.textContent = window.v2App.tempWin.methodName || '点击选择';
-            methodBtn.onclick = () => openSelectMethodDialog('win_method');
+
+            // 2. ★ 全新：处理分类下拉框与编号下拉框 ★
+            const catSelect = document.getElementById('winCatSelect');
+            const numSelect = document.getElementById('winNumSelect');
+            const imgDisplay = document.getElementById('winInfoMethodImg');
+            const winData = gameData.customMethods && gameData.customMethods.win ? gameData.customMethods.win : { categories: [], items: [] };
+
+            // 初始化：把分类灌入第一个下拉框 (剔除"无分类"这种没用的)
+            const validCats = winData.categories.filter(c => c.code !== 'D' && c.id !== 'cw_def');
+            catSelect.innerHTML = '<option value="">-- 选分类 --</option>' + 
+                validCats.map(c => `<option value="${c.id}">${c.code} (${c.name})</option>`).join('');
+
+            const updateImage = (methodName) => {
+                let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>--</text></svg>";
+                if(!methodName) { imgDisplay.src = defaultUrl; return; }
+                let item = winData.items.find(i => i.name === methodName);
+                imgDisplay.src = item && item.url ? item.url : defaultUrl;
+            };
+
+            // 当“分类”改变时，联动“编号”下拉框
+            catSelect.onchange = () => {
+                const cid = catSelect.value;
+                if (!cid) {
+                    numSelect.innerHTML = '<option value="">--</option>';
+                    numSelect.disabled = true;
+                    window.v2App.tempWin.methodName = null;
+                    updateImage(null);
+                    return;
+                }
+                
+                const catItems = winData.items.filter(i => i.categoryId === cid);
+                numSelect.innerHTML = '<option value="">-- 选编号 --</option>' + 
+                    catItems.map(i => `<option value="${i.name}">${i.num || i.name}</option>`).join('');
+                numSelect.disabled = false;
+                window.v2App.tempWin.methodName = null; // 清空方式，等选编号
+                updateImage(null);
+            };
+
+            // 当“编号”改变时，锁定胜利方式并显示图片
+            numSelect.onchange = () => {
+                const mName = numSelect.value;
+                if (!mName) {
+                    window.v2App.tempWin.methodName = null;
+                    updateImage(null);
+                } else {
+                    window.v2App.tempWin.methodName = mName;
+                    updateImage(mName);
+                }
+            };
+
+            // 如果之前已经记住了某个方式，自动反向推导选中对应选项
+            if (window.v2App.tempWin.methodName) {
+                let item = winData.items.find(i => i.name === window.v2App.tempWin.methodName);
+                if (item) {
+                    catSelect.value = item.categoryId;
+                    catSelect.onchange(); // 触发联动加载编号
+                    numSelect.value = item.name;
+                    updateImage(item.name);
+                }
+            } else {
+                catSelect.value = ""; catSelect.onchange();
+            }
+
+            // 3. ★ 同步外界的主分数框 ★
+            const mainScoreInput = document.querySelector(`.v2-score-input[data-id="${targetPid}"]`);
+            const diagScoreInput = document.getElementById('winInfoScoreInput');
+            
+            // 把外部已填写的分数，复制到弹窗里显示
+            if (mainScoreInput && mainScoreInput.value !== '') {
+                diagScoreInput.value = mainScoreInput.value;
+            } else {
+                diagScoreInput.value = '0';
+            }
+            
+            // 实时监听弹窗里的输入，自动保存进 tempWin
+            diagScoreInput.oninput = () => {
+                window.v2App.tempWin.score = diagScoreInput.value;
+            };
         };
 
         window.openSelectPlayerDialog = function(context) {
@@ -10149,30 +10876,42 @@ window.setTempElimKiller = function(id) {
         
         safeBind('elimInfoCancelBtn', () => document.getElementById('v2DialogSetElimInfo').classList.add('hidden'));
         
-        safeBind('elimInfoConfirmBtn', () => {
-            window.v2App.tempElim.cards = document.getElementById('elimInfoCardsInput').value;
-            if (window.v2App.tempElim.players.length === 0) return alert("请至少选择一名淘汰者！");
-            if (!window.v2App.tempElim.killerId) return alert("请选择被谁淘汰！"); 
-            if (!window.v2App.tempElim.methodName) return alert("请选择淘汰方式！");
+safeBind('elimInfoConfirmBtn', () => {
+            // 获取下拉框和输入框的最终值
+            const finalMethodName = document.getElementById('elimNumSelect').value;
+            const finalScore = document.getElementById('elimInfoScoreInput').value;
+            
+            if (window.v2App.tempElim.players.length === 0) return alert("发生未知错误，找不到淘汰玩家！");
+            if (!window.v2App.tempElim.killerId) return alert("请选择是被谁淘汰的！"); 
+            if (!finalMethodName) return alert("请务必选择正确的分类编码和编号！");
 
             v2State.eliminated = v2State.eliminated || {};
             v2State.eliminationDetails = v2State.eliminationDetails || {};
-            v2State.eliminationEvents = v2State.eliminationEvents ||[];
+
+            // 提取第一步二次确认时死死咬住的“绝对冻结时间”
+            let savedTime = window.v2App.tempElim.freezeTime !== undefined ? window.v2App.tempElim.freezeTime : (typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0);
 
             window.v2App.tempElim.players.forEach(pid => {
-                v2State.eliminated[pid] = window.v2App.tempElim.methodName;
-                v2State.eliminationDetails[pid] = { killerId: window.v2App.tempElim.killerId, cards: window.v2App.tempElim.cards ? parseInt(window.v2App.tempElim.cards) : 0, time: typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0 };
+                // ★ 补救点：因为顺位在刚刚点击二次确认时就已经排好了，所以这里绝对不能再 push 一次！！
+                // 我们只需要把刚才系统给的“未设置方式”更新为你现在选好的死法和凶手即可！
+                
+                v2State.eliminated[pid] = finalMethodName;
+                v2State.eliminationDetails[pid] = { killerId: window.v2App.tempElim.killerId, cards: 0, time: savedTime };
+                
+                // 分数同步回主面板
+                const mainScoreInput = document.querySelector(`.v2-score-input[data-id="${pid}"]`);
+                if (mainScoreInput) {
+                    mainScoreInput.value = finalScore;
+                }
             });
-            // 【终极修复】必须存ID，不能存对象！！！
-            v2State.eliminationEvents.push([...window.v2App.tempElim.players]);
-            
-            v2State.lastElimWasSuicide = (window.v2App.tempElim.killerId === window.v2App.tempElim.players[0]);
-            v2State.lastElimMethodName = window.v2App.tempElim.methodName;
 
+            v2State.lastElimWasSuicide = (window.v2App.tempElim.killerId === window.v2App.tempElim.players[0]);
+            v2State.lastElimMethodName = finalMethodName;
+
+            // 隐藏弹窗
             document.getElementById('v2DialogSetElimInfo').classList.add('hidden');
             
-            if(typeof startTimer === 'function') startTimer(); 
-            if(typeof checkWinCondition === 'function') checkWinCondition(); 
+            // 补刷一次主界面 UI（为了让你刚选的凶手名字能立刻在外面的小胶囊上体现出来）
             if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
         });
 
@@ -10215,7 +10954,7 @@ window.setTempElimKiller = function(id) {
             }
 
             if (finalWinMethod === 'MANUAL') {
-                window.v2App.tempWin = { playerId: winnerId, methodName: null };
+                window.v2App.tempWin = { playerId: winnerId, methodName: null, score: '' };
                 window.v2App.tempForcedLoseMethod = finalLoseMethodForOthers; 
                 let p = gameData.players.find(x=>x.id===winnerId);
                 document.getElementById('winInfoPlayerBtn').innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-6 py-1.5 flex items-center gap-3 shadow-sm cursor-pointer hover:brightness-110" style="background-color: ${p.color};" onclick="openSelectPlayerDialog('win_select'); document.getElementById('v2DialogSetWinInfo').classList.add('hidden');"><div class="w-9 h-9 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl">${p.name}</span></div>`;
@@ -10267,14 +11006,27 @@ if(typeof stopTimer === 'function') stopTimer();
             if (typeof els !== 'undefined') els.survivingPlayersContainer = newSurvElem;
         }
 
-        safeBind('winInfoConfirmBtn', () => {
-            if (!window.v2App.tempWin.methodName) return alert("请选择胜利方式！");
+safeBind('winInfoConfirmBtn', () => {
+            // 获取下拉框和输入框的最终值
+            const finalMethodName = document.getElementById('winNumSelect').value;
+            const finalScore = document.getElementById('winInfoScoreInput').value;
+
+            if (!finalMethodName) return alert("请务必选择正确的分类编码和编号！");
+            
+            window.v2App.tempWin.methodName = finalMethodName;
+
             v2State.eliminated = v2State.eliminated || {};
             v2State.eliminationDetails = v2State.eliminationDetails || {};
             v2State.eliminationEvents = v2State.eliminationEvents ||[];
 
             v2State.winnerId = window.v2App.tempWin.playerId; 
             v2State.winMethod = window.v2App.tempWin.methodName;
+
+            // 分数同步回主面板
+            const mainScoreInput = document.querySelector(`.v2-score-input[data-id="${v2State.winnerId}"]`);
+            if (mainScoreInput) {
+                mainScoreInput.value = finalScore;
+            }
 
             const active = gameData.players.filter(p => p.isActive);
             let simultaneous =[]; 
@@ -10283,7 +11035,7 @@ if(typeof stopTimer === 'function') stopTimer();
                     // 彻底解决默认为特殊1的遗留死角：优先读取大脑赋给的死法
                     v2State.eliminated[p.id] = window.v2App.tempForcedLoseMethod || window.getSpecialMethodName('lose', 1); 
                     // 【修复】把最后这批人的凶手强行绑定给最终赢家
-                    v2State.eliminationDetails[p.id] = { killerId: v2State.winnerId, cards: 0 };
+                    v2State.eliminationDetails[p.id] = { killerId: v2State.winnerId, cards: 0, time: typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0 };
                     simultaneous.push(p.id);
                 }
             });
@@ -10292,8 +11044,8 @@ if(typeof stopTimer === 'function') stopTimer();
             document.getElementById('v2DialogSetWinInfo').classList.add('hidden');
             let calcBtn = document.getElementById('v2CalculateBtn');
             if (calcBtn) { calcBtn.disabled = false; calcBtn.classList.replace('bg-gray-400', 'bg-primary'); calcBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
-           if(typeof pauseTrStopwatch === 'function') pauseTrStopwatch(); // 【新增】：一旦确认胜者，立刻瞬间暂停秒表！
- if(typeof stopTimer === 'function') stopTimer(); 
+            if(typeof pauseTrStopwatch === 'function') pauseTrStopwatch(); // 【新增】：一旦确认胜者，立刻瞬间暂停秒表！
+            if(typeof stopTimer === 'function') stopTimer(); 
             if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
         });
 
@@ -10316,66 +11068,340 @@ if(typeof stopTimer === 'function') stopTimer();
         if (scoreAreaElem) {
             scoreAreaElem.addEventListener('click', e => {
                 // 【修复逻辑】：如果是胜者被定了，仅拦截存活玩家被点击（防止误触），但放行被淘汰的玩家进行复活！
-            const btnForCheck = e.target.closest('.v2-player-cap');
+const btnForCheck = e.target.closest('.v2-player-cap');
             if(!btnForCheck) return;
             const pidForCheck = parseInt(btnForCheck.dataset.id);
-            if(v2State.winnerId && !v2State.eliminated[pidForCheck]) return; 
-                const btn = e.target.closest('.v2-player-cap'); if(!btn) return;
+            
+            // ★ 核心逻辑：如果本局已经有赢家了
+            if(v2State.winnerId) {
+                // 如果点击的是【赢家自己】，弹出图1修改菜单！
+                if (pidForCheck === v2State.winnerId) {
+                    const p = gameData.players.find(x => x.id === pidForCheck);
+                    document.getElementById('winnerMenuAvatar').src = p.avatar;
+                    document.getElementById('winnerMenuName').textContent = p.name.slice(-1);
+                    document.getElementById('winnerMenuPlayerCap').style.backgroundColor = p.color;
+                    document.getElementById('v2DialogWinnerMenu').classList.remove('hidden');
+                    return; // 结束，不再往下走
+                }
+                // 如果点击的既不是赢家，也不是被淘汰的人（拦截无效操作）
+                if (!v2State.eliminated[pidForCheck]) return; 
+            }
+            
+            const btn = e.target.closest('.v2-player-cap'); if(!btn) return;
                 const pid = parseInt(btn.dataset.id);
-                if(v2State.eliminated[pid]) { 
-                    v2TargetPlayerId = pid; const p = gameData.players.find(x=>x.id===pid); const reviveName = document.getElementById('revivePlayerName');
-                    if(reviveName) { reviveName.textContent = p.name; reviveName.style.color = p.color; }
-                    if(!v2State.revivedUsed) document.getElementById('doReviveBtn').classList.remove('hidden'); else document.getElementById('doReviveBtn').classList.add('hidden');
-                    document.getElementById('reviveDialog').classList.remove('hidden');
-                } else { 
-                    window.v2App.tempElim = { players: [pid], killerId: null, methodName: null, cards: '' };
-                    let defMethod = null; if (gameData.customMethods && gameData.customMethods.lose) defMethod = gameData.customMethods.lose.items.find(i => i.id === gameData.customMethods.lose.defaultMethodId);
-                    if (defMethod) window.v2App.tempElim.methodName = defMethod.name;
-                    window.renderElimInfoDialog(); document.getElementById('v2DialogSetElimInfo').classList.remove('hidden');
+if(v2State.eliminated[pid]) { 
+                    v2TargetPlayerId = pid; 
+                    const p = gameData.players.find(x => x.id === pid); 
+                    
+                    // 把玩家信息填入图1弹窗的顶部胶囊
+                    document.getElementById('epMenuAvatar').src = p.avatar;
+                    const nameEl = document.getElementById('epMenuName');
+                    nameEl.textContent = p.name.slice(-1);
+                    document.getElementById('epMenuPlayerCap').style.backgroundColor = p.color;
+
+                    // 如果已经用过复活了，就把复活按钮变灰，防止点击
+                    const revBtn = document.getElementById('epMenuReviveBtn');
+                    if(v2State.revivedUsed) {
+                        revBtn.classList.add('opacity-50', 'grayscale', 'cursor-not-allowed');
+                        revBtn.onclick = null; // 封死点击事件
+                    } else {
+                        revBtn.classList.remove('opacity-50', 'grayscale', 'cursor-not-allowed');
+                        revBtn.onclick = () => window.openEpMenuAction('revive'); // 恢复点击事件
+                    }
+
+                    // 显示图1菜单弹窗
+                    document.getElementById('v2DialogElimPlayerMenu').classList.remove('hidden');
+                } else {
+                    // 1. 获取玩家并填充 图1 的信息
+                    const p = gameData.players.find(x => x.id === pid);
+                    document.getElementById('quickElimAvatar').src = p.avatar;
+                    document.getElementById('quickElimName').textContent = p.name;
+                    document.getElementById('quickElimName').style.color = p.color;
+                    
+                    // 2. 绑定 图1 中“淘汰”按钮的事件，传递 PID
+                    const qBtn = document.getElementById('quickElimBtn');
+                    qBtn.onclick = () => {
+                        document.getElementById('v2DialogQuickElimOptions').classList.add('hidden');
+                        
+// 绑定 图2 中“确认”按钮的事件
+                        const cBtn = document.getElementById('quickElimConfirmBtn');
+                        cBtn.onclick = () => {
+                            // 1. 核心：在点击确认的这一瞬间，立刻捕获绝对精准的时间！！！
+                            let currentTime = typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0;
+                            window.v2App.tempElim = { players: [pid], killerId: null, methodName: null, score: '', freezeTime: currentTime };
+                            
+                            // 2. ★ 核心补救：立刻向系统底层注入“该玩家已阵亡”的事实！★
+                            v2State.eliminated = v2State.eliminated || {};
+                            v2State.eliminationDetails = v2State.eliminationDetails || {};
+                            v2State.eliminationEvents = v2State.eliminationEvents || [];
+
+                            // 先给他发个占位死法，等会儿弹窗再改
+                            let defMethod = '未设置方式'; 
+                            if (gameData.customMethods && gameData.customMethods.lose) {
+                                let dItem = gameData.customMethods.lose.items.find(i => i.id === gameData.customMethods.lose.defaultMethodId);
+                                if (dItem) defMethod = dItem.name;
+                            }
+                            // 立刻写入死亡名单、写入冻结时间、排入死亡顺位！
+                            v2State.eliminated[pid] = defMethod;
+                            v2State.eliminationDetails[pid] = { killerId: null, cards: 0, time: currentTime };
+                            v2State.eliminationEvents.push([pid]); 
+
+                            // 3. 隐藏二次确认框
+                            document.getElementById('v2DialogQuickElimConfirm').classList.add('hidden');
+                            
+                            // 4. ★ 核心补救：立刻启动主界面引擎！★
+                            // 让秒表马上跑起来、让该玩家胶囊瞬间变灰、检查这局是不是只剩最后一人了！
+                            if(typeof startTimer === 'function') startTimer(); 
+                            if(typeof checkWinCondition === 'function') checkWinCondition(); 
+                            if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+
+                            // 5. 最后，弹出详情框让他悠哉游哉地慢慢填
+                            window.renderElimInfoDialog(); 
+                            document.getElementById('v2DialogSetElimInfo').classList.remove('hidden');
+                        };
+                        
+                        document.getElementById('v2DialogQuickElimConfirm').classList.remove('hidden');
+                    };
+
+                    // 显示 图1
+                    document.getElementById('v2DialogQuickElimOptions').classList.remove('hidden');
                 }
             });
         }
 
+// ====================================================================
+        // ★ 核心引擎：图1 & 图2 提前获胜高亮选中逻辑 (修复被覆盖Bug版) ★
+        // ====================================================================
+        window.tempEarlyWinPlayerId = null; // 记忆小助手
+
+        // 核心画笔函数：实时重绘网格，表现出“点中高亮，其他人变暗”的特效
+        window.renderEarlyWinGrid = function() {
+            const active = gameData.players.filter(p => p.isActive);
+            const alive = active.filter(p => !v2State.eliminated[p.id]);
+
+            document.getElementById('survivingPlayersContainer').innerHTML = alive.map(p => {
+                const isSelected = window.tempEarlyWinPlayerId === p.id;
+                const hasSelection = window.tempEarlyWinPlayerId !== null;
+                
+                let stateClass = "";
+                // 状态 1：还没点任何人时，大家都是正常状态
+                if (!hasSelection) {
+                    stateClass = "opacity-100 scale-100 hover:scale-105 shadow-[0_2px_0_#5E4B8B]";
+                } 
+                // 状态 2：点中了这个人，强行放大，加绿色外发光，并弹出底层投影！
+                else if (isSelected) {
+                    stateClass = "opacity-100 scale-110 shadow-[0_4px_0_#5E4B8B] ring-[3px] ring-[#71B52D] z-10"; 
+                } 
+                // 状态 3：点中了别人，这个人立刻变灰变暗缩小
+                else {
+                    stateClass = "opacity-40 grayscale-[60%] scale-95 shadow-none";
+                }
+
+                return `
+                <!-- 
+                  ========================================================
+                  【小白调节区 5：网格内的单张玩家卡牌】
+                  [尺寸比例] aspect-square 强制为1:1正方形，适配图1排版
+                  ========================================================
+                -->
+                <div class="flex flex-col items-center justify-center border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[8px] py-1.5 px-1 cursor-pointer transition-all duration-300 w-full aspect-square early-win-opt-btn ${stateClass}" style="background-color: ${p.color};" onclick="window.selectEarlyWinPlayer(${p.id})">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden mb-1 flex items-center justify-center shadow-sm pointer-events-none">
+                        <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <span class="font-black text-white text-[12px] sm:text-[14px] text-stroke tracking-widest leading-none pb-[1px] pointer-events-none" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
+                </div>
+                `;
+            }).join('');
+        };
+
+        window.selectEarlyWinPlayer = function(id) {
+            window.tempEarlyWinPlayerId = id; // 记录下被点击的ID
+            window.renderEarlyWinGrid();      // 瞬间命令重绘画板！
+        };
+
+        // 【致命修复点】：强行接管了原本出错的点击按钮
         const earlyWinElem = document.getElementById('earlyWinBtn');
         if (earlyWinElem) {
-            earlyWinElem.onclick = () => { if(typeof stopTimer === 'function') stopTimer(); window.openSelectPlayerDialog('win_select'); };
+            earlyWinElem.onclick = () => { 
+                if(typeof stopTimer === 'function') stopTimer(); 
+                window.tempEarlyWinPlayerId = null; // 打开时先清除上次的记忆
+                window.renderEarlyWinGrid();        // 画出全新网格
+                document.getElementById('earlyWinPlayerDialog').classList.remove('hidden'); 
+            };
+        }
+
+        // ==========================================
+        // 绑定底部四个按钮的操作引擎
+        // ==========================================
+        const btnConfirmEarly = document.getElementById('confirmEarlyWinBtn');
+        if (btnConfirmEarly) {
+            btnConfirmEarly.onclick = () => {
+                if (window.tempEarlyWinPlayerId === null) {
+                    alert("请先点击选中一位获胜的玩家！");
+                    return;
+                }
+                // 1. 关闭图1
+                document.getElementById('earlyWinPlayerDialog').classList.add('hidden');
+                
+                // 2. 把选中的玩家信息塞给图2
+                const p = gameData.players.find(x => x.id === window.tempEarlyWinPlayerId);
+                document.getElementById('earlyWinConfirmAvatar').src = p.avatar;
+                document.getElementById('earlyWinConfirmName').textContent = p.name.slice(-1);
+                document.getElementById('earlyWinConfirmPlayerCap').style.backgroundColor = p.color;
+
+                // 3. 弹出图2
+                document.getElementById('earlyWinConfirmDialog').classList.remove('hidden');
+            };
+        }
+
+// ==========================================
+        // 绑定图1：赢家专属菜单的按钮操作
+        // ==========================================
+        const btnEditWinnerInfo = document.getElementById('winnerMenuEditBtn');
+        if (btnEditWinnerInfo) {
+            btnEditWinnerInfo.onclick = () => {
+                // 1. 关闭图1菜单
+                document.getElementById('v2DialogWinnerMenu').classList.add('hidden');
+                
+                // 2. 准备数据，重新弹出填写信息的窗口
+                window.v2App.tempWin = { playerId: v2State.winnerId, methodName: v2State.winMethod, score: '' };
+                let wp = gameData.players.find(x=>x.id===v2State.winnerId);
+                
+                document.getElementById('winInfoPlayerBtn').innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-6 py-1.5 flex items-center gap-3 shadow-sm cursor-default" style="background-color: ${wp.color};"><div class="w-9 h-9 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${wp.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl">${wp.name}</span></div>`;
+                
+                document.getElementById('v2DialogSetWinInfo').classList.remove('hidden');
+                window.renderWinInfoDialog();
+            };
+        }
+
+        const btnCancelWinnerMenu = document.getElementById('winnerMenuCancelBtn');
+        if (btnCancelWinnerMenu) {
+            btnCancelWinnerMenu.onclick = () => {
+                // 取消，直接关掉图1菜单
+                document.getElementById('v2DialogWinnerMenu').classList.add('hidden');
+            };
+        }
+
+        const btnCancelEarly = document.getElementById('cancelEarlyWinBtn');
+        if (btnCancelEarly) {
+            btnCancelEarly.onclick = () => document.getElementById('earlyWinPlayerDialog').classList.add('hidden');
+        }
+
+const btnFinalConfirm = document.getElementById('finalConfirmEarlyWinBtn');
+        if (btnFinalConfirm) {
+            btnFinalConfirm.onclick = () => {
+                // 1. 关闭图2 二次确认弹窗
+                document.getElementById('earlyWinConfirmDialog').classList.add('hidden');
+                v2TargetPlayerId = window.tempEarlyWinPlayerId;
+
+                // ========================================================
+                // ★ 核心逻辑修复：瞬间锁定胜利者，状态不可逆！ ★
+                // ========================================================
+                v2State.winnerId = v2TargetPlayerId;
+                if(!v2State.winMethod) v2State.winMethod = '未设置方式'; // 兜底占位
+
+                // 2. 把其他人都标记为淘汰
+ let active = gameData.players.filter(p => p.isActive);
+                let simultaneous = [];
+                active.forEach(p => {
+                    if(p.id !== v2TargetPlayerId && !v2State.eliminated[p.id]) {
+                        v2State.eliminated[p.id] = window.getSpecialMethodName('lose', 1);
+                        
+                        // 【核心修复】：强行把这些人的凶手，判定为提前获胜的玩家！同时记录定格的秒表时间！
+                        v2State.eliminationDetails[p.id] = { 
+                            killerId: v2TargetPlayerId, 
+                            cards: 0, 
+                            time: typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0 
+                        };
+                        
+                        simultaneous.push(p.id);
+                    }
+                });
+                if (simultaneous.length > 0) v2State.eliminationEvents.push(simultaneous);
+
+                // 3. 瞬间刷新界面，让别人暗下去，赢家亮起来！
+                let calcBtn = document.getElementById('v2CalculateBtn');
+                if (calcBtn) { calcBtn.disabled = false; calcBtn.classList.replace('bg-gray-400', 'bg-primary'); calcBtn.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(typeof stopTimer === 'function') stopTimer();
+                if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+
+                // 4. 异步弹出信息修改框（此时即便点击取消，胜负也已经锁定了）
+                window.v2App.tempWin = { playerId: v2TargetPlayerId, methodName: v2State.winMethod, score: '' };
+                
+                let wp = gameData.players.find(x=>x.id===v2TargetPlayerId);
+                // 生成玩家胶囊，并去除重新选人的 onclick 功能，因为已经锁死了
+                document.getElementById('winInfoPlayerBtn').innerHTML = `<div class="border-[3px] border-[#5E4B8B] rounded-full pl-1.5 pr-6 py-1.5 flex items-center gap-3 shadow-sm cursor-default" style="background-color: ${wp.color};"><div class="w-9 h-9 rounded-full border-[3px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${wp.avatar}" class="w-full h-full object-cover"></div><span class="font-black text-white text-stroke tracking-widest text-xl">${wp.name}</span></div>`;
+                
+                document.getElementById('v2DialogSetWinInfo').classList.remove('hidden');
+                window.renderWinInfoDialog();
+            };
+        }
+
+        const btnFinalCancel = document.getElementById('finalCancelEarlyWinBtn');
+        if (btnFinalCancel) {
+            btnFinalCancel.onclick = () => document.getElementById('earlyWinConfirmDialog').classList.add('hidden');
         }
         
-        const calcElem = document.getElementById('v2CalculateBtn');
+const calcElem = document.getElementById('v2CalculateBtn');
         if (calcElem) {
+            // 先清理旧的绑定，防止干扰
+            calcElem.onclick = null; 
+            
             calcElem.onclick = () => {
                 if(!v2State.winnerId) return;
-                const active = gameData.players.filter(p => p.isActive); const scores = {}; let inputsValid = true;
-                active.forEach(p => { const input = document.querySelector(`.v2-score-input[data-id="${p.id}"]`); if(input && input.value !== '') scores[p.id] = parseInt(input.value); else { if(input) input.classList.add('border-danger'); inputsValid = false; } });
+                
+                const active = gameData.players.filter(p => p.isActive); 
+                const scores = {}; 
+                let inputsValid = true;
+                
+                // 1. 抓取分数并校验
+                active.forEach(p => { 
+                    const input = document.querySelector(`.v2-score-input[data-id="${p.id}"]`); 
+                    if(input && input.value !== '') {
+                        scores[p.id] = parseInt(input.value); 
+                    } else { 
+                        if(input) input.classList.add('border-danger'); 
+                        inputsValid = false; 
+                    } 
+                });
+                
                 if(!inputsValid) return alert("请补全所有玩家的分数\n(填分数即可，默认0)");
 
-                if(!inputsValid) return alert("请补全所有玩家的分数\n(填分数即可，默认0)");
-
-                // ====== 【小白专属逻辑优化】：自动判定毒死=复活 ======
-                // 获取当前设置里“特殊淘汰方式3”的名字
+                // ====== 自动判定毒死=复活 ======
                 let poisonMethodName = typeof window.getSpecialMethodName === 'function' ? window.getSpecialMethodName('lose', 3) : null;
                 if (poisonMethodName && v2State.eliminated) {
                     for (let pid in v2State.eliminated) {
-                        // 如果有人这局被这瓶毒药淘汰了
                         if (v2State.eliminated[pid] === poisonMethodName) {
-                            // 强行记录：这局的复活名额被他使用了！
                             v2State.revivedPlayerId = parseInt(pid);
                         }
                     }
                 }
-                // =================================================
 
-                let winIdStr = String(v2State.winnerId); let winnerScore = scores[v2State.winnerId]; const changes = {}; let totalPool = 0;
-                active.forEach(p => { if (String(p.id) !== winIdStr) { const penalty = Math.max(0, scores[p.id] - winnerScore); changes[p.id] = -penalty; totalPool += penalty; } });
+                // 2. 计算分数加减
+                let winIdStr = String(v2State.winnerId); 
+                let winnerScore = scores[v2State.winnerId]; 
+                const changes = {}; 
+                let totalPool = 0;
+                
+                active.forEach(p => { 
+                    if (String(p.id) !== winIdStr) { 
+                        const penalty = Math.max(0, scores[p.id] - winnerScore); 
+                        changes[p.id] = -penalty; 
+                        totalPool += penalty; 
+                    } 
+                });
                 changes[winIdStr] = totalPool;
 
+                // 防呆：确保数据对象存在
                 v2State.eliminated = v2State.eliminated || {};
-                v2State.eliminationEvents = v2State.eliminationEvents ||[];
+                v2State.eliminationEvents = v2State.eliminationEvents || [];
                 v2State.eliminationDetails = v2State.eliminationDetails || {};
 
-// 【核心修改点：加入 stopwatchTime】
+                // 3. 将本局战报正式装车入库！
                 gameData.rounds.push({
-                    round: gameData.rounds.length + 1, changes: changes, winner: parseInt(winIdStr),
+                    round: gameData.rounds.length + 1, 
+                    changes: changes, 
+                    winner: parseInt(winIdStr),
                     v2Stats: { 
                         winMethod: v2State.winMethod, 
                         eliminated: JSON.parse(JSON.stringify(v2State.eliminated)), 
@@ -10384,39 +11410,56 @@ if(typeof stopTimer === 'function') stopTimer();
                         manualPenalties: JSON.parse(JSON.stringify(v2State.manualPenalties)), 
                         revivedPlayerId: v2State.revivedPlayerId, 
                         timerRemainAtEnd: typeof timerRemain !== 'undefined' ? timerRemain : 0,
-                        stopwatchTime: trElapsedSeconds // <---- 【新增！把正向计时器的秒数强行刻在这局历史里】
+                        stopwatchTime: typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0 
                     }
                 });
                 
-                // 紧接着在 push 完成后，让秒表停止并归零，迎接下一局！
-                resetTrStopwatch(); 
-                // 同时把容器3显示的文字更新成下一局
+                // 4. 处理时间与场次记录
+                if(typeof resetTrStopwatch === 'function') resetTrStopwatch(); 
+                if(typeof resetTimer === 'function') resetTimer();
+                
                 const trRoundText = document.getElementById('trCurrentRoundText');
                 if (trRoundText) trRoundText.textContent = gameData.rounds.length + 1;
 
-                const now = new Date(); const dateStr = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-                const roundNum = gameData.rounds.length; if (!gameData.sessions) gameData.sessions =[];
-                if (gameData.sessions.length > 0) { const lastSession = gameData.sessions[gameData.sessions.length - 1]; if (lastSession.date === dateStr) lastSession.end = roundNum; else gameData.sessions.push({ date: dateStr, start: roundNum, end: roundNum }); } 
-                else { gameData.sessions.push({ date: dateStr, start: roundNum, end: roundNum }); }
-
-redoStack.length = 0; 
-                window.resetV2State(); 
+                const now = new Date(); 
+                const dateStr = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+                const roundNum = gameData.rounds.length; 
+                if (!gameData.sessions) gameData.sessions = [];
+                if (gameData.sessions.length > 0) { 
+                    const lastSession = gameData.sessions[gameData.sessions.length - 1]; 
+                    if (lastSession.date === dateStr) lastSession.end = roundNum; 
+                    else gameData.sessions.push({ date: dateStr, start: roundNum, end: roundNum }); 
+                } else { 
+                    gameData.sessions.push({ date: dateStr, start: roundNum, end: roundNum }); 
+                }
 
                 // ========================================================
-                // 【核心修复：清理记忆海绵残留】
-                // 在这局结算完毕后，立刻清空页面上所有的分数输入框。
-                // 因为我们在绘制 UI 的时候有“防误触记忆功能”，如果不主动清空，
-                // 它会把刚结账的分数当成你正在输的新分数而强行记住！
+                // ★ 5. 核心状态爆破重置！★
                 // ========================================================
+                redoStack.length = 0; 
+                window.resetV2State(); // 调用我们之前写好的霸体清空引擎，赢家、淘汰名单全部清空！
+
+                // 物理清空记忆海绵：清除所有分数框内残留的分数
                 document.querySelectorAll('.v2-score-input').forEach(input => {
                     input.value = '';
                 });
 
+                // 把结算按钮变回灰色不可点状态
+                calcElem.disabled = true;
+                calcElem.classList.replace('bg-primary', 'bg-gray-400');
+                calcElem.classList.add('opacity-50', 'cursor-not-allowed');
+
+                // ========================================================
+                // ★ 6. 全局 UI 终极刷新，完美进入下一局！★
+                // ========================================================
                 gameData.currentSessionIndex = -1; // 强制回到全局视角
                 if(typeof updateViewRounds === 'function') updateViewRounds(); 
                 if(typeof recalculateStats === 'function') recalculateStats(); 
                 if(typeof updateAllUI === 'function') updateAllUI(); 
                 if(typeof saveData === 'function') saveData();
+                
+                // 强制要求实时结算区域重新画一次胶囊，彻底洗掉高亮和变暗！
+                if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
             };
         }
 
