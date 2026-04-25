@@ -16,7 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -330,88 +329,6 @@
     </style>
 </head>
 <body class="min-h-screen pb-[120px]" id="appBody" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
-
-<!-- ==================================================================== -->
-<!-- ★★★ UNO 终极联机大厅 (像素级复刻) ★★★ -->
-<!-- ==================================================================== -->
-<div id="multiplayerLobbyOverlay" class="fixed inset-0 z-[9999999] flex items-center justify-center backdrop-blur-md" style="background: linear-gradient(135deg, rgba(94,75,139,0.8) 0%, rgba(236,113,161,0.8) 100%);">
-    
-    <!-- 
-      ========================================================
-      【小白调节区 1：大厅主面板】
-      [bg-[#FEFCE8]] 护眼淡黄色底板
-      [border-[6px]] 极其厚重的深紫色外框，复刻卡牌实体感
-      [shadow-[0_10px_0_#5E4B8B]] 底部超厚立体投影
-      ========================================================
-    -->
-    <div class="bg-[#FEFCE8] border-[5px] sm:border-[6px] border-[#5E4B8B] rounded-[2.5rem] p-6 sm:p-8 max-w-[320px] sm:max-w-[360px] w-[90%] mx-auto flex flex-col items-center shadow-[0_10px_0_#5E4B8B] relative magic-glow">
-        
-        <!-- 大标题 Logo -->
-        <div class="bg-[#FFD93D] border-[4px] border-[#5E4B8B] rounded-full px-8 py-2 mb-8 shadow-[0_4px_0_#5E4B8B] transform -translate-y-12 absolute">
-            <span class="font-black text-white text-[28px] sm:text-[32px] tracking-widest text-stroke" style="-webkit-text-stroke: 2px #5E4B8B; paint-order: stroke fill;">UNO 联机大厅</span>
-        </div>
-
-        <div class="w-full flex flex-col gap-4 mt-6">
-            <!-- 
-              ========================================================
-              【小白调节区 2：创建房间按钮 (主机端)】
-              [bg-[#4ADE80]] 鲜艳的绿色
-              [hover:brightness-110] 鼠标放上去发亮
-              [active:translate-y-1.5 active:shadow-none] 点击时狠狠按下去的机械手感
-              ========================================================
-            -->
-            <button onclick="window.NetEngine.createRoom()" class="w-full bg-[#4ADE80] border-[4px] border-[#5E4B8B] rounded-2xl py-3.5 flex flex-col items-center justify-center shadow-[0_6px_0_#5E4B8B] active:translate-y-1.5 active:shadow-none transition-all hover:brightness-110 group">
-                <span class="font-black text-white text-[22px] sm:text-[24px] tracking-widest text-stroke leading-none" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">创建房间</span>
-                <span class="font-bold text-[#5E4B8B] text-[11px] sm:text-xs mt-1">我是房主/裁判 (掌握总数据)</span>
-            </button>
-
-            <!-- 加入房间按钮 (副机端) -->
-            <button onclick="document.getElementById('joinRoomModal').classList.remove('hidden'); document.getElementById('multiplayerLobbyOverlay').classList.add('hidden');" class="w-full bg-[#3B82F6] border-[4px] border-[#5E4B8B] rounded-2xl py-3.5 flex flex-col items-center justify-center shadow-[0_6px_0_#5E4B8B] active:translate-y-1.5 active:shadow-none transition-all hover:brightness-110 group">
-                <span class="font-black text-white text-[22px] sm:text-[24px] tracking-widest text-stroke leading-none" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">加入房间</span>
-                <span class="font-bold text-[#E0F2FE] text-[11px] sm:text-xs mt-1">我是玩家 (与主机实时同步)</span>
-            </button>
-
-            <!-- 分割线 -->
-            <div class="flex items-center w-full my-1 opacity-50">
-                <div class="h-[3px] flex-1 bg-[#5E4B8B] rounded-full"></div>
-                <span class="px-3 font-black text-[#5E4B8B] text-sm">OR</span>
-                <div class="h-[3px] flex-1 bg-[#5E4B8B] rounded-full"></div>
-            </div>
-
-            <!-- 单机模式按钮 -->
-            <button onclick="window.NetEngine.startSinglePlayer()" class="w-full bg-[#E2E8F0] border-[4px] border-[#5E4B8B] rounded-2xl py-2.5 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110">
-                <span class="font-black text-[#5E4B8B] text-[18px] tracking-widest">单机模式 (不联网)</span>
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- ==================================================================== -->
-<!-- ★ 加入房间：输入房间号弹窗 ★ -->
-<!-- ==================================================================== -->
-<div id="joinRoomModal" class="fixed inset-0 z-[9999999] flex items-center justify-center backdrop-blur-sm bg-black/60 hidden">
-    <div class="bg-[#FEFCE8] border-[5px] border-[#5E4B8B] rounded-[2rem] p-6 max-w-[300px] w-[90%] flex flex-col items-center shadow-[0_8px_0_#5E4B8B] relative">
-        <div class="bg-[#F43F5E] border-[3px] border-[#5E4B8B] rounded-xl py-1.5 px-8 mb-4 shadow-[0_3px_0_#5E4B8B]">
-            <span class="font-black text-white text-[20px] tracking-widest text-stroke" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">输入房间号</span>
-        </div>
-        
-        <!-- 6位数字输入框 -->
-        <input type="number" id="roomCodeInput" placeholder="请输入6位数字" class="w-full h-14 bg-white border-[4px] border-[#5E4B8B] rounded-xl text-center font-black text-[#5E4B8B] text-2xl tracking-[0.3em] outline-none focus:ring-4 focus:ring-[#3B82F6]/50 shadow-inner mb-4 placeholder:text-gray-300 placeholder:tracking-normal placeholder:text-base">
-        
-        <div class="flex gap-3 w-full">
-            <button onclick="window.NetEngine.joinRoom()" class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-[20px] shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none hover:brightness-110 text-stroke" style="-webkit-text-stroke: 1.2px #5E4B8B; paint-order: stroke fill;">加入</button>
-            <button onclick="document.getElementById('joinRoomModal').classList.add('hidden'); document.getElementById('multiplayerLobbyOverlay').classList.remove('hidden');" class="flex-1 bg-[#F87171] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-[20px] shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none hover:brightness-110 text-stroke" style="-webkit-text-stroke: 1.2px #5E4B8B; paint-order: stroke fill;">返回</button>
-        </div>
-    </div>
-</div>
-
-<!-- ==================================================================== -->
-<!-- ★ 悬浮网络状态提示器 (显示在右上角) ★ -->
-<!-- ==================================================================== -->
-<div id="networkStatusBadge" class="fixed top-4 right-4 z-[99999] bg-[#9CA3AF] border-[3px] border-[#5E4B8B] rounded-full px-3 py-1 flex items-center gap-2 shadow-[0_3px_0_#5E4B8B] transition-colors hidden">
-    <div id="networkSignalDot" class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></div>
-    <span id="networkStatusText" class="font-black text-white text-[10px] sm:text-xs tracking-widest text-stroke" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">未连接</span>
-</div>
     
     <div id="mainContainer" class="container mx-auto px-2 py-4 max-w-[800px] relative flex flex-col"> 
 <!-- 【极其关键：防死机幽灵口袋】专门用来骗过老JS引擎，防止报错卡死全局 -->
@@ -2399,168 +2316,6 @@
     </div>
 
     <script>
-
-// ====================================================================
-        // ★★★ UNO 终极联机网络引擎 (MQTT Host-Authoritative 模型) ★★★
-        // ====================================================================
-        window.NetRole = 'single'; // 'host' (主机) | 'client' (副机) | 'single' (单机)
-        window.RoomCode = '';
-        window.NetClient = null;
-        
-        window.NetEngine = {
-            init: function(role, code) {
-                window.NetRole = role;
-                window.RoomCode = code;
-                
-                // 连接公共免费低延迟物联网节点
-                const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
-                const clientId = 'UNO_V2_' + Math.random().toString(16).substr(2, 8);
-                
-                document.getElementById('networkStatusBadge').classList.remove('hidden');
-                this.updateStatus('正在连接...', '#F59E0B'); // 黄色
-                
-                window.NetClient = mqtt.connect(brokerUrl, { clientId: clientId });
-                
-                window.NetClient.on('connect', () => {
-                    this.updateStatus(`已连接 (房间:${code})`, '#4ADE80'); // 绿色
-                    
-                    // 订阅自己房间的专属频道
-                    window.NetClient.subscribe(`uno_room_${code}`);
-                    
-                    if (role === 'host') {
-                        // 主机端：连接成功后，立刻向全场广播自己的权威数据
-                        this.broadcastState();
-                        alert(`房间创建成功！\n房间号: 【 ${code} 】\n请让其他玩家点击“加入房间”并输入此号码。`);
-                    } else {
-                        // 副机端：连接成功后，立刻向主机发送“求数据”暗号
-                        this.requestFullData();
-                        this.applyClientUI(); // 隐藏副机无权查看的板块
-                    }
-                });
-
-                window.NetClient.on('message', (topic, message) => {
-                    try {
-                        const payload = JSON.parse(message.toString());
-                        this.handleNetworkMessage(payload);
-                    } catch (e) { console.error("网络消息解析错误", e); }
-                });
-
-                window.NetClient.on('close', () => this.updateStatus('连接断开', '#F87171'));
-                window.NetClient.on('error', () => this.updateStatus('网络错误', '#F87171'));
-            },
-
-            updateStatus: function(text, color) {
-                const textEl = document.getElementById('networkStatusText');
-                const badgeEl = document.getElementById('networkStatusBadge');
-                const dotEl = document.getElementById('networkSignalDot');
-                if(textEl) textEl.textContent = text;
-                if(badgeEl) badgeEl.style.borderColor = color;
-                if(dotEl) dotEl.style.backgroundColor = color;
-            },
-
-            createRoom: function() {
-                const code = Math.floor(100000 + Math.random() * 900000).toString(); // 生成6位随机数
-                document.getElementById('multiplayerLobbyOverlay').classList.add('hidden');
-                this.init('host', code);
-            },
-
-            joinRoom: function() {
-                const code = document.getElementById('roomCodeInput').value.trim();
-                if(code.length !== 6) return alert("请输入正确的6位数字房间号！");
-                document.getElementById('joinRoomModal').classList.add('hidden');
-                this.init('client', code);
-            },
-
-            startSinglePlayer: function() {
-                document.getElementById('multiplayerLobbyOverlay').classList.add('hidden');
-                window.NetRole = 'single';
-            },
-
-            // 广播全场数据 (主机和副机只要自己操作了，就通知全场)
-            broadcastState: function() {
-                if(!window.NetClient || !window.NetClient.connected || window.NetRole === 'single') return;
-                
-                const payload = {
-                    type: 'STATE_SYNC',
-                    senderRole: window.NetRole,
-                    timestamp: Date.now(),
-                    gameData: gameData,
-                    v2State: typeof v2State !== 'undefined' ? v2State : {},
-                    timerInfo: { 
-                        timerTotal: typeof timerTotal !== 'undefined' ? timerTotal : 480,
-                        timerRemain: typeof timerRemain !== 'undefined' ? timerRemain : 480,
-                        isTimerRunning: typeof isTimerRunning !== 'undefined' ? isTimerRunning : false
-                    }
-                };
-                window.NetClient.publish(`uno_room_${window.RoomCode}`, JSON.stringify(payload));
-            },
-
-            // 副机求数据
-            requestFullData: function() {
-                if(!window.NetClient || !window.NetClient.connected) return;
-                window.NetClient.publish(`uno_room_${window.RoomCode}`, JSON.stringify({ type: 'REQ_FULL_DATA' }));
-            },
-
-            // 处理收到的消息
-            handleNetworkMessage: function(payload) {
-                if (payload.type === 'REQ_FULL_DATA' && window.NetRole === 'host') {
-                    // 主机收到副机的请求，立刻下发总账本
-                    this.broadcastState();
-                } 
-                else if (payload.type === 'STATE_SYNC') {
-                    // 所有人（包括主机和副机）收到最新的状态更新
-                    // 防止自己的消息回弹给自己（时间戳校验，毫秒级防抖）
-                    if (this.lastSyncTime && payload.timestamp <= this.lastSyncTime) return;
-                    this.lastSyncTime = payload.timestamp;
-
-                    // 1. 强制覆盖本地数据库
-                    gameData = payload.gameData;
-                    if(typeof v2State !== 'undefined' && payload.v2State) {
-                        Object.assign(v2State, payload.v2State);
-                    }
-                    
-                    // 2. 倒计时极限同步算法 (防跳秒)
-                    if(payload.timerInfo) {
-                        timerTotal = payload.timerInfo.timerTotal;
-                        timerRemain = payload.timerInfo.timerRemain;
-                        if(payload.timerInfo.isTimerRunning && !isTimerRunning) {
-                            if(typeof startTimer === 'function') startTimer();
-                        } else if(!payload.timerInfo.isTimerRunning && isTimerRunning) {
-                            if(typeof stopTimer === 'function') stopTimer();
-                        } else {
-                            if(typeof updateTimerUI === 'function') updateTimerUI();
-                        }
-                    }
-
-                    // 3. 强制刷新屏幕画面！(无感丝滑更新)
-                    if(typeof updateViewRounds === 'function') updateViewRounds();
-                    if(typeof recalculateStats === 'function') recalculateStats();
-                    if(typeof updateAllUI === 'function') updateAllUI();
-                    if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
-                }
-            },
-
-            // 副机专属 UI 处理 (隐藏无权查看的板块)
-            applyClientUI: function() {
-                // 强制隐藏 底部数据备份(tab8) 和 卡牌信息(tab10)
-                const t8 = document.querySelector('.mobile-tab-btn[data-tab="tab8"]');
-                const t10 = document.querySelector('.mobile-tab-btn[data-tab="tab10"]');
-                if(t8) t8.style.setProperty('display', 'none', 'important');
-                if(t10) t10.style.setProperty('display', 'none', 'important');
-            }
-        };
-
-        // 拦截原有的 saveData 函数，只要数据一保存，瞬间发射给全网！
-        const originalSaveDataEngine = window.saveData;
-        window.saveData = function() {
-            if(originalSaveDataEngine) originalSaveDataEngine();
-            // 只要不是单机模式，就触发网络同步
-            if(window.NetEngine && window.NetRole !== 'single') {
-                window.NetEngine.broadcastState();
-            }
-        };
-        // ====================================================================
-
         const avatarList =[
             "https://i.ibb.co/PZJJm3Bs/2025-12-16-204026-031.jpg",
             "https://i.ibb.co/ZR2pSC3N/2025-12-16-203958-691.jpg",
@@ -3405,7 +3160,6 @@ function checkAudienceMode() {
         checkAudienceMode(); // 页面一加载，第一时间先验明正身
 // 核心功能3：将当前所有数据打包，上传到云端
 async function uploadDataToCloud() {
-return false; //
             if (!CLOUD_API_KEY) {
                 alert("请先在代码中填入您的 JSONBin API Key 喔！");
                 return;
@@ -3480,7 +3234,6 @@ return false; //
         }
 
         async function fetchDataFromCloud(syncView = false) {
-return false;
             if (!cloudBinId) return;
             const statusBadge = document.getElementById('shareStatusBadge');
             const originalText = statusBadge.textContent;
@@ -10000,116 +9753,6 @@ window.switchMobileTab = function(tabId) {
         }
     }
 };
-
-// ====================================================================
-        // ★★★ 第三步核心补丁：彻底解锁副机权限 & 时间完美同步 ★★★
-        // ====================================================================
-        
-        // 1. 强行解除旧版观众模式限制，让副机(玩家)拥有和主机一样的点击操作权限！
-        window.checkAudienceMode = function() {
-            window.isAudienceMode = false; 
-        };
-
-        // 2. 拦截时间按钮：只要有人点击播放/暂停，瞬间触发全网同步！
-        const _hookSync = function() {
-            if(window.NetEngine && window.NetRole !== 'single') {
-                window.NetEngine.broadcastState();
-            }
-        };
-
-        // 无痕接管倒计时
-        const _origStartTimer = window.startTimer;
-        window.startTimer = function() { if(_origStartTimer) _origStartTimer(); _hookSync(); };
-        
-        const _origStopTimer = window.stopTimer;
-        window.stopTimer = function() { if(_origStopTimer) _origStopTimer(); _hookSync(); };
-        
-        const _origResetTimer = window.resetTimer;
-        window.resetTimer = function() { if(_origResetTimer) _origResetTimer(); _hookSync(); };
-
-        // 无痕接管秒表
-        const _origStartSW = window.startTrStopwatch;
-        window.startTrStopwatch = function() { if(_origStartSW) _origStartSW(); _hookSync(); };
-        
-        const _origPauseSW = window.pauseTrStopwatch;
-        window.pauseTrStopwatch = function() { if(_origPauseSW) _origPauseSW(); _hookSync(); };
-        
-        const _origResetSW = window.resetTrStopwatch;
-        window.resetTrStopwatch = function() { if(_origResetSW) _origResetSW(); _hookSync(); };
-
-        // 3. 升级网络引擎：加入秒表数据，精准接收，拒绝死循环
-        if (window.NetEngine) {
-            window.NetEngine.broadcastState = function() {
-                if(!window.NetClient || !window.NetClient.connected || window.NetRole === 'single') return;
-                const payload = {
-                    type: 'STATE_SYNC',
-                    senderRole: window.NetRole,
-                    timestamp: Date.now(),
-                    gameData: gameData,
-                    v2State: typeof v2State !== 'undefined' ? v2State : {},
-                    // 发送倒计时数据
-                    timerInfo: { 
-                        timerTotal: typeof timerTotal !== 'undefined' ? timerTotal : 480,
-                        timerRemain: typeof timerRemain !== 'undefined' ? timerRemain : 480,
-                        isTimerRunning: typeof isTimerRunning !== 'undefined' ? isTimerRunning : false
-                    },
-                    // 发送秒表数据
-                    stopwatchInfo: {
-                        elapsed: typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0,
-                        isRunning: typeof trIsRunning !== 'undefined' ? trIsRunning : false
-                    }
-                };
-                window.NetClient.publish(`uno_room_${window.RoomCode}`, JSON.stringify(payload));
-            };
-
-            window.NetEngine.handleNetworkMessage = function(payload) {
-                if (payload.type === 'REQ_FULL_DATA' && window.NetRole === 'host') {
-                    this.broadcastState(); // 主机收到请求，立刻下发数据
-                } 
-                else if (payload.type === 'STATE_SYNC') {
-                    // 防抖处理，避免旧数据覆盖新数据
-                    if (this.lastSyncTime && payload.timestamp <= this.lastSyncTime) return;
-                    this.lastSyncTime = payload.timestamp;
-
-                    // 强制覆盖核心数据
-                    gameData = payload.gameData;
-                    if(typeof v2State !== 'undefined' && payload.v2State) {
-                        Object.assign(v2State, payload.v2State);
-                    }
-                    
-                    // 倒计时动画完美同步（通过本地引擎接管，丝滑无卡顿）
-                    if(payload.timerInfo) {
-                        timerTotal = payload.timerInfo.timerTotal;
-                        timerRemain = payload.timerInfo.timerRemain;
-                        if(payload.timerInfo.isTimerRunning && !window.isTimerRunning) {
-                            if(_origStartTimer) _origStartTimer(); // 使用原函数防死循环
-                        } else if(!payload.timerInfo.isTimerRunning && window.isTimerRunning) {
-                            if(_origStopTimer) _origStopTimer();
-                        }
-                        if(typeof updateTimerUI === 'function') updateTimerUI();
-                    }
-
-                    // 秒表动画完美同步
-                    if(payload.stopwatchInfo) {
-                        trElapsedSeconds = payload.stopwatchInfo.elapsed;
-                        if(payload.stopwatchInfo.isRunning && !window.trIsRunning) {
-                            if(_origStartSW) _origStartSW();
-                        } else if(!payload.stopwatchInfo.isRunning && window.trIsRunning) {
-                            if(_origPauseSW) _origPauseSW();
-                        }
-                        if(typeof updateTrDisplay === 'function') updateTrDisplay();
-                    }
-
-                    // 瞬间重绘全场 UI
-                    if(typeof updateViewRounds === 'function') updateViewRounds();
-                    if(typeof recalculateStats === 'function') recalculateStats();
-                    if(typeof updateAllUI === 'function') updateAllUI();
-                    if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
-                }
-            };
-        }
-        // ====================================================================
-
 // ====================================================================
         window.onload = init;
 // ==========================================
@@ -10786,7 +10429,9 @@ window.renderElimInfoDialog = function() {
 
             // 1. 渲染凶手选择区 (保持原逻辑)
             const killerBtn = document.getElementById('elimInfoKillerBtn');
-            const activeKillers = gameData.players.filter(p => p.isActive && !v2State.eliminated[p.id]);
+            // 【小白修改区：凶手列表生成器】
+// 修复逻辑：允许玩家自己淘汰自己！只要是活跃玩家，且（未被淘汰 或者 就是当前正在处理的受害者本人 targetPid），都显示在头像列表里！
+const activeKillers = gameData.players.filter(p => p.isActive && (!v2State.eliminated[p.id] || p.id === targetPid));
             killerBtn.className = "grid grid-cols-4 gap-1.5 sm:gap-2 w-full px-1";
             killerBtn.innerHTML = activeKillers.map(p => {
                 const isSelected = window.v2App.tempElim.killerId === p.id;
@@ -10870,10 +10515,11 @@ window.renderElimInfoDialog = function() {
             const diagScoreInput = document.getElementById('elimInfoScoreInput');
             
             // 把外部已填写的分数，复制到弹窗里显示
-            if (mainScoreInput && mainScoreInput.value !== '') {
+// 【小白修改区：淘汰弹窗分数显示逻辑】
+            if (mainScoreInput && mainScoreInput.value !== '' && mainScoreInput.value !== '0') {
                 diagScoreInput.value = mainScoreInput.value;
             } else {
-                diagScoreInput.value = '';
+                diagScoreInput.value = ''; // 确保严格为空，点击直接可输入
             }
             
             // 实时监听弹窗里的输入，自动保存进 tempElim
@@ -11067,10 +10713,11 @@ window.renderWinInfoDialog = function() {
             const diagScoreInput = document.getElementById('winInfoScoreInput');
             
             // 把外部已填写的分数，复制到弹窗里显示
-            if (mainScoreInput && mainScoreInput.value !== '') {
+// 【小白修改区：胜利弹窗分数显示逻辑】
+            if (mainScoreInput && mainScoreInput.value !== '' && mainScoreInput.value !== '0') {
                 diagScoreInput.value = mainScoreInput.value;
             } else {
-                diagScoreInput.value = '0';
+                diagScoreInput.value = ''; // 【修复】默认留空，点击直接输入，不再需要删0
             }
             
             // 实时监听弹窗里的输入，自动保存进 tempWin
@@ -12466,133 +12113,6 @@ if(btnSelRevive && btnSelUndo && btnConfirmUI) {
         }
     });
 }
-// ====================================================================
-        // ★★★ 第四步核心补丁：打通全局任督二脉 (打字同步 & 全动作防漏) ★★★
-        // ====================================================================
-        
-        window.isSyncingTarget = false; // 智能防死循环锁
-
-        // 1. 拦截“实时结算”界面的所有刷新动作，只要画面一变，立刻广播！
-        const _origRenderV2 = window.renderV2ScoreArea || (typeof renderV2ScoreArea !== 'undefined' ? renderV2ScoreArea : null);
-        window.renderV2ScoreArea = renderV2ScoreArea = function() {
-            if(_origRenderV2) _origRenderV2();
-            if(window.NetEngine && window.NetRole !== 'single' && !window.isSyncingTarget) {
-                window.NetEngine.broadcastState();
-            }
-        };
-
-        // 2. 拦截全局大刷新
-        const _origUpdateUI = window.updateAllUI || (typeof updateAllUI !== 'undefined' ? updateAllUI : null);
-        window.updateAllUI = updateAllUI = function() {
-            if(_origUpdateUI) _origUpdateUI();
-            if(window.NetEngine && window.NetRole !== 'single' && !window.isSyncingTarget) {
-                window.NetEngine.broadcastState();
-            }
-        };
-
-        // 3. 拦截底层的 saveData (保证所有数据落地瞬间绝对全网同步)
-        const _realSaveData = window.saveData || (typeof saveData !== 'undefined' ? saveData : null);
-        window.saveData = saveData = function() {
-            if(_realSaveData) _realSaveData();
-            if(window.NetEngine && window.NetRole !== 'single' && !window.isSyncingTarget) {
-                window.NetEngine.broadcastState();
-            }
-        };
-
-        // 4. 【最神级的功能】：实时同步打字输入！(副机打字，主机瞬间看到，且光标不乱跳)
-        document.addEventListener('input', (e) => {
-            if (e.target.classList.contains('v2-score-input')) {
-                if(window.NetEngine && window.NetRole !== 'single' && !window.isSyncingTarget) {
-                    const pid = e.target.dataset.id;
-                    const val = e.target.value;
-                    window.NetClient.publish(`uno_room_${window.RoomCode}`, JSON.stringify({
-                        type: 'TYPING_SCORE',
-                        pid: pid,
-                        val: val,
-                        senderRole: window.NetRole
-                    }));
-                }
-            }
-        });
-
-        // 5. 升级网络接收器：加入防死循环锁和打字同步处理
-        if (window.NetEngine) {
-            window.NetEngine.handleNetworkMessage = function(payload) {
-                if (payload.type === 'REQ_FULL_DATA' && window.NetRole === 'host') {
-                    this.broadcastState(); 
-                } 
-                else if (payload.type === 'TYPING_SCORE') {
-                    // 收到别人打字的信息，立刻在自己屏幕上显示出来！
-                    if (payload.senderRole === window.NetRole) return;
-                    const input = document.querySelector(`.v2-score-input[data-id="${payload.pid}"]`);
-                    // 只有值不同才修改，防止打字时输入法光标鬼畜回弹
-                    if (input && input.value !== payload.val) {
-                        input.value = payload.val;
-                    }
-                }
-                else if (payload.type === 'STATE_SYNC') {
-                    if (this.lastSyncTime && payload.timestamp <= this.lastSyncTime) return;
-                    this.lastSyncTime = payload.timestamp;
-
-                    // ★ 开启绝对防御锁：正在应用别人的数据时，自己绝对不要发广播，防止死循环死机！ ★
-                    window.isSyncingTarget = true;
-                    
-                    try {
-                        gameData = payload.gameData;
-                        if(typeof v2State !== 'undefined' && payload.v2State) {
-                            // 深度精确覆盖 v2State 确保 UI 完美对应
-                            v2State.eliminated = payload.v2State.eliminated || {};
-                            v2State.revivedUsed = payload.v2State.revivedUsed || false;
-                            v2State.winnerId = payload.v2State.winnerId || null;
-                            v2State.winMethod = payload.v2State.winMethod || null;
-                            v2State.eliminationEvents = payload.v2State.eliminationEvents || [];
-                            v2State.revivedPlayerId = payload.v2State.revivedPlayerId || null;
-                            v2State.manualPenalties = payload.v2State.manualPenalties || [];
-                            v2State.penaltyUndoStack = payload.v2State.penaltyUndoStack || [];
-                            v2State.eliminationDetails = payload.v2State.eliminationDetails || {};
-                        }
-                        
-                        // 倒计时完美同步
-                        if(payload.timerInfo) {
-                            timerTotal = payload.timerInfo.timerTotal;
-                            timerRemain = payload.timerInfo.timerRemain;
-                            let localIsRunning = typeof isTimerRunning !== 'undefined' ? isTimerRunning : false;
-                            
-                            if(payload.timerInfo.isTimerRunning && !localIsRunning) {
-                                if(typeof startTimer === 'function') startTimer();
-                            } else if(!payload.timerInfo.isTimerRunning && localIsRunning) {
-                                if(typeof stopTimer === 'function') stopTimer();
-                            }
-                            if(typeof updateTimerUI === 'function') updateTimerUI();
-                        }
-
-                        // 秒表完美同步
-                        if(payload.stopwatchInfo) {
-                            trElapsedSeconds = payload.stopwatchInfo.elapsed;
-                            let localTrRunning = typeof trIsRunning !== 'undefined' ? trIsRunning : false;
-                            
-                            if(payload.stopwatchInfo.isRunning && !localTrRunning) {
-                                if(typeof startTrStopwatch === 'function') startTrStopwatch();
-                            } else if(!payload.stopwatchInfo.isRunning && localTrRunning) {
-                                if(typeof pauseTrStopwatch === 'function') pauseTrStopwatch();
-                            }
-                            if(typeof updateTrDisplay === 'function') updateTrDisplay();
-                        }
-
-                        // 暴力刷新所有界面
-                        if(typeof updateViewRounds === 'function') updateViewRounds();
-                        if(typeof recalculateStats === 'function') recalculateStats();
-                        if(typeof updateAllUI === 'function') updateAllUI();
-                        if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
-
-                    } finally {
-                        // 无论发生什么，0.1秒后自动解除死循环锁
-                        setTimeout(() => { window.isSyncingTarget = false; }, 100);
-                    }
-                }
-            };
-        }
-        // ====================================================================
 </script>
 </body>
 </html>
