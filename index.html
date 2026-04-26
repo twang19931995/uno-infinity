@@ -16,6 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- 引入 MQTT 物联网通讯协议库，实现毫秒级零延迟同步 -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -2288,6 +2290,112 @@
             <p id="importResultMsg" class="mb-6 font-bold"></p>
             <button id="closeImportResultBtn" class="kawaii-btn bg-primary text-white py-2 px-10 shadow-none">确定</button>
         </div>
+    </div>
+
+<!-- ======================================================== -->
+    <!-- ★★★ 全新联机大厅：全屏遮罩与身份选择 ★★★ -->
+    <!-- ======================================================== -->
+    <!-- 
+      【小白调节区：联机大厅全屏背景】
+      [控制代码] bg-[#BBE2D6][使用方法] 控制整个大厅的背景色。目前是清新的薄荷绿，和主界面顶部导航栏一致。
+      [控制代码] z-[999999]
+      [使用方法] 层级极高，确保它绝对遮挡住游戏主界面，不选身份绝对不让进！
+    -->
+    <div id="networkLobby" class="fixed inset-0 bg-[#BBE2D6] z-[999999] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+        
+        <!-- 大标题区 -->
+        <div class="mb-10 flex flex-col items-center relative">
+            <span class="font-black text-white text-[60px] sm:text-[70px] tracking-widest drop-shadow-md text-stroke" style="-webkit-text-stroke: 4px #5E4B8B; paint-order: stroke fill;">UNO</span>
+            <div class="bg-[#FDE047] border-[4px] border-[#5E4B8B] rounded-full px-6 py-1.5 shadow-[0_4px_0_#5E4B8B] -mt-4 z-10 transform -rotate-2">
+                <span class="font-black text-[#5E4B8B] text-xl tracking-widest">终极电竞联机版</span>
+            </div>
+        </div>
+
+        <!-- 1. 主菜单面板 (选择身份) -->
+        <div id="nlMainMenu" class="w-full max-w-[320px] flex flex-col gap-5 transition-all">
+            <!-- 
+              【小白调节区：创建房间按钮 (主机端)】
+              [控制代码] bg-[#FCA5A5] (粉红色底)[控制代码] shadow-[0_6px_0_#5E4B8B] (极厚的深紫色底部立体阴影)
+              [特效备份] 如果想让按钮呼吸发光，可在最后加上 magic-glow
+            -->
+            <button onclick="window.nlShowCreateRoom()" class="w-full bg-[#FCA5A5] border-[4px] border-[#5E4B8B] rounded-2xl py-4 flex flex-col items-center justify-center shadow-[0_6px_0_#5E4B8B] active:translate-y-2 active:shadow-none transition-all hover:brightness-105">
+                <span class="font-black text-white text-[24px] tracking-widest text-stroke" style="-webkit-text-stroke: 2.5px #5E4B8B; paint-order: stroke fill;">创建房间</span>
+                <span class="font-bold text-[#5E4B8B] text-xs mt-1 tracking-widest">(我是主机/裁判)</span>
+            </button>
+            
+            <!-- 
+              【小白调节区：加入房间按钮 (副机端)】
+              [控制代码] bg-[#A3D977] (绿色底)
+            -->
+            <button onclick="window.nlShowJoinRoom()" class="w-full bg-[#A3D977] border-[4px] border-[#5E4B8B] rounded-2xl py-4 flex flex-col items-center justify-center shadow-[0_6px_0_#5E4B8B] active:translate-y-2 active:shadow-none transition-all hover:brightness-105">
+                <span class="font-black text-white text-[24px] tracking-widest text-stroke" style="-webkit-text-stroke: 2.5px #5E4B8B; paint-order: stroke fill;">加入房间</span>
+                <span class="font-bold text-[#5E4B8B] text-xs mt-1 tracking-widest">(我是副机/玩家)</span>
+            </button>
+            
+            <div class="w-full h-[4px] bg-[#5E4B8B]/20 rounded-full my-1"></div>
+            
+            <!-- 单机模式按钮 -->
+            <button onclick="window.nlStartSingle()" class="w-full bg-white border-[4px] border-[#5E4B8B] rounded-2xl py-3 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:bg-gray-50">
+                <span class="font-black text-[#5E4B8B] text-[18px] tracking-widest">单机模式</span>
+            </button>
+        </div>
+
+        <!-- 2. 创建房间面板 (主机：生成中特效) -->
+        <div id="nlCreateMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-4 transition-all">
+            <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-6 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
+                <i class="fa-solid fa-satellite-dish text-5xl text-[#5FA4FA] mb-4 animate-pulse"></i>
+                <span class="font-black text-[#5E4B8B] text-lg tracking-widest">正在连接对讲机频道...</span>
+            </div>
+        </div>
+
+        <!-- 3. 创建成功：展示 6 位数房间号 (主机) -->
+        <div id="nlHostRoomMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-6 transition-all">
+            <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-6 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
+                <span class="font-bold text-gray-400 text-sm mb-2 tracking-widest">您的房间号</span>
+                <!-- 房间号红字超大显示 -->
+                <span id="nlHostRoomCode" class="font-black text-[#E11D48] text-[55px] tracking-widest leading-none mb-2 drop-shadow-sm">------</span>
+                <span class="font-bold text-[#5FA4FA] text-xs">请让玩家输入此号码加入</span>
+            </div>
+            <button onclick="window.nlEnterGameAsHost()" class="w-full bg-[#5FA4FA] border-[4px] border-[#5E4B8B] rounded-2xl py-4 flex items-center justify-center shadow-[0_6px_0_#5E4B8B] active:translate-y-2 active:shadow-none transition-all">
+                <span class="font-black text-white text-[24px] tracking-widest text-stroke" style="-webkit-text-stroke: 2.5px #5E4B8B; paint-order: stroke fill;">进入游戏</span>
+            </button>
+        </div>
+
+        <!-- 4. 加入房间：输入 6 位数面板 (副机) -->
+        <div id="nlJoinMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-5 transition-all">
+            <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-6 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
+                <span class="font-black text-[#5E4B8B] text-xl mb-4 tracking-widest">输入房间号</span>
+                <!-- 
+                  【小白调节区：房间号输入框】
+                  [控制代码] text-[35px] font-black text-[#E11D48] (超大号红字加粗)
+                -->
+                <input type="number" id="nlJoinCodeInput" placeholder="6位数字" class="w-full bg-gray-100 border-[3px] border-[#5E4B8B] rounded-xl text-center text-[35px] font-black text-[#E11D48] py-2 focus:outline-none focus:ring-4 focus:ring-[#A3D977]/50 transition-all tracking-widest" oninput="if(this.value.length>6)this.value=this.value.slice(0,6)">
+            </div>
+            <div class="flex gap-3 w-full">
+                <!-- 返回按钮 -->
+                <button onclick="window.nlBackToMain()" class="w-1/3 bg-gray-300 border-[4px] border-[#5E4B8B] rounded-xl py-3 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">
+                    <span class="font-black text-white text-lg text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">返回</span>
+                </button>
+                <!-- 连接房间按钮 -->
+                <button onclick="window.nlConfirmJoin()" id="nlConfirmJoinBtn" class="flex-1 bg-[#A3D977] border-[4px] border-[#5E4B8B] rounded-xl py-3 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">
+                    <span class="font-black text-white text-xl tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">连接房间</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. 加入成功：选择专属座位面板 (副机) -->
+        <div id="nlSeatMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-4 transition-all">
+            <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-4 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
+                <span class="font-black text-[#5E4B8B] text-lg mb-3 tracking-widest">请选择您的专属座位</span>
+                <span class="font-bold text-gray-400 text-[10px] mb-3 text-center">副机只能操作自己的数据<br>请务必选对自己的名字！</span>
+                
+                <!-- 座位网格：JS 会在这里生成头像按钮 -->
+                <div id="nlSeatGrid" class="grid grid-cols-3 gap-2 w-full">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -12208,6 +12316,396 @@ if(btnSelRevive && btnSelUndo && btnConfirmUI) {
         }
     });
 }
+// ====================================================================
+        // ★★★ 第三步：MQTT 毫秒级通讯引擎与联机大厅控制器 ★★★
+        // ====================================================================
+        
+        let mqttClient = null; // 对讲机本体
+        let roomCode = '';     // 6位数房间号
+        let myRole = 'single'; // 身份：'single'(单机), 'host'(主机), 'client'(副机)
+        let mySeatId = null;   // 副机专属座位号
+
+        // 隐藏大厅
+        window.nlHideLobby = function() {
+            document.getElementById('networkLobby').classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => document.getElementById('networkLobby').classList.add('hidden'), 500);
+        };
+
+        // 1. 点击【单机模式】
+        window.nlStartSingle = function() {
+            myRole = 'single';
+            window.nlHideLobby();
+        };
+
+        // 2. 主机：点击【创建房间】
+        window.nlShowCreateRoom = function() {
+            document.getElementById('nlMainMenu').classList.add('hidden');
+            document.getElementById('nlCreateMenu').classList.remove('hidden');
+            document.getElementById('nlCreateMenu').classList.add('flex');
+
+            // 魔法：生成 6 位随机房间号
+            roomCode = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // 魔法：连接免费的 EMQX 顶级公共节点 (WSS加密防拦截)
+            mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+
+            // 连接成功后
+            mqttClient.on('connect', () => {
+                console.log('👑 主机已连接对讲机频道！房间号:', roomCode);
+                // 监听专属的 6 位数频道
+                mqttClient.subscribe(`uno_room_${roomCode}`);
+                
+                // 切换到显示房间号的界面
+                document.getElementById('nlCreateMenu').classList.add('hidden');
+                document.getElementById('nlCreateMenu').classList.remove('flex');
+                document.getElementById('nlHostRoomMenu').classList.remove('hidden');
+                document.getElementById('nlHostRoomMenu').classList.add('flex');
+                document.getElementById('nlHostRoomCode').textContent = roomCode;
+                myRole = 'host';
+            });
+
+            // 挂载对讲机听筒（收到消息时触发）
+            mqttClient.on('message', window.handleMqttMessage);
+        };
+
+        // 3. 主机：点击【进入游戏】
+        window.nlEnterGameAsHost = function() {
+            window.nlHideLobby();
+            alert("👑 您已作为【裁判/主机】进入游戏！\n全场所有数据以您的手机为准，请等待玩家加入。");
+        };
+
+        // 4. 副机：点击【加入房间】
+        window.nlShowJoinRoom = function() {
+            document.getElementById('nlMainMenu').classList.add('hidden');
+            document.getElementById('nlJoinMenu').classList.remove('hidden');
+            document.getElementById('nlJoinMenu').classList.add('flex');
+        };
+
+        // 副机：返回主菜单
+        window.nlBackToMain = function() {
+            document.getElementById('nlJoinMenu').classList.add('hidden');
+            document.getElementById('nlJoinMenu').classList.remove('flex');
+            document.getElementById('nlMainMenu').classList.remove('hidden');
+        };
+
+        // 5. 副机：输入完号码，点击【连接房间】
+        window.nlConfirmJoin = function() {
+            const input = document.getElementById('nlJoinCodeInput').value.trim();
+            if (input.length !== 6) {
+                alert("请输入正确的 6 位数字房间号喔！");
+                return;
+            }
+            roomCode = input;
+            const btn = document.getElementById('nlConfirmJoinBtn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-white text-xl mr-2"></i>连接中...';
+
+            // 副机连接同一个对讲机节点
+            mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+
+            mqttClient.on('connect', () => {
+                console.log('📱 副机已连接对讲机频道！房间号:', roomCode);
+                mqttClient.subscribe(`uno_room_${roomCode}`);
+                myRole = 'client';
+                
+                // 魔法暗号：连上后，立刻通过频道向主机大喊“求全量数据！”
+                mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({ action: 'REQ_FULL_SYNC' }));
+            });
+
+            mqttClient.on('message', window.handleMqttMessage);
+        };
+
+        // 6. 核心通讯中枢：处理对讲机里收到的所有广播
+        window.handleMqttMessage = function(topic, message) {
+            if (topic !== `uno_room_${roomCode}`) return;
+            try {
+                const payload = JSON.parse(message.toString());
+
+                // 【情景 A】主机听到了副机的求救：把当前所有真实数据打包砸过去！
+                if (payload.action === 'REQ_FULL_SYNC' && myRole === 'host') {
+                    const syncData = {
+                        action: 'FULL_SYNC_DATA',
+                        gameData: gameData,
+                        v2State: v2State,
+                        // 连带把主机的计时器状态也发过去
+                        timerRemain: typeof timerRemain !== 'undefined' ? timerRemain : 0,
+                        isTimerRunning: typeof isTimerRunning !== 'undefined' ? isTimerRunning : false
+                    };
+                    mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify(syncData));
+                }
+
+                // 【情景 B】副机接住了主机砸过来的全量数据！
+                if (payload.action === 'FULL_SYNC_DATA' && myRole === 'client') {
+                    // 1. 覆盖本地数据
+                    gameData = payload.gameData;
+                    if(payload.v2State) v2State = payload.v2State;
+                    saveData(); // 存入本地缓存
+
+                    // 2. 界面切换：隐藏输入框，显示【选座界面】
+                    document.getElementById('nlJoinMenu').classList.add('hidden');
+                    document.getElementById('nlJoinMenu').classList.remove('flex');
+                    document.getElementById('nlSeatMenu').classList.remove('hidden');
+                    document.getElementById('nlSeatMenu').classList.add('flex');
+
+                    // 3. 用收到的数据，画出全场玩家头像供副机选择
+                    const seatGrid = document.getElementById('nlSeatGrid');
+                    seatGrid.innerHTML = gameData.players.filter(p => p.isActive).map(p => `
+                        <div onclick="window.nlSelectSeat(${p.id})" class="flex flex-col items-center border-[3px] border-[#5E4B8B] rounded-xl py-2 shadow-sm cursor-pointer active:scale-95 transition-transform bg-white">
+                            <div class="w-10 h-10 rounded-[6px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden mb-1">
+                                <img src="${p.avatar}" class="w-full h-full object-cover">
+                            </div>
+                            <span class="font-black text-[15px]" style="color: ${p.color}; -webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
+                        </div>
+                    `).join('');
+                }
+                
+                // --- 下方预留空位：下一步处理战斗中的增量同步操作 ---
+
+            } catch(e) {
+                console.error("MQTT 消息解析失败:", e);
+            }
+        };
+
+        // 7. 副机：点击认领自己的专属座位
+        window.nlSelectSeat = function(pid) {
+            mySeatId = pid;
+            const p = gameData.players.find(x => x.id === pid);
+            alert(`📱 您已成功入座！\n当前身份：【${p.name}】\n请注意：作为副机，您只能操作自己的淘汰状态和分数！`);
+            
+            window.nlHideLobby();
+            
+            // 强行利用主机传来的数据刷新全屏幕！
+            if(typeof updateViewRounds === 'function') updateViewRounds();
+            if(typeof recalculateStats === 'function') recalculateStats();
+            if(typeof updateAllUI === 'function') updateAllUI();
+            
+            // 触发副机的封印机制（屏蔽多余按钮）
+            if (typeof window.applyClientRestrictions === 'function') {
+                window.applyClientRestrictions();
+            }
+        };
+
+        // 【预占位】：防止报错，真实的封印代码下一步再写
+        window.applyClientRestrictions = window.applyClientRestrictions || function() {};
+// ====================================================================
+        // ★★★ 第四步：副机权限封印 与 战斗过程增量实时同步 ★★★
+        // ====================================================================
+
+// ====================================================================
+        // ★★★ 第四步：副机权限封印 与 战斗过程增量实时同步 (终极修复版) ★★★
+        // ====================================================================
+
+        // 魔法 1：副机权限封印术
+        window.applyClientRestrictions = function() {
+            if (myRole !== 'client') return;
+
+            const lcdBox = document.getElementById('trStopwatchDisplay')?.parentElement?.parentElement;
+            if (lcdBox) lcdBox.style.display = 'none';
+
+            const cdBox = document.getElementById('timerBar')?.parentElement?.parentElement;
+            if (cdBox) cdBox.style.display = 'none';
+
+            const v2Undo = document.getElementById('v2UndoBtn')?.parentElement;
+            if (v2Undo) v2Undo.style.display = 'none';
+
+            const earlyBtn = document.getElementById('earlyWinBtn');
+            const calcBtn = document.getElementById('v2CalculateBtn');
+            if (earlyBtn) earlyBtn.style.display = 'none';
+            if (calcBtn) calcBtn.style.display = 'none';
+
+            const t8 = document.querySelector('.mobile-tab-btn[data-tab="tab8"]');
+            const t10 = document.querySelector('.mobile-tab-btn[data-tab="tab10"]');
+            if (t8) t8.style.setProperty('display', 'none', 'important');
+            if (t10) t10.style.setProperty('display', 'none', 'important');
+
+            const ioSec = document.getElementById('dataIOSection');
+            const cardSec = document.getElementById('cardInfoSection');
+            if (ioSec) ioSec.classList.add('hidden');
+            if (cardSec) cardSec.classList.add('hidden');
+        };
+
+// 魔法 2：主机状态全场广播器 (升级版：附带全场分数兜底！)
+        window.broadcastV2State = function() {
+            if (myRole !== 'host' || !mqttClient) return;
+            
+            // 将屏幕上所有人的最新分数一网打尽
+            const currentScores = {};
+            document.querySelectorAll('.v2-score-input').forEach(input => {
+                currentScores[input.dataset.id] = input.value;
+            });
+
+            mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({
+                action: 'SYNC_V2_STATE',
+                v2State: v2State,
+                scores: currentScores // 附加上全场绝对的分数快照
+            }));
+        };
+
+        // 魔法 3：全能通讯中枢
+        const oldHandleMqtt = window.handleMqttMessage;
+        window.handleMqttMessage = function(topic, message) {
+            oldHandleMqtt(topic, message);
+            if (topic !== `uno_room_${roomCode}`) return;
+            try {
+                const payload = JSON.parse(message.toString());
+
+                // 【情景 A：纯分数打字同步】
+                if (payload.action === 'UPDATE_SCORE' && myRole === 'host') {
+                    const input = document.querySelector(`.v2-score-input[data-id="${payload.targetId}"]`);
+                    if (input) input.value = payload.val;
+                    mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({ action: 'SYNC_SCORE', targetId: payload.targetId, val: payload.val }));
+                }
+                
+                // ★修复★ 任何人收到打字广播，只要光标不在这个框上，就无条件更新！
+                if (payload.action === 'SYNC_SCORE') {
+                    const input = document.querySelector(`.v2-score-input[data-id="${payload.targetId}"]`);
+                    if (input && document.activeElement !== input) {
+                        input.value = payload.val;
+                    }
+                }
+
+                // 【情景 B：★修复★ 主机广播的全局状态与分数兜底】
+                if (payload.action === 'SYNC_V2_STATE' && myRole === 'client') {
+                    v2State = payload.v2State;
+                    if (typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+                    
+                    // 顺便把所有分数恢复到副机屏幕上
+                    if (payload.scores) {
+                        for (let pid in payload.scores) {
+                            const input = document.querySelector(`.v2-score-input[data-id="${pid}"]`);
+                            if (input && document.activeElement !== input) {
+                                input.value = payload.scores[pid];
+                            }
+                        }
+                    }
+                }
+
+                // 【情景 C：接收副机发来的所有复杂状态变更】
+                if (payload.action === 'CLIENT_MUTATED_STATE' && myRole === 'host') {
+                    const pid = payload.targetId;
+                    let wasAlive = !v2State.eliminated[pid];
+
+                    if (payload.scoreVal !== undefined) {
+                        const input = document.querySelector(`.v2-score-input[data-id="${pid}"]`);
+                        if (input) input.value = payload.scoreVal;
+                    }
+
+                    if (payload.eliminatedStr) {
+                        v2State.eliminated[pid] = payload.eliminatedStr;
+                        v2State.eliminationDetails[pid] = payload.detailsObj;
+                        if (wasAlive) {
+                            v2State.eliminationEvents.push([pid]);
+                            if (v2State.eliminationEvents.length === 1) {
+                                if (typeof startTimer === 'function') startTimer();
+                                if (typeof startTrStopwatch === 'function') startTrStopwatch();
+                            }
+                        }
+                    } else {
+                        delete v2State.eliminated[pid];
+                        if (v2State.eliminationDetails) delete v2State.eliminationDetails[pid];
+                        v2State.eliminationEvents = v2State.eliminationEvents.map(g => g.filter(id => id !== pid)).filter(g => g.length > 0);
+                    }
+
+                    if (payload.revivedUsed) {
+                        v2State.revivedUsed = true;
+                        v2State.revivedPlayerId = payload.revivedPlayerId;
+                    }
+
+                    if (typeof checkWinCondition === 'function') checkWinCondition(); 
+                    if (typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+                    window.broadcastV2State();
+                }
+
+                if (payload.action === 'GAME_CALCULATED' && myRole === 'client') {
+                    mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({ action: 'REQ_FULL_SYNC' }));
+                }
+
+            } catch (e) {}
+        };
+
+        // 魔法 4：全局拦截与侦听器
+        
+        // 拦截 1：外层键盘打字分数
+        document.body.addEventListener('input', (e) => {
+            if (myRole === 'single') return; 
+            const input = e.target.closest('.v2-score-input');
+            if (input) {
+                const pid = parseInt(input.dataset.id);
+                if (myRole === 'client' && pid !== mySeatId) {
+                    e.preventDefault();
+                    input.value = '';
+                    return;
+                }
+                if (mqttClient) {
+                    mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({
+                        action: myRole === 'host' ? 'SYNC_SCORE' : 'UPDATE_SCORE', 
+                        targetId: pid, 
+                        val: input.value
+                    }));
+                }
+            }
+        });
+
+        // 拦截 2：副机误触别人胶囊
+        document.addEventListener('click', (e) => {
+            if (myRole === 'client') {
+                const cap = e.target.closest('.v2-player-cap');
+                if (cap) {
+                    const pid = parseInt(cap.dataset.id);
+                    if (pid !== mySeatId) {
+                        alert('📱 警告：作为副机，您只能操作【自己】的玩家位喔！');
+                        e.stopPropagation(); 
+                        return;
+                    }
+                }
+            }
+        }, true);
+
+        // 拦截 3：★终极修复★ 监听 V2 所有弹窗的确认按钮，提取最终状态发给主机！
+        document.body.addEventListener('click', (e) => {
+            if (myRole !== 'client' || !mqttClient) return;
+
+            // 监听：快速淘汰确认、详细信息修改确认、菜单操作(撤销/复活/毒药)确认
+            const targetIds =['quickElimConfirmBtn', 'elimInfoConfirmBtn', 'epConfirmOkBtn'];
+            const isTargetBtn = targetIds.some(id => e.target.closest('#' + id));
+
+            if (isTargetBtn) {
+                // 延迟 50ms：等待系统把 死亡方式、凶手、改写的分数 全部存进内存后，瞬间打包！
+                setTimeout(() => {
+                    const myScoreInput = document.querySelector(`.v2-score-input[data-id="${mySeatId}"]`);
+                    const currentScore = myScoreInput ? myScoreInput.value : '';
+
+                    mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({
+                        action: 'CLIENT_MUTATED_STATE',
+                        targetId: mySeatId,
+                        scoreVal: currentScore,
+                        eliminatedStr: v2State.eliminated ? v2State.eliminated[mySeatId] : null,
+                        detailsObj: v2State.eliminationDetails ? v2State.eliminationDetails[mySeatId] : null,
+                        revivedUsed: !!v2State.revivedUsed,
+                        revivedPlayerId: v2State.revivedPlayerId
+                    }));
+                }, 50);
+            }
+        });
+
+        const origRenderV2ScoreArea = window.renderV2ScoreArea;
+        window.renderV2ScoreArea = function() {
+            if (origRenderV2ScoreArea) origRenderV2ScoreArea();
+            if (myRole === 'host') window.broadcastV2State();
+            if (myRole === 'client') {
+                document.querySelectorAll('.v2-score-input').forEach(input => {
+                    if (parseInt(input.dataset.id) !== mySeatId) input.readOnly = true; 
+                });
+            }
+        };
+
+        document.addEventListener('click', (e) => {
+            const calcBtnFinal = e.target.closest('#finalCalcOkBtn');
+            if (calcBtnFinal && myRole === 'host' && mqttClient) {
+                setTimeout(() => {
+                    mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({ action: 'GAME_CALCULATED' }));
+                }, 500); 
+            }
+        });
 </script>
 </body>
 </html>
