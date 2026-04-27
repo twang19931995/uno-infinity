@@ -386,6 +386,17 @@
                 <button id="quickEditCardBtn" class="hidden w-8 h-8 sm:w-10 sm:h-10 bg-[#FBBF24] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="window.toggleCardEditMode()">
                     <i class="fa-solid fa-pencil text-white text-xs sm:text-base"></i>
                 </button>
+
+<!-- 【新增】：玩家管理按钮 (图1红框：仅在实时结算页面显示) -->
+                <!-- 
+                  ========================================================
+                  【小白调节区：顶部玩家管理按钮】[底色] bg-[#F59E0B] 完美复刻图1中的明黄橙色[图标] fa-users 玩家群组图标
+                  [厚度] shadow-[0_3px_0_#5E4B8B] 立体下沉投影
+                  ========================================================
+                -->
+                <button id="quickPlayerMgrBtn" class="hidden w-8 h-8 sm:w-10 sm:h-10 bg-[#F59E0B] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110" onclick="window.openPlayerManagerModal()">
+                    <i class="fa-solid fa-users text-white text-xs sm:text-base"></i>
+                </button>
             </div>
    
             <!-- 中间：动态胶囊标题 -->
@@ -407,8 +418,23 @@
                 <span id="topTabText" class="font-black text-[#5E4B8B] text-lg sm:text-xl tracking-widest">实时结算</span>
             </div>
 
-            <!-- 右侧：设置按钮 -->
-            <div class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2">
+<!-- 右侧：房间号与设置按钮 -->
+            <div class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 sm:gap-2.5">
+                
+                <!-- 【新增】：顶部房间号展示框 (图1红框：仅在实时结算区域且联机时显示) -->
+                <!-- 
+                  ========================================================
+                  【小白调节区：顶部房间号显示】
+                  [尺寸] h-[26px] sm:h-[32px] 控制框的高度
+                  [底色与边框] bg-white 白底, border-[#5E4B8B] 紫色描边
+                  [文字] text-[#E11D48] 鲜红色数字
+                  [投影] shadow-[0_3px_0_#5E4B8B] 底部立体投影
+                  ========================================================
+                -->
+                <div id="topRoomCodeDisplay" class="hidden bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[6px] px-2.5 sm:px-3 h-[26px] sm:h-[32px] shadow-[0_3px_0_#5E4B8B] items-center justify-center pointer-events-none">
+                    <span id="topRoomCodeText" class="font-black text-[#E11D48] text-[13px] sm:text-[15px] tracking-widest leading-none pt-[1px]"></span>
+                </div>
+
                 <div class="relative">
                     <button id="bgSwitcherBtn" class="w-8 h-8 sm:w-10 sm:h-10 bg-[#F87171] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full flex items-center justify-center shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:brightness-110">
                         <i class="fa-solid fa-gear text-white text-xs sm:text-base"></i>
@@ -740,6 +766,37 @@
 </div>
 <!-- ==================================================================== -->
 
+<!-- ======================================================== -->
+        <!-- ★ 全新：玩家管理独立弹窗 (点击顶部黄底群组按钮弹出) ★ -->
+        <!-- ======================================================== -->
+        <div id="playerManagerModal" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+            <!-- 
+              【小白调节区：玩家管理弹窗】
+              [宽度] max-w-[340px]: 控制弹窗最大宽度，防止撑满屏幕
+              [高度] max-h-[85vh]: 限制高度，玩家太多时内部会自己出现滑动条！
+            -->
+            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 sm:p-5 max-w-[340px] w-[95%] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center relative max-h-[85vh]">
+                
+                <!-- 右上角关闭按钮 -->
+                <button onclick="document.getElementById('playerManagerModal').classList.add('hidden')" class="absolute -top-4 -right-3 w-8 h-8 bg-white border-[3px] border-[#5E4B8B] rounded-full flex items-center justify-center text-[#5E4B8B] font-black shadow-sm z-50 hover:bg-gray-100 active:scale-90 transition-transform">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+                
+                <!-- 顶部黄色标题胶囊 -->
+                <div class="bg-[#F59E0B] border-[3px] border-[#5E4B8B] rounded-full py-1.5 px-8 font-black text-white text-lg shadow-[0_3px_0_#5E4B8B] w-auto text-center tracking-widest mb-4 z-10 shrink-0 text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">玩家管理</div>
+                
+                <!-- 内部玩家列表无缝滚动区 -->
+                <div class="w-full overflow-y-auto custom-scroll px-1 flex flex-col gap-3 flex-1 mb-2">
+                    <!-- JS 底层引擎会在这里画出所有的玩家列表 -->
+                    <div id="playerList" class="flex flex-col gap-2.5 items-center w-full pb-1"></div>
+                    
+                    <div class="mt-1 pt-3 border-t-[2.5px] border-dashed border-[#5E4B8B]/30 shrink-0">
+                        <p class="text-xs text-[#5E4B8B] font-bold text-center tracking-widest">提示：未参与该局的玩家分数填0即可，系统将不计入其参与局数。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 【全新新增】图2 历史局数选择弹窗 -->
         <div id="statusRoundDialog" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
             <div class="bg-[#D5E8D4] border-[4px] border-[#5E4B8B] p-4 max-w-[280px] sm:max-w-[320px] w-full mx-4 shadow-2xl relative flex justify-center">
@@ -809,20 +866,7 @@
             </div>
         </section>
 
-        <div id="playerSection" class="kawaii-card mb-6 overflow-hidden">
-            <div id="playerMgrHeader" class="p-4 rounded-t-[1.8rem] bg-[#E0F2FE]/50 cursor-pointer flex justify-between items-center select-none border-b-4 border-transparent hover:border-[#5E4B8B] transition-colors">
-                <h2 class="text-lg font-bold flex items-center text-[#5E4B8B]">
-                    <i class="fa-solid fa-users mr-2"></i>玩家管理 (点击展开/收起)
-                </h2>
-                <i id="playerMgrIcon" class="fa-solid fa-chevron-down transition-transform duration-300"></i>
-            </div>
-            <div id="playerMgrContent" class="hidden p-4 rounded-b-[1.8rem]">
-                <div id="playerList" class="flex flex-col sm:flex-row flex-wrap gap-3 items-center justify-center sm:justify-start"></div>
-                <div class="mt-4 pt-4 border-t-2 border-dashed border-gray-200">
-                    <p class="text-xs text-gray-400 mb-2 text-center">未参与该局的玩家分数填0即可，系统将不计入其参与局数</p>
-                </div>
-            </div>
-        </div>
+
 
         <section id="inputSection" class="kawaii-card p-5 mb-6 hidden">
             <div class="flex justify-between items-center mb-4">
@@ -1068,6 +1112,20 @@
                 </div>
             </div>
 
+<!-- 
+                  ========================================================
+                  【小白调节区：副机端专属局数显示胶囊】
+                  [隐藏机制] 这个容器默认是 hidden，只有系统检测到当前是副机/观众时才会显示，主机绝对看不见！
+                  [颜色控制] bg-[#8DA4D0] 这是一个护眼的莫兰迪浅蓝色，你可以换成 #FCA5A5(粉) 或 #A3D977(绿)。
+                  [外框阴影] border-[2.5px] 紫色描边，shadow-[0_3px_0_#5E4B8B] 底部立体厚投影。
+                  ========================================================
+                -->
+                <div id="clientRoundCapsule" class="hidden justify-center mb-3 w-full">
+                    <div class="bg-[#8DA4D0] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-6 py-1 sm:py-1.5 shadow-[0_3px_0_#5E4B8B] flex items-center justify-center">
+                        <span class="font-black text-white text-sm sm:text-base tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">第 <span id="clientCurrentRound" class="mx-0.5 text-[#FDE047]">1</span> 局</span>
+                    </div>
+                </div>
+
             <!-- 3. 分数输入大白框 -->
             <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-5 mb-4 shadow-[0_4px_0_#5E4B8B]">
                 <!-- 玩家胶囊与分数输入区 (由JS动态生成) -->
@@ -1078,7 +1136,14 @@
   [间距控制] gap-1 sm:gap-2：控制胶囊之间的空隙，如果你觉得换行后上下太挤，可以改成 gap-2 sm:gap-3。
   ========================================================
 -->
-<div id="v2ScoreArea" class="grid grid-cols-5 gap-1 sm:gap-2 w-full">
+<!-- 
+  ========================================================
+  【小白调节区：实时结算玩家胶囊区纵向列表】
+  [排版控制] flex flex-col：垂直线性排布，强制每个玩家独立占领一行！
+  [间距控制] 玩家胶囊之间的上下间距交给了下方 JS 渲染代码里的 mb-2 sm:mb-3 统一控制。
+  ========================================================
+-->
+<div id="v2ScoreArea" class="flex flex-col w-full">
                     <!-- JS 动态填充 -->
                 </div>
             </div>
@@ -2465,7 +2530,7 @@ const modulesConfig =[
 { id: 'penaltySection', name: '罚牌记录区', icon: 'fa-clone' }, // <--- 这是你刚加的
             { id: 'sessionFilterDisplay', name: '局次区间展示', icon: 'fa-calendar-day' }, // 【修复】给它上户口！
 { id: 'methodManagerSection', name: '结算方式管理区', icon: 'fa-box-open' }, // 【图1新增】
-            { id: 'playerSection', name: '玩家管理', icon: 'fa-users' },
+            
             { id: 'timerSection', name: '倒计时', icon: 'fa-stopwatch' },
             { id: 'methodStatSection', name: '结算方式统计', icon: 'fa-clipboard-list' },
             { id: 'eliminationOrderSection', name: '淘汰顺序统计', icon: 'fa-list-ol' },
@@ -2612,9 +2677,6 @@ const badgeDefs =[
             fontNumSelect: document.getElementById('fontNumSelect'),
             fontEnSelect: document.getElementById('fontEnSelect'),
             fontZhSelect: document.getElementById('fontZhSelect'),
-            playerMgrHeader: document.getElementById('playerMgrHeader'),
-            playerMgrContent: document.getElementById('playerMgrContent'),
-            playerMgrIcon: document.getElementById('playerMgrIcon'),
             playerList: document.getElementById('playerList'),
             scoreInputs: document.getElementById('scoreInputs'),
             currentRoundDisplay: document.getElementById('currentRoundDisplay'),
@@ -3488,6 +3550,10 @@ function initCloudUI() {
                 });
             }
         }
+
+window.openPlayerManagerModal = function() {
+            document.getElementById('playerManagerModal').classList.remove('hidden');
+        };
 
 function init() {
             initCloudUI(); 
@@ -4766,25 +4832,36 @@ if (r.v2Stats.eliminationEvents && r.v2Stats.eliminationEvents.length > 0) {
         });
     }
 
-        function renderPlayerManager() {
+function renderPlayerManager() {
+            if (!els.playerList) return;
             els.playerList.innerHTML = gameData.players.map(p => `
-                <div class="flex items-center gap-2 bg-white rounded-full px-3 py-2 shadow-sm border-2 border-[#5E4B8B] w-full sm:w-auto">
-                    <div class="relative w-10 h-10 rounded-xl border-2 border-[#5E4B8B] overflow-hidden shrink-0">
+                <!-- 
+                  ========================================================
+                  【小白调节区：弹窗内的单个玩家条目框】
+                  [排版] 完美包裹在白底紫边的大框内，自带下沉点击效果
+                  ========================================================
+                -->
+                <div class="flex items-center gap-2.5 bg-white rounded-xl px-2 sm:px-3 py-1.5 shadow-[0_3px_0_#5E4B8B] border-[2.5px] border-[#5E4B8B] w-full hover:bg-gray-50 transition-colors">
+                    
+                    <div class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-[8px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 shadow-sm">
                         <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
                     </div>
-                    <input type="text" class="player-name-input font-bold text-lg bg-transparent w-16 truncate" data-id="${p.id}" value="${p.name}" style="color:${p.color}">
-                    <div class="relative w-6 h-6 rounded-full overflow-hidden border-2 border-[#5E4B8B]" style="background-color:${p.color}">
+                    
+                    <input type="text" class="player-name-input font-black text-[15px] sm:text-[16px] bg-transparent flex-1 min-w-0 truncate focus:outline-none" data-id="${p.id}" value="${p.name}" style="color:${p.color}; -webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">
+                    
+                    <div class="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden border-[2px] border-[#5E4B8B] shrink-0 shadow-sm" style="background-color:${p.color}">
                         <input type="color" class="player-color-picker absolute inset-[-20%] w-[140%] h-[140%] cursor-pointer" data-id="${p.id}" value="${p.color}">
                     </div>
-                    <button class="toggle-active ml-auto px-2 py-1 rounded-full text-sm font-bold transition-colors ${p.isActive ? 'bg-success text-white' : 'bg-gray-200 text-gray-500'}" data-id="${p.id}">
-                        ${p.isActive ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-times"></i>'}
+                    
+                    <button class="toggle-active ml-auto w-14 h-7 rounded-full border-[2.5px] border-[#5E4B8B] text-[11px] font-black tracking-widest transition-all flex items-center justify-center shadow-sm active:translate-y-[1px] active:shadow-none shrink-0 ${p.isActive ? 'bg-[#4ADE80] text-white' : 'bg-[#9CA3AF] text-white'}" data-id="${p.id}">
+                        ${p.isActive ? '活跃' : '休息'}
                     </button>
                 </div>
             `).join('');
 
             const addBtn = document.createElement('button');
-            addBtn.className = "kawaii-btn bg-white text-[#5E4B8B] hover:text-white transition-colors text-xl font-bold";
-            addBtn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+            addBtn.className = "w-full bg-[#3B82F6] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-base shadow-[0_3px_0_#5E4B8B] active:translate-y-1 active:shadow-none hover:brightness-110 transition-all mt-1 flex items-center justify-center tracking-widest";
+            addBtn.innerHTML = '<i class="fa-solid fa-plus mr-1 text-sm"></i>添加新玩家';
             addBtn.onclick = addPlayer;
             els.playerList.appendChild(addBtn);
         }
@@ -7918,16 +7995,7 @@ function updateUndoRedoButtons() {
                 }
             });
 
-            els.playerMgrHeader.onclick = () => {
-                const isHidden = els.playerMgrContent.classList.contains('hidden');
-                if (isHidden) {
-                    els.playerMgrContent.classList.remove('hidden');
-                    els.playerMgrIcon.classList.add('rotate-180');
-                } else {
-                    els.playerMgrContent.classList.add('hidden');
-                    els.playerMgrIcon.classList.remove('rotate-180');
-                }
-            };
+
 
             els.playerList.addEventListener('input', e => {
                 const id = parseInt(e.target.dataset.id);
@@ -8374,10 +8442,26 @@ function resetV2State() {
     resetTimer(); // 自动复原倒计时
 }
 
-// 2. 画出新版的胶囊按钮和分数输入框 (图1像素级复刻厚重投影 + 分数记忆防清零)
+// 2. 画出新版的胶囊按钮和分数输入框 (图2、图3像素级复刻厚重投影 + 纵向排版 + 淘汰状态细化)
 function renderV2ScoreArea() {
-    const roundDisp = document.getElementById('v2CurrentRoundDisplay');
+const roundDisp = document.getElementById('v2CurrentRoundDisplay');
     if (roundDisp) roundDisp.textContent = gameData.rounds.length + 1;
+
+    // 【新增魔法】：副机/观众端专属局数显示控制
+    const clientRoundDisp = document.getElementById('clientCurrentRound');
+    if (clientRoundDisp) clientRoundDisp.textContent = gameData.rounds.length + 1;
+    
+    const clientRoundCapsule = document.getElementById('clientRoundCapsule');
+    if (clientRoundCapsule) {
+        // 如果是联机副机(client) 或者 扫码观看的观众(isAudienceMode)，就显示这个专属胶囊！主机直接隐藏！
+        if ((typeof isAudienceMode !== 'undefined' && isAudienceMode) || (typeof myRole !== 'undefined' && myRole === 'client')) {
+            clientRoundCapsule.classList.remove('hidden');
+            clientRoundCapsule.classList.add('flex');
+        } else {
+            clientRoundCapsule.classList.add('hidden');
+            clientRoundCapsule.classList.remove('flex');
+        }
+    }
 
     // 【新增魔法】：记忆海绵！在刷新前，偷偷记住当前所有输入框里的分数
     const savedScores = {};
@@ -8387,12 +8471,30 @@ function renderV2ScoreArea() {
 
     const active = gameData.players.filter(p => p.isActive);
     if (active.length === 0) {
-        els.v2ScoreArea.innerHTML = '<div class="col-span-full text-center text-gray-400 py-4 font-bold">暂无活跃玩家</div>';
+        els.v2ScoreArea.innerHTML = '<div class="w-full text-center text-gray-400 py-4 font-bold">暂无活跃玩家</div>';
         els.earlyWinBtn.classList.add('hidden');
         return;
     }
 
     let aliveCount = 0;
+    
+    // 获取几血和淘汰事件
+    let elimEvents = v2State.eliminationEvents || [];
+    const bloodNames =['一血', '二血', '三血', '四血', '五血', '六血', '七血', '八血'];
+    const bloodBgColors =['#9c0a00', '#ba1b0f', '#d43024', '#eb483a', '#f5695d', '#fa8a82', '#ffaba6', '#ffcfcc'];
+
+    let getMethodUrl = (methodName, type) => {
+        let defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>无图</text></svg>";
+        if (!gameData.customMethods) return defaultUrl;
+        let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
+        let item = data.items.find(i => i.name === methodName);
+        if (!item) {
+            data = type === 'win' ? gameData.customMethods.lose : gameData.customMethods.win;
+            item = data.items.find(i => i.name === methodName);
+        }
+        return item && item.url ? item.url : defaultUrl;
+    };
+
     els.v2ScoreArea.innerHTML = active.map(p => {
         const isElim = !!v2State.eliminated[p.id];
         const isWinner = v2State.winnerId === p.id;
@@ -8401,10 +8503,15 @@ function renderV2ScoreArea() {
         let capBg = p.color; 
         let shadowColor = "#5E4B8B";
         let capBorder = "#5E4B8B";
-        let textColor = "text-white stroke-xs"; 
-        let opacityClass = "opacity-100";
+        let textColor = "text-white"; 
+        
         let nameContent = p.name ? p.name.slice(-1) : '?'; 
         let cursor = "cursor-pointer hover:brightness-110 active:translate-y-1 active:shadow-none";
+
+        let rightWidgetsHtml = '';
+        let redLineHtml = '';
+        let inputWidthClass = 'w-full max-w-[160px]';
+        let avatarFilter = 'none';
 
         if (isWinner) {
             capBg = "#FDE047"; 
@@ -8412,29 +8519,126 @@ function renderV2ScoreArea() {
             cursor = "cursor-default";
             nameContent = `<i class="fa-solid fa-crown mr-0.5"></i>${nameContent}`;
         } else if (isElim) {
-            capBg = "#E2E8F0"; 
-            capBorder = "#9CA3AF";
-            shadowColor = "#9CA3AF";
-            textColor = "text-gray-500";
-            opacityClass = "opacity-60";
-            nameContent = `<span class="line-through">${nameContent}</span>`;
-            cursor = "cursor-pointer hover:brightness-110"; // 【修复】让淘汰的玩家也能被点击复活！
+            // ===============================================
+            // 【被淘汰玩家模式 (图3 完美复刻)】
+            // 黑白显示 -> 将背景色改为深灰色 #9CA3AF，头像加上灰度滤镜
+            // ===============================================
+            capBg = "#9CA3AF"; 
+            capBorder = "#5E4B8B"; 
+            shadowColor = "#5E4B8B";
+            textColor = "text-white"; 
+            cursor = "cursor-pointer hover:brightness-110";
+            inputWidthClass = 'w-[60px] sm:w-[80px]'; // 淘汰时把分数输入框缩短，给右边腾位置
+            avatarFilter = 'grayscale(100%)';
+
+            let lMethod = v2State.eliminated[p.id];
+            let methodImg = getMethodUrl(lMethod, 'lose');
+
+            let bloodLevelIndex = elimEvents.findIndex(group => group.includes(p.id));
+            let bloodName = bloodLevelIndex >= 0 ? bloodNames[bloodLevelIndex] : '淘汰';
+            let bloodBg = bloodBgColors[Math.min(bloodLevelIndex >= 0 ? bloodLevelIndex : 0, bloodBgColors.length - 1)];
+
+            let killerId = (v2State.eliminationDetails && v2State.eliminationDetails[p.id]) ? v2State.eliminationDetails[p.id].killerId : null;
+            let kName = '?'; let kColor = '#9CA3AF'; let kAvatar = p.avatar; 
+            if (killerId === p.id) {
+                kName = '自'; kColor = p.color; kAvatar = p.avatar;
+            } else if (killerId) {
+                let kP = gameData.players.find(x => x.id === killerId);
+                if (kP) { kName = kP.name ? kP.name.slice(-1) : '?'; kColor = kP.color; kAvatar = kP.avatar; }
+            } else {
+                kName = '系'; kColor = '#6B7280'; 
+            }
+
+            rightWidgetsHtml = `
+            <!-- 
+              ========================================================
+              【小白调节区：图3 淘汰状态右侧悬浮件 (1-2, 1-3, 1-4)】
+              [位置控制] right-[2%] top-1/2 -translate-y-1/2 (靠右悬浮在底框上方)
+              [层级要求] z-50 确保不被红线遮挡
+              ========================================================
+            -->
+            <div class="absolute right-[2%] top-1/2 -translate-y-1/2 flex items-center gap-1 sm:gap-1.5 z-50 pointer-events-none">
+                
+                <!-- 容器1-2 几血 (灰度处理 grayscale，红边框 #e5004f) -->
+                <div class="flex items-center justify-center border-[2px] sm:border-[2.5px] border-[#e5004f] rounded-[6px] px-1 sm:px-1.5 py-0.5 shadow-sm grayscale" style="background-color: ${bloodBg};">
+                    <span class="font-black text-white text-[10px] sm:text-[12px] leading-none text-stroke" style="-webkit-text-stroke: 1px #e5004f; paint-order: stroke fill;">${bloodName}</span>
+                </div>
+                
+                <!-- 容器1-3 结算方式图 (等比例缩放保留原色，红边框 #e5004f) -->
+                <div class="w-[28px] sm:w-[36px] aspect-[2/3] bg-[#111111] border-[2px] sm:border-[2.5px] border-[#e5004f] rounded-[4px] sm:rounded-[6px] overflow-hidden flex items-center justify-center shadow-sm">
+                    <img src="${methodImg}" class="w-full h-full object-contain" crossorigin="anonymous">
+                </div>
+                
+                <!-- 容器1-4 凶手 (原色凶手底色，红边框 #e5004f) -->
+                <div class="flex items-center gap-1 border-[2px] sm:border-[2.5px] border-[#e5004f] rounded-[6px] px-1 sm:px-1.5 py-0.5 shadow-sm" style="background-color: ${kColor};">
+                    <div class="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px] rounded-[3px] border-[1px] sm:border-[1.5px] border-[#e5004f] bg-black overflow-hidden flex items-center justify-center shrink-0">
+                        <img src="${kAvatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                    <span class="font-black text-white text-stroke text-[10px] sm:text-[12px] leading-none pb-[1px]" style="-webkit-text-stroke: 1px #e5004f; paint-order: stroke fill;">${kName}</span>
+                </div>
+            </div>
+            `;
+
+            redLineHtml = `
+            <!-- 
+              ========================================================
+              【小白调节区：贯穿红线 (图3要求)】
+              [颜色] bg-[#e5004f] 
+              [宽度] w-[70%] sm:w-[65%] (此长度刚好贯穿左侧到输入框和几血处，不切破右侧彩色图片)
+              [位置] absolute top-1/2 left-[2%] 绝对定位压在正中间
+              ========================================================
+            -->
+            <div class="absolute top-1/2 left-[2%] w-[70%] sm:w-[65%] h-[3px] sm:h-[4px] bg-[#e5004f] z-40 pointer-events-none transform -translate-y-1/2 shadow-sm"></div>
+            `;
         }
 
-        // 提取被记忆的分数，如果没有记忆就是 0
         const restoredScore = savedScores[p.id] !== undefined ? savedScores[p.id] : '0';
 
         return `
-        <div class="flex-1 flex flex-col items-center min-w-0">
-            <button class="v2-player-cap w-full flex items-center justify-center gap-1 sm:gap-1.5 py-1 sm:py-1.5 px-1 sm:px-1.5 border-[2.5px] sm:border-[3px] rounded-full transition-all ${cursor} ${opacityClass} ${textColor}" style="background-color: ${capBg}; border-color: ${capBorder}; box-shadow: 0 3px 0 ${shadowColor};" data-id="${p.id}">
-                <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[1.5px] sm:border-[2px] border-[#5E4B8B] bg-black overflow-hidden shrink-0 flex items-center justify-center">
-                    <img src="${p.avatar}" class="w-full h-full object-cover">
+        <!-- 
+          ========================================================
+          【小白调节区：底部大容器 1 (图2 / 图3 共用底座)】[高度/边距] mb-2 sm:mb-3 纵向排列时的胶囊上下间距！[边框] border-[3px] sm:border-[4px] border-[#5E4B8B] (深紫边)
+          [阴影] shadow-[0_4px_0_#5E4B8B] (厚重立体阴影)
+          [圆角] rounded-[1rem] sm:rounded-full (大圆角长胶囊)
+          ========================================================
+        -->
+        <div class="relative w-full flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-full mb-2 sm:mb-3 transition-all ${cursor} v2-player-cap" data-id="${p.id}" style="background-color: ${capBg}; box-shadow: 0 4px 0 ${shadowColor};">
+            
+            <!-- 被淘汰时才会绘制的中心贯穿红线 -->
+            ${redLineHtml}
+
+            <!-- 胶囊内部左侧：头像和名字 -->
+            <div class="flex items-center gap-2 shrink-0 pointer-events-none w-[35%] sm:w-[30%] z-10">
+                <!-- 头像外框 -->
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-[6px] sm:rounded-[8px] border-[2px] sm:border-[2.5px] border-[#5E4B8B] bg-black overflow-hidden flex items-center justify-center shrink-0" style="filter: ${avatarFilter};">
+                    <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
                 </div>
-                <span class="font-black text-[12px] sm:text-[15px] truncate max-w-full">${nameContent}</span>
-            </button>
-            <input type="number" class="v2-score-input w-[95%] sm:w-[90%] h-6 sm:h-8 mt-2.5 sm:mt-3 bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full text-center font-black text-[#5E4B8B] text-xs sm:text-sm focus:outline-none focus:border-[#4ADE80] transition-colors shadow-[0_3px_0_#5E4B8B] ${isElim ? 'opacity-50 shadow-[0_3px_0_#9CA3AF] border-[#9CA3AF]' : ''}" data-id="${p.id}" value="${restoredScore}" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'">
-            ${isElim ? `<span class="text-[9px] text-[#E11D48] font-bold mt-1.5 scale-90 whitespace-nowrap truncate w-full text-center">${v2State.eliminated[p.id]}</span>` : ''}
-        </div>`;
+                <!-- 名字 -->
+                <span class="font-black ${textColor} text-[16px] sm:text-[20px] tracking-widest text-stroke leading-none pb-[1px]" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${nameContent}</span>
+            </div>
+            
+            <!-- 胶囊内部中间：容器 1-1 (分数输入区) -->
+            <!-- flex-1 让输入框自动占据中间空白区域，justify-start 让其靠左排列 -->
+            <div class="flex-1 flex justify-start z-10 pl-1 sm:pl-2">
+                <!-- 
+                  【小白调节区：输入框样式】
+                  [变灰] 淘汰时加 opacity-80 grayscale (被红线穿过时不会显得太突兀)。
+                  [尺寸] ${inputWidthClass} 宽度自适应，不会被右侧的模块遮挡！
+                -->
+ <!-- 
+  ========================================================
+  【小白调节区：分数输入框 Bug 修复】
+  [修复防穿透] onclick="event.stopPropagation();" 这一句魔法保证了点击输入框时，绝不会触发外层胶囊的菜单弹窗！[层级霸体] relative z-50 保证输入框死死处于最高层级，随时可以呼出键盘修改分数！
+  ========================================================
+-->
+<input type="number" class="v2-score-input ${inputWidthClass} h-8 sm:h-10 bg-white border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full text-center font-black text-[#5E4B8B] text-[16px] sm:text-[18px] focus:outline-none focus:ring-2 focus:ring-[#4ADE80] transition-colors shadow-inner pointer-events-auto relative z-50 ${isElim ? 'opacity-80 grayscale' : ''}" data-id="${p.id}" value="${restoredScore}" onclick="event.stopPropagation();" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'">
+           </div>
+
+            <!-- 右侧：淘汰专用的悬浮模块群 (1-2, 1-3, 1-4) -->
+            ${rightWidgetsHtml}
+
+        </div>
+        `;
     }).join('');
 
     if (aliveCount > 1 && !v2State.winnerId) els.earlyWinBtn.classList.remove('hidden');
@@ -9090,6 +9294,22 @@ const quickEditCardBtn = document.getElementById('quickEditCardBtn');
                 quickEditCardBtn.classList.remove('flex');
             }
         }
+
+// 【新增】：联动刷新顶部房间号的显示状态
+        if(typeof window.refreshTopRoomCode === 'function') window.refreshTopRoomCode(tabId);
+
+// 【新增】：控制顶部玩家管理按钮的显示 (仅在实时结算 tab7 页面显示)
+        const quickPlayerMgrBtn = document.getElementById('quickPlayerMgrBtn');
+        if (quickPlayerMgrBtn) {
+            if (tabId === 'tab7' && (typeof isAudienceMode === 'undefined' || !isAudienceMode)) {
+                quickPlayerMgrBtn.classList.remove('hidden');
+                quickPlayerMgrBtn.classList.add('flex');
+            } else {
+                quickPlayerMgrBtn.classList.add('hidden');
+                quickPlayerMgrBtn.classList.remove('flex');
+            }
+        }
+
         // =======================================================
         window.dispatchEvent(new Event('resize'));
     };
@@ -12324,6 +12544,31 @@ if(btnSelRevive && btnSelUndo && btnConfirmUI) {
         let roomCode = '';     // 6位数房间号
         let myRole = 'single'; // 身份：'single'(单机), 'host'(主机), 'client'(副机)
         let mySeatId = null;   // 副机专属座位号
+// 【新增】：全局房间号 UI 刷新引擎
+        window.refreshTopRoomCode = function(tabId) {
+            const topRoomCodeDisplay = document.getElementById('topRoomCodeDisplay');
+            const textEl = document.getElementById('topRoomCodeText');
+            if (!topRoomCodeDisplay || !textEl) return;
+            
+            // 如果传入了 tabId，就用传入的；如果没有，就去抓取顶部大字判断当前处于哪个页面
+            let isTab7 = false;
+            if (tabId) {
+                isTab7 = (tabId === 'tab7'); // tab7 就是实时结算界面
+            } else {
+                const topText = document.getElementById('topTabText');
+                isTab7 = topText && topText.textContent === '实时结算';
+            }
+            
+            // 魔法逻辑：只有处于“实时结算”页面，且当前存在有效的房间号(非单机状态)，才显示这块牌子！
+            if (isTab7 && typeof roomCode !== 'undefined' && roomCode) {
+                topRoomCodeDisplay.classList.remove('hidden');
+                topRoomCodeDisplay.classList.add('flex');
+                textEl.textContent = roomCode;
+            } else {
+                topRoomCodeDisplay.classList.add('hidden');
+                topRoomCodeDisplay.classList.remove('flex');
+            }
+        };
 
         // 隐藏大厅
         window.nlHideLobby = function() {
@@ -12370,7 +12615,8 @@ if(btnSelRevive && btnSelUndo && btnConfirmUI) {
 
         // 3. 主机：点击【进入游戏】
         window.nlEnterGameAsHost = function() {
-            window.nlHideLobby();
+window.nlHideLobby();
+            if(typeof window.refreshTopRoomCode === 'function') window.refreshTopRoomCode(); // 唤醒房间号显示
             alert("👑 您已作为【裁判/主机】进入游戏！\n全场所有数据以您的手机为准，请等待玩家加入。");
         };
 
@@ -12471,7 +12717,8 @@ if(btnSelRevive && btnSelUndo && btnConfirmUI) {
             const p = gameData.players.find(x => x.id === pid);
             alert(`📱 您已成功入座！\n当前身份：【${p.name}】\n请注意：作为副机，您只能操作自己的淘汰状态和分数！`);
             
-            window.nlHideLobby();
+window.nlHideLobby();
+            if(typeof window.refreshTopRoomCode === 'function') window.refreshTopRoomCode(); // 唤醒房间号显示
             
             // 强行利用主机传来的数据刷新全屏幕！
             if(typeof updateViewRounds === 'function') updateViewRounds();
