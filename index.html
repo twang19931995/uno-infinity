@@ -3602,8 +3602,9 @@ window.openPlayerManagerModal = function() {
             const rtContainer = document.getElementById('rtSettlementBgContainer'); // 【新增】抓取实时结算的背景框
             if(!bgContainer && !rtContainer) return;
 
-            if(bgContainer) bgContainer.className = "absolute w-[300vw] h-[300vh] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-start justify-center pointer-events-none opacity-[0.25] z-0 transform rotate-[30deg]";
-            if(rtContainer) rtContainer.className = "absolute w-[300vw] h-[300vh] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-start justify-center pointer-events-none opacity-[0.15] z-0 transform rotate-[30deg]";
+// 【性能优化：瘦身底板】将 300 降为 200，完全足够覆盖手机屏幕边缘，性能节约一半！
+            if(bgContainer) bgContainer.className = "absolute w-[200vw] h-[200vh] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-start justify-center pointer-events-none opacity-[0.25] z-0 transform rotate-[30deg]";
+            if(rtContainer) rtContainer.className = "absolute w-[200vw] h-[200vh] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-start justify-center pointer-events-none opacity-[0.15] z-0 transform rotate-[30deg]";
 
             // 1. 提取所有卡牌图片
             let cardUrls =[];
@@ -3619,9 +3620,9 @@ window.openPlayerManagerModal = function() {
             const defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>UNO</text></svg>";
             if(cardUrls.length === 0) cardUrls = [defaultUrl, defaultUrl, defaultUrl];
 
-            // 2. 生成超长超宽轨道 HTML
-            let cols = 20;        
-            let cardsPerCol = 30; 
+            // 2. 生成轨道 HTML 【性能优化：卡牌数量砍掉 70%，消除卡顿源头！】
+            let cols = 12;        
+            let cardsPerCol = 14;
             let html = '<div class="flex justify-center items-start w-full h-full">';
 
             for(let i = 0; i < cols; i++) {
