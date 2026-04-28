@@ -119,6 +119,32 @@
             }
         }
         @layer utilities {
+/* --- 【大厅动态卡牌背景动画马达】 --- */
+    @keyframes lobbySlideUp { 
+        0% { transform: translateY(0); } 
+        100% { transform: translateY(-50%); } /* 滑动一半瞬间重置，实现无缝循环 */
+    }
+    @keyframes lobbySlideDown { 
+        0% { transform: translateY(-50%); } 
+        100% { transform: translateY(0); } 
+    }
+    /* 
+/* 
+/* 
+      【小白调节区：背景卡牌滑动速度】
+      40s 控制滑动跑完一圈的时间，数字越小滑得越快。
+      will-change: transform; 这是魔法！开启手机 GPU 硬件渲染，彻底告别卡顿！
+    */
+    .animate-lobby-up { 
+        animation: lobbySlideUp 70s linear infinite; 
+        will-change: transform;
+    }
+    .animate-lobby-down { 
+        animation: lobbySlideDown 70s linear infinite; 
+        will-change: transform;
+    }
+
+
 /* 
      * ========================================================
      * 【小白调节区：结算详情1 区域专属参数】
@@ -332,7 +358,21 @@
 </head>
 <body class="min-h-screen pb-[120px]" id="appBody" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
     
-    <div id="mainContainer" class="container mx-auto px-2 py-4 max-w-[800px] relative flex flex-col"> 
+    <!-- ======================================================== -->
+        <!-- ★ 【全新新增】：实时结算专属动态卡牌背景层 ★ -->
+        <!-- ======================================================== -->
+        <!-- 
+          【小白调节区：实时结算背景框】
+          [透明度调节]: 下方 opacity-[0.15] 控制卡牌的透明度。因为是游戏主界面背景，为了防止看不清字，我把透明度降到了 15%。如果你想要更明显，可以改成 0.2 或者 0.25。
+        -->
+        <div id="rtSettlementBgWrapper" class="fixed inset-0 overflow-hidden pointer-events-none z-[0] hidden transition-opacity duration-500">
+            <div id="rtSettlementBgContainer" class="absolute w-[300vw] h-[300vh] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-start justify-center pointer-events-none opacity-[0.15] z-0 transform rotate-[30deg]">
+                <!-- JS 动态引擎会在这里灌入卡牌 -->
+            </div>
+        </div>
+
+        <!-- 加上 z-10 保证所有的按钮和内容绝对在这层动态背景之上！ -->
+        <div id="mainContainer" class="container mx-auto px-2 py-4 max-w-[800px] relative flex flex-col z-10"> 
 <!-- 【极其关键：防死机幽灵口袋】专门用来骗过老JS引擎，防止报错卡死全局 -->
         <div id="ghost-elements" style="display: none;">
             <button id="presetMenuBtn"></button>
@@ -1012,8 +1052,10 @@
             </div>
         </section>
 
-        <section id="timerSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8]">
+        <section id="timerSection" class=" p-4 sm:p-5 mb-6 ">
             <!-- 隐藏旧的设定功能（保留防报错） -->
+
+
             <div class="hidden">
                 <input type="number" id="timerSetMin">
                 <button id="timerSetBtn"></button>
@@ -1121,8 +1163,8 @@
                   ========================================================
                 -->
                 <div id="clientRoundCapsule" class="hidden justify-center mb-3 w-full">
-                    <div class="bg-[#8DA4D0] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-6 py-1 sm:py-1.5 shadow-[0_3px_0_#5E4B8B] flex items-center justify-center">
-                        <span class="font-black text-white text-sm sm:text-base tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">第 <span id="clientCurrentRound" class="mx-0.5 text-[#FDE047]">1</span> 局</span>
+                    <div class="bg-[white] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-6 py-1 sm:py-1.5 shadow-[0_3px_0_#5E4B8B] flex items-center justify-center">
+                        <span class="font-black text-[#5E4B8B] text-sm sm:text-base tracking-widest "; paint-order: stroke fill;">第 <span id="clientCurrentRound" class="mx-0.5 text-[#5E4B8B]">1</span> 局</span>
                     </div>
                 </div>
 
@@ -1153,6 +1195,9 @@
                 <button id="earlyWinBtn" class="bg-[#84CC16] text-[#5E4B8B] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full py-2 px-5 sm:px-6 font-black text-xs sm:text-sm shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hidden tracking-widest">提前获胜</button>
                 <button id="v2CalculateBtn" disabled class="border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-full py-2 px-6 sm:px-8 font-black text-xs sm:text-sm transition-all tracking-widest">确认结算</button>
             </div>
+
+
+
         </section>
 
 <!-- ======================================= -->
@@ -1187,6 +1232,7 @@
                 <div id="newLoseStatsList" class="flex flex-col gap-1.5 sm:gap-2 p-1.5 sm:p-2"></div>
             </div>
 
+ 
         </div>
     </div>
 </section>
@@ -1200,7 +1246,7 @@
 
 <!-- 【图2 1比1像素级复刻：全场成就展示区】 -->
 <!-- 小白调节区：bg-[#FDFCE6] 完美复原图2淡黄纸张底色，border-[4px] 保持极粗外框 -->
-<section id="achievementsSection" class="relative rounded-[2rem] pt-[30px] pb-6 px-6 sm:px-3 mb-6 bg-[#FDFCE6] border-[4px] border-[#5E4B8B]" style="order: 0; margin-top: 10px;">
+<section id="achievementsSection" class="relative rounded-[0rem] pt-[0px] pb-6 px-6 sm:px-3 mb-6  border-[0px] border-[#5E4B8B]" style="order: 0; margin-top: 10px;">
     
 
     
@@ -2366,58 +2412,59 @@
       [控制代码] z-[999999]
       [使用方法] 层级极高，确保它绝对遮挡住游戏主界面，不选身份绝对不让进！
     -->
-    <div id="networkLobby" class="fixed inset-0 bg-[#BBE2D6] z-[999999] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+<!-- ======================================================== -->
+    <!-- ★★★ 全新联机大厅：华丽动态卡牌背景版 ★★★ -->
+    <!-- ======================================================== -->
+    <!-- 【修改点】加上了 overflow-hidden 防止卡牌溢出屏幕 -->
+    <div id="networkLobby" class="fixed inset-0 bg-[#BBE2D6] z-[999999] flex flex-col items-center justify-center p-4 transition-opacity duration-500 overflow-hidden">
         
-        <!-- 大标题区 -->
-        <div class="mb-10 flex flex-col items-center relative">
+        <!-- 【全新新增】：华丽卡牌平铺动态背景底层 -->
+        <!-- 
+          【小白调节区：背景特效】
+          opacity-[0.25]: 控制背景卡牌的透明度。如果觉得太花哨抢眼，可以改成 0.15；想更鲜艳就改 0.4。
+          rotate-[30deg]: 整体旋转 30 度。
+          scale-[1.3]: 放大 1.3 倍，确保倾斜后四个角落不会漏出空白。
+        -->
+        <div id="nlBgContainer" class="absolute inset-[-50%] flex items-center justify-center pointer-events-none opacity-[0.25] z-0 transform rotate-[30deg] scale-[1.3]">
+            <!-- JS 引擎会在这里灌入无穷无尽的卡牌轨道 -->
+        </div>
+
+        <!-- 大标题区 (加上 z-10 保证在背景之上) -->
+        <div class="mb-10 flex flex-col items-center relative z-10">
             <span class="font-black text-white text-[60px] sm:text-[70px] tracking-widest drop-shadow-md text-stroke" style="-webkit-text-stroke: 4px #5E4B8B; paint-order: stroke fill;">UNO</span>
             <div class="bg-[#FDE047] border-[4px] border-[#5E4B8B] rounded-full px-6 py-1.5 shadow-[0_4px_0_#5E4B8B] -mt-4 z-10 transform -rotate-2">
                 <span class="font-black text-[#5E4B8B] text-xl tracking-widest">终极电竞联机版</span>
             </div>
         </div>
 
-        <!-- 1. 主菜单面板 (选择身份) -->
-        <div id="nlMainMenu" class="w-full max-w-[320px] flex flex-col gap-5 transition-all">
-            <!-- 
-              【小白调节区：创建房间按钮 (主机端)】
-              [控制代码] bg-[#FCA5A5] (粉红色底)[控制代码] shadow-[0_6px_0_#5E4B8B] (极厚的深紫色底部立体阴影)
-              [特效备份] 如果想让按钮呼吸发光，可在最后加上 magic-glow
-            -->
+        <!-- 1. 主菜单面板 (选择身份) (加上 z-10 和 relative) -->
+        <div id="nlMainMenu" class="w-full max-w-[320px] flex flex-col gap-5 transition-all relative z-10">
             <button onclick="window.nlShowCreateRoom()" class="w-full bg-[#FCA5A5] border-[4px] border-[#5E4B8B] rounded-2xl py-4 flex flex-col items-center justify-center shadow-[0_6px_0_#5E4B8B] active:translate-y-2 active:shadow-none transition-all hover:brightness-105">
                 <span class="font-black text-white text-[24px] tracking-widest text-stroke" style="-webkit-text-stroke: 2.5px #5E4B8B; paint-order: stroke fill;">创建房间</span>
                 <span class="font-bold text-[#5E4B8B] text-xs mt-1 tracking-widest">(我是主机/裁判)</span>
             </button>
-            
-            <!-- 
-              【小白调节区：加入房间按钮 (副机端)】
-              [控制代码] bg-[#A3D977] (绿色底)
-            -->
             <button onclick="window.nlShowJoinRoom()" class="w-full bg-[#A3D977] border-[4px] border-[#5E4B8B] rounded-2xl py-4 flex flex-col items-center justify-center shadow-[0_6px_0_#5E4B8B] active:translate-y-2 active:shadow-none transition-all hover:brightness-105">
                 <span class="font-black text-white text-[24px] tracking-widest text-stroke" style="-webkit-text-stroke: 2.5px #5E4B8B; paint-order: stroke fill;">加入房间</span>
                 <span class="font-bold text-[#5E4B8B] text-xs mt-1 tracking-widest">(我是副机/玩家)</span>
             </button>
-            
             <div class="w-full h-[4px] bg-[#5E4B8B]/20 rounded-full my-1"></div>
-            
-            <!-- 单机模式按钮 -->
             <button onclick="window.nlStartSingle()" class="w-full bg-white border-[4px] border-[#5E4B8B] rounded-2xl py-3 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all hover:bg-gray-50">
                 <span class="font-black text-[#5E4B8B] text-[18px] tracking-widest">单机模式</span>
             </button>
         </div>
 
-        <!-- 2. 创建房间面板 (主机：生成中特效) -->
-        <div id="nlCreateMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-4 transition-all">
+        <!-- 2. 创建房间面板 (主机：生成中特效) (加上 z-10 和 relative) -->
+        <div id="nlCreateMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-4 transition-all relative z-10">
             <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-6 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
                 <i class="fa-solid fa-satellite-dish text-5xl text-[#5FA4FA] mb-4 animate-pulse"></i>
                 <span class="font-black text-[#5E4B8B] text-lg tracking-widest">正在连接对讲机频道...</span>
             </div>
         </div>
 
-        <!-- 3. 创建成功：展示 6 位数房间号 (主机) -->
-        <div id="nlHostRoomMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-6 transition-all">
+        <!-- 3. 创建成功：展示 6 位数房间号 (主机) (加上 z-10 和 relative) -->
+        <div id="nlHostRoomMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-6 transition-all relative z-10">
             <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-6 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
                 <span class="font-bold text-gray-400 text-sm mb-2 tracking-widest">您的房间号</span>
-                <!-- 房间号红字超大显示 -->
                 <span id="nlHostRoomCode" class="font-black text-[#E11D48] text-[55px] tracking-widest leading-none mb-2 drop-shadow-sm">------</span>
                 <span class="font-bold text-[#5FA4FA] text-xs">请让玩家输入此号码加入</span>
             </div>
@@ -2426,35 +2473,27 @@
             </button>
         </div>
 
-        <!-- 4. 加入房间：输入 6 位数面板 (副机) -->
-        <div id="nlJoinMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-5 transition-all">
+        <!-- 4. 加入房间：输入面板 (副机) (加上 z-10 和 relative) -->
+        <div id="nlJoinMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-5 transition-all relative z-10">
             <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-6 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
                 <span class="font-black text-[#5E4B8B] text-xl mb-4 tracking-widest">输入房间号</span>
-                <!-- 
-                  【小白调节区：房间号输入框】
-                  [控制代码] text-[35px] font-black text-[#E11D48] (超大号红字加粗)
-                -->
                 <input type="number" id="nlJoinCodeInput" placeholder="6位数字" class="w-full bg-gray-100 border-[3px] border-[#5E4B8B] rounded-xl text-center text-[35px] font-black text-[#E11D48] py-2 focus:outline-none focus:ring-4 focus:ring-[#A3D977]/50 transition-all tracking-widest" oninput="if(this.value.length>6)this.value=this.value.slice(0,6)">
             </div>
             <div class="flex gap-3 w-full">
-                <!-- 返回按钮 -->
                 <button onclick="window.nlBackToMain()" class="w-1/3 bg-gray-300 border-[4px] border-[#5E4B8B] rounded-xl py-3 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">
                     <span class="font-black text-white text-lg text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">返回</span>
                 </button>
-                <!-- 连接房间按钮 -->
                 <button onclick="window.nlConfirmJoin()" id="nlConfirmJoinBtn" class="flex-1 bg-[#A3D977] border-[4px] border-[#5E4B8B] rounded-xl py-3 flex items-center justify-center shadow-[0_4px_0_#5E4B8B] active:translate-y-1 active:shadow-none transition-all">
                     <span class="font-black text-white text-xl tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">连接房间</span>
                 </button>
             </div>
         </div>
 
-        <!-- 5. 加入成功：选择专属座位面板 (副机) -->
-        <div id="nlSeatMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-4 transition-all">
+        <!-- 5. 加入成功：选择座位面板 (副机) (加上 z-10 和 relative) -->
+        <div id="nlSeatMenu" class="w-full max-w-[320px] hidden flex-col items-center gap-4 transition-all relative z-10">
             <div class="bg-white border-[4px] border-[#5E4B8B] rounded-2xl p-4 w-full flex flex-col items-center shadow-[0_6px_0_#5E4B8B]">
                 <span class="font-black text-[#5E4B8B] text-lg mb-3 tracking-widest">请选择您的专属座位</span>
                 <span class="font-bold text-gray-400 text-[10px] mb-3 text-center">副机只能操作自己的数据<br>请务必选对自己的名字！</span>
-                
-                <!-- 座位网格：JS 会在这里生成头像按钮 -->
                 <div id="nlSeatGrid" class="grid grid-cols-3 gap-2 w-full">
                     <!-- 动态生成 -->
                 </div>
@@ -3555,6 +3594,64 @@ window.openPlayerManagerModal = function() {
             document.getElementById('playerManagerModal').classList.remove('hidden');
         };
 
+// ========================================================
+        // 【全新引擎】：华丽动态卡牌背景生成器 (双屏渲染无缝循环版)
+        // ========================================================
+        window.renderLobbyBackground = function() {
+            const bgContainer = document.getElementById('nlBgContainer');
+            const rtContainer = document.getElementById('rtSettlementBgContainer'); // 【新增】抓取实时结算的背景框
+            if(!bgContainer && !rtContainer) return;
+
+            if(bgContainer) bgContainer.className = "absolute w-[300vw] h-[300vh] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-start justify-center pointer-events-none opacity-[0.25] z-0 transform rotate-[30deg]";
+            if(rtContainer) rtContainer.className = "absolute w-[300vw] h-[300vh] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-start justify-center pointer-events-none opacity-[0.15] z-0 transform rotate-[30deg]";
+
+            // 1. 提取所有卡牌图片
+            let cardUrls =[];
+            if(gameData.cardSystem && gameData.cardSystem.items) {
+                cardUrls.push(...gameData.cardSystem.items.map(i => i.url).filter(Boolean));
+            }
+            if(gameData.customMethods) {
+                if(gameData.customMethods.win) cardUrls.push(...gameData.customMethods.win.items.map(i => i.url).filter(Boolean));
+                if(gameData.customMethods.lose) cardUrls.push(...gameData.customMethods.lose.items.map(i => i.url).filter(Boolean));
+            }
+            
+            // 兜底图片防裂开
+            const defaultUrl = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' fill='%239ca3af' font-size='20' font-family='sans-serif' text-anchor='middle' dy='.3em'>UNO</text></svg>";
+            if(cardUrls.length === 0) cardUrls = [defaultUrl, defaultUrl, defaultUrl];
+
+            // 2. 生成超长超宽轨道 HTML
+            let cols = 20;        
+            let cardsPerCol = 30; 
+            let html = '<div class="flex justify-center items-start w-full h-full">';
+
+            for(let i = 0; i < cols; i++) {
+                let isUp = i % 2 === 0;
+                let animClass = isUp ? 'animate-lobby-up' : 'animate-lobby-down';
+                
+                let colUrls =[];
+                for(let j = 0; j < cardsPerCol; j++) {
+                    colUrls.push(cardUrls[Math.floor(Math.random() * cardUrls.length)]);
+                }
+                
+                let halfHtml = colUrls.map(url => `
+                    <div class="py-2 sm:py-3 px-2 sm:px-3 w-full shrink-0">
+                        <div class="w-full aspect-[2/3] bg-[#111111] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[8px] sm:rounded-[10px] shadow-lg overflow-hidden flex items-center justify-center">
+                            <img src="${url}" class="w-full h-full object-contain" crossorigin="anonymous">
+                        </div>
+                    </div>
+                `).join('');
+
+                html += `<div class="flex flex-col ${animClass} w-[90px] sm:w-[120px] shrink-0">`;
+                html += halfHtml; 
+                html += halfHtml; 
+                html += `</div>`;
+            }
+            html += '</div>';
+
+            // 【核心魔法】同时给大厅和实时结算界面注入这套华丽的动画代码！
+            if(bgContainer) bgContainer.innerHTML = html;
+            if(rtContainer) rtContainer.innerHTML = html;
+        };
 function init() {
             initCloudUI(); 
             const genBtn = document.getElementById('generateShareLinkBtn');
@@ -3699,7 +3796,10 @@ updateViewRounds(); // 【新增】启动时先分配好当前的区间数据
 bindV2Events(); // 【V2新增】激活我们的新事件
 bindTimeRecordEvents(); // 初始化时间记录模块事件
         resetV2State(); // 【V2新增】初始化所有淘汰状态
-        }
+// 【新增】：启动大厅华丽背景马达！
+            if(typeof window.renderLobbyBackground === 'function') window.renderLobbyBackground();
+        } // 这是 init() 的结尾大括号
+        
 
 // ========================================================
         // 【新增引擎】随机选择器核心逻辑 (包含动画、音效、淘汰过滤)
@@ -4170,6 +4270,8 @@ bindTimeRecordEvents(); // 初始化时间记录模块事件
         // 【新增函数】管理滴滴声的频率与音量
         function loopSound() {
             if (!isTimerRunning || timerRemain <= 0) return;
+// 【副机静音魔法】如果是副机或观众，直接静音，不播放过程滴滴声！
+            if ((typeof isAudienceMode !== 'undefined' && isAudienceMode) || (typeof myRole !== 'undefined' && myRole === 'client')) return;
 
             let interval = 1000;
             let vol = 0.1;
@@ -4230,7 +4332,10 @@ bindTimeRecordEvents(); // 初始化时间记录模块事件
                 if (timerRemain <= 0) {
                     timerRemain = 0;
                     stopTimer();
-                    playBeep(1.0, 1200, 1.5); // 时间到长音报警
+// 【副机静音魔法】只有单机或主机才能播放时间到的长音！
+                    if (!((typeof isAudienceMode !== 'undefined' && isAudienceMode) || (typeof myRole !== 'undefined' && myRole === 'client'))) {
+                        playBeep(1.0, 1200, 1.5); // 时间到长音报警
+                    }
 
                     // 【新增】时间归零自动弹出选赢家（只显示未淘汰玩家）
                     const active = gameData.players.filter(p => p.isActive);
@@ -9297,6 +9402,28 @@ const quickEditCardBtn = document.getElementById('quickEditCardBtn');
 
 // 【新增】：联动刷新顶部房间号的显示状态
         if(typeof window.refreshTopRoomCode === 'function') window.refreshTopRoomCode(tabId);
+// 【升级】：控制动态卡牌背景在多个大区域的显隐
+        const rtBgWrapper = document.getElementById('rtSettlementBgWrapper');
+        if (rtBgWrapper) {
+            // 
+            // ========================================================
+            // 【小白调节区：动态背景显隐控制台】
+            // 下面这个 showBgTabs 数组里写了所有允许显示动态卡牌背景的页面！
+            // 'tab1' = 最新战况，'tab3' = 奖杯荣誉，'tab4' = 全场成就
+            // 'tab6' = 随机抽选，'tab7' = 实时结算，'tab9' = 动态数据
+            // 如果你想让某个页面不显示背景了，把它从下面括号里的单引号删掉就行！
+            // ========================================================
+            //
+            const showBgTabs =['tab1', 'tab3', 'tab4', 'tab6', 'tab7', 'tab9'];
+            
+            if (showBgTabs.includes(tabId)) {
+                // 如果当前切换的页面在这个名单里，就显示背景！
+                rtBgWrapper.classList.remove('hidden');
+            } else {
+                // 如果是排行榜、详细数据等不需要背景的页面，就乖乖隐藏！
+                rtBgWrapper.classList.add('hidden');
+            }
+        }
 
 // 【新增】：控制顶部玩家管理按钮的显示 (仅在实时结算 tab7 页面显示)
         const quickPlayerMgrBtn = document.getElementById('quickPlayerMgrBtn');
