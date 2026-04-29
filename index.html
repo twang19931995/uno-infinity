@@ -617,7 +617,7 @@
 <!-- ★★★ 【全新大模块】动态数据可视化引擎 (你追我赶跑马图) ★★★ -->
 <!-- ==================================================================== -->
 <!-- 小白调节区：bg-[#A0E6CC] 控制背景那层淡淡的青绿色 -->
-<section id="dynamicDataSection" class="kawaii-card p-3 sm:p-4 mb-6 bg-[#A0E6CC] relative" style="order: 0; display: none;">
+<section id="dynamicDataSection" class=" p-3 sm:p-4 mb-6  relative" style="order: 0; display: none;">
     
     <!-- 顶部：粘性局次控制台 (复用系统的组件，这里我们放个占位标识即可，底层JS会把真控制台吸附过来) -->
     <div class="w-full h-[0px] mb-0 pointer-events-none"></div>
@@ -945,7 +945,7 @@
 <!-- ======================================================== -->
         <!-- 【全新重构】随机选择器区域 (双引擎UI版，包含经典轨道与全新大转盘) -->
         <!-- ======================================================== -->
-        <section id="randomSelectorSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8]" style="order: 0;">
+        <section id="randomSelectorSection" class=" p-4 sm:p-5 mb-6 " style="order: 0;">
             <div class="flex flex-col items-center w-full relative gap-4">
                 
                 <!-- 【顶部控制区：标题与切换按钮】 -->
@@ -10623,10 +10623,12 @@ window.renderMethodManager = function() {
 
                 // 小白调节区：这里控制主界面分类和卡片的UI排版
                 html += `
+<!-- 小白调节区：这里控制主界面分类和卡片的UI排版 -->
                 <div class="mb-3 w-full px-1">
                     <!-- 分类标题行 -->
                     <div class="flex items-center justify-between mb-1">
-                        <div class="flex items-center gap-1.5">
+                        <!-- 【新增修改】：给这里加上 onclick 事件和点击动效，点击红/蓝框区域即可呼出编辑分类面板！ -->
+                        <div class="flex items-center gap-1.5 cursor-pointer hover:brightness-110 active:scale-95 transition-all" onclick="window.openCardCatModal('${cat.id}')">
                             <!-- 分类码 (正方形) -->
                             <div class="w-8 h-8 border-[1.5px] border-[#333333] flex items-center justify-center shadow-[1.5px_1.5px_0_#333333] rounded-sm" style="background-color: ${cat.color};">
                                 <span class="font-black text-white text-[20px] drop-shadow-sm">${cat.code}</span>
@@ -10648,32 +10650,36 @@ window.renderMethodManager = function() {
                     <!-- min-h-[90px] 保证就算里面没卡片，也有一个基础高度的白框 -->
                     <div class="w-full bg-white border-[1.5px] border-[#333333] min-h-[90px] p-2 flex flex-wrap gap-[6px] mm-cat-grid rounded-sm" data-cat-id="${cat.id}">
                         ${catItems.map((item, index) => {
-                            // 【核心魔法】动态生成展示编码：分类码 + (如果是特殊或填了编号就用item.num，否则用index+1)
                             let displayNum = item.num || (index + 1);
                             let displayCode = cat.code + displayNum;
 
                             return `
                             <!-- 卡片本体 -->
                             <div class="flex flex-col items-center w-[50px] mm-item-cap cursor-move relative group" data-id="${item.id}">
-                                <!-- 隐藏式删除小按钮 (极小巧的X) -->
                                 <button class="absolute -top-1.5 -right-1.5 bg-white border-[1px] border-[#333333] rounded-full w-[15px] h-[15px] flex items-center justify-center z-10 mm-del-item-btn shadow-sm" data-id="${item.id}">
                                     <i class="fa-solid fa-times text-[8px] text-[#333333] pointer-events-none"></i>
                                 </button>
-                                
-                                <!-- 黑底图片框 (严格1:1正方形，适配图1排版) -->
                                 <div class="w-full aspect-square border-[1.5px] border-[#333333] bg-black flex items-center justify-center overflow-hidden mb-[3px] rounded-sm shadow-sm cursor-pointer active:scale-95 transition-transform" onclick="window.openMmItemDialog('${item.id}')">
                                     <img src="${item.url || 'data:image/svg+xml;utf8,<svg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'150\\\' height=\\\'150\\\'><rect width=\\\'100%\\\' height=\\\'100%\\\' fill=\\\'%23f3f4f6\\\'/><text x=\\\'50%\\\' y=\\\'50%\\\' fill=\\\'%239ca3af\\\' font-size=\\\'20\\\' font-family=\\\'sans-serif\\\' text-anchor=\\\'middle\\\' dy=\\\'.3em\\\'>无图</text></svg>'}" class="w-full h-full object-contain bg-[#111111]" crossorigin="anonymous">
                                 </div>
-
-                                <!-- 底部编号胶囊 -->
                                 <div class="w-full h-[16px] border-[1px] border-[#333333] flex items-center justify-center rounded-sm shadow-sm" style="background-color: ${cat.color};">
                                     <span class="font-black text-white text-[10px] leading-none drop-shadow-sm pt-[1px] tracking-tighter">${displayCode}</span>
                                 </div>
                             </div>
                             `;
                         }).join('')}
+                        
+                        <!-- 【新增修改】：在分类的最后面加一个硕大的“加号”卡片，点击直接在此分类下添加卡牌！ -->
+                        <div class="flex flex-col items-center w-[50px] cursor-pointer hover:scale-105 transition-transform opacity-70 hover:opacity-100 ignore-drag" onclick="window.openMmItemDialog(null, '${cat.id}')">
+                            <div class="w-full aspect-square border-[2px] border-[#333333] bg-white flex items-center justify-center overflow-hidden mb-[3px] rounded-sm shadow-sm border-dashed">
+                                <i class="fa-solid fa-plus text-2xl text-[#333333]"></i>
+                            </div>
+                            <div class="w-full h-[16px]"></div>
+                        </div>
+
                     </div>
                 </div>
+
                 `;
             });
 
@@ -10728,8 +10734,8 @@ window.renderMethodManager = function() {
             saveData(); window.renderMethodManager(); document.getElementById('mmCategoryDialog').classList.add('hidden');
         });
 
-        // 辅助魔法：打开添加方式/编辑方式的窗口
-        window.openMmItemDialog = function(itemId = null) {
+// 辅助魔法：打开添加方式/编辑方式的窗口
+        window.openMmItemDialog = function(itemId = null, prefillCatId = null) {
             window.v2App.mmTargetId = itemId;
             const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
             
@@ -10741,8 +10747,11 @@ window.renderMethodManager = function() {
                 document.getElementById('mmItemNumInput').value = item.num || '';
                 document.getElementById('mmItemUrlInput').value = item.url || '';
             } else {
-                // 如果是新建，默认选 D未分类
-                let cat = data.categories.find(c => c.code === 'D') || data.categories[0];
+                // 如果是新建，优先选中传入的分类，没有就选 D未分类
+                let cat = null;
+                if (prefillCatId) cat = data.categories.find(c => c.id === prefillCatId);
+                if (!cat) cat = data.categories.find(c => c.code === 'D') || data.categories[0];
+                
                 document.getElementById('mmItemCatSelectBtn').dataset.cid = cat.id;
                 document.getElementById('mmItemCatDisplay').textContent = cat.name;
                 document.getElementById('mmItemNumInput').value = '';
@@ -11367,10 +11376,8 @@ safeBind('elimInfoConfirmBtn', () => {
             // 提取第一步二次确认时死死咬住的“绝对冻结时间”
             let savedTime = window.v2App.tempElim.freezeTime !== undefined ? window.v2App.tempElim.freezeTime : (typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0);
 
-            window.v2App.tempElim.players.forEach(pid => {
-                // ★ 补救点：因为顺位在刚刚点击二次确认时就已经排好了，所以这里绝对不能再 push 一次！！
-                // 我们只需要把刚才系统给的“未设置方式”更新为你现在选好的死法和凶手即可！
-                
+window.v2App.tempElim.players.forEach(pid => {
+                // 把刚才系统给的“未设置方式”更新为你现在选好的死法和凶手
                 v2State.eliminated[pid] = finalMethodName;
                 v2State.eliminationDetails[pid] = { killerId: window.v2App.tempElim.killerId, cards: 0, time: savedTime };
                 
@@ -11381,13 +11388,36 @@ safeBind('elimInfoConfirmBtn', () => {
                 }
             });
 
-            v2State.lastElimWasSuicide = (window.v2App.tempElim.killerId === window.v2App.tempElim.players[0]);
-            v2State.lastElimMethodName = finalMethodName;
+            /*
+             * ========================================================
+             * 【补救修正核心】：手填完凶手后，瞬间同步修正赢家 A 的胜利方式！
+             * ========================================================
+             */
+            const active = gameData.players.filter(p => p.isActive);
+            const alive = active.filter(p => !v2State.eliminated[p.id]);
+            // 判断防误触：只有场上真的只剩一个赢家时，才执行联动修正
+            if (alive.length === 1 && v2State.winnerId === alive[0].id) {
+                let A_id = v2State.winnerId;
+                let B_id = window.v2App.tempElim.players[0]; // 刚编辑完的被淘汰的 B
+                let killerId = window.v2App.tempElim.killerId; // 刚从下拉框里选出来的凶手
+
+                if (killerId === B_id) {
+                    // 如果改成了自尽，修正 A 为方式2 (D2)
+                    v2State.winMethod = window.getSpecialMethodName('win', 2);
+                } else if (killerId === A_id) {
+                    // 如果明确了凶手是 A，让 A 直接继承这名死者B当前的淘汰方式！
+                    v2State.winMethod = finalMethodName;
+                }
+            }
+            
+            // 每次结算完，强制清理旧的全局脏数据，防止污染下一局
+            v2State.lastElimWasSuicide = false;
+            v2State.lastElimMethodName = null;
 
             // 隐藏弹窗
             document.getElementById('v2DialogSetElimInfo').classList.add('hidden');
             
-            // 补刷一次主界面 UI（为了让你刚选的凶手名字能立刻在外面的小胶囊上体现出来）
+            // 补刷一次主界面 UI（为了让你刚选的凶手名字和刚才顺手修正的赢家胜利方式，能立刻在外面的小胶囊上体现出来）
             if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
         });
 
@@ -11417,12 +11447,35 @@ safeBind('elimInfoConfirmBtn', () => {
                     finalWinMethod = 'MANUAL';
                     finalLoseMethodForOthers = window.getSpecialMethodName('lose', 1);
                 }
-            } else if (survivorsCount === 1) {
+} else if (survivorsCount === 1) {
                 if (!isTimeUp && isAutoOneLeft) {
-                    if (v2State.lastElimWasSuicide) {
-                        finalWinMethod = window.getSpecialMethodName('win', 2);
+                    /*
+                     * ========================================================
+                     * 【自动结算核心修复】：斩断旧记忆污染，精准抓取本局最后一个死者的真实数据
+                     * ========================================================
+                     */
+                    let lastVictimId = null;
+                    if (v2State.eliminationEvents && v2State.eliminationEvents.length > 0) {
+                        let lastGroup = v2State.eliminationEvents[v2State.eliminationEvents.length - 1];
+                        if (lastGroup.length === 1) lastVictimId = lastGroup[0];
+                    }
+                    
+                    if (lastVictimId && v2State.eliminationDetails && v2State.eliminationDetails[lastVictimId]) {
+                        let killerId = v2State.eliminationDetails[lastVictimId].killerId;
+                        let bMethod = v2State.eliminated[lastVictimId];
+
+                        if (killerId === lastVictimId) {
+                            // 判定1：如果凶手是自己(自尽)，给赢家记为方式2 (D2)
+                            finalWinMethod = window.getSpecialMethodName('win', 2);
+                        } else if (killerId === winnerId && bMethod && bMethod !== '未设置方式') {
+                            // 判定2：如果凶手是赢家A，直接完美继承死者B的淘汰方式！
+                            finalWinMethod = bMethod;
+                        } else {
+                            // 判定3：如果凶手还没选(刚点淘汰瞬间)，暂时给个默认方式1，等填完弹窗再修正！
+                            finalWinMethod = window.getSpecialMethodName('win', 1);
+                        }
                     } else {
-                        finalWinMethod = v2State.lastElimMethodName || window.getSpecialMethodName('win', 1);
+                        finalWinMethod = window.getSpecialMethodName('win', 1);
                     }
                 } else {
                     finalWinMethod = window.getSpecialMethodName('win', 1);
