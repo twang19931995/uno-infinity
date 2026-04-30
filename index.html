@@ -2509,14 +2509,14 @@
 
     <script>
         const avatarList =[
-            "https://i.ibb.co/PZJJm3Bs/2025-12-16-204026-031.jpg",
+            "https://i.ibb.co/N8msDrM/image.jpg",
             "https://i.ibb.co/ZR2pSC3N/2025-12-16-203958-691.jpg",
             "https://i.ibb.co/nMwf7NQf/2025-12-16-204010-951.jpg",
             "https://i.ibb.co/chCccrd3/2025-12-16-203929-703.jpg",
             "https://i.ibb.co/8J2ZNyW/2025-12-16-203935-715.jpg",
-            "https://i.ibb.co/PZJJm3Bs/2025-12-16-204026-031.jpg",
-            "https://i.ibb.co/PZJJm3Bs/2025-12-16-204026-031.jpg",
-            "https://i.ibb.co/PZJJm3Bs/2025-12-16-204026-031.jpg"
+            "https://i.ibb.co/JRPtBGMB/2026-04-30-215222-711.jpg",
+            "https://i.ibb.co/PVKQF08/2026-04-30-215215-007.jpg",
+            "https://i.ibb.co/79vNbp7/Q.png"
         ];
 
         let gameData = { 
@@ -8619,9 +8619,27 @@ function renderV2ScoreArea() {
         let inputWidthClass = 'w-full max-w-[160px]';
         let avatarFilter = 'none';
 
-        if (isWinner) {
+if (isWinner) {
             capBg = "#FDE047"; textColor = "text-[#5E4B8B]"; cursor = "cursor-default";
             nameContent = `<i class="fa-solid fa-crown mr-0.5"></i>${nameContent}`;
+            inputWidthClass = 'w-[60px] sm:w-[80px]'; // 给赢家输入框腾出空间
+            
+            // 【像素级复刻图3】：赢家胶囊右侧显示胜利方式卡牌
+            let wMethod = v2State.winMethod || '默认胜利';
+            let methodImg = getMethodUrl(wMethod, 'win');
+            
+            rightWidgetsHtml = `
+            <!-- 
+              ========================================================
+              【小白调节区：图3 赢家专属卡牌图片容器】
+              [边框颜色] border-[#1f8316] 就是你要求的专属绿色外描边！
+              ========================================================
+            -->
+            <div class="absolute right-[2%] top-1/2 -translate-y-1/2 flex items-center gap-1 sm:gap-1.5 z-50 pointer-events-none">
+                <div class="w-[28px] sm:w-[36px] aspect-[2/3] bg-[#111111] border-[2px] sm:border-[2.5px] rounded-[4px] sm:rounded-[6px] overflow-hidden flex items-center justify-center shadow-sm" style="border-color: #1f8316;">
+                    <img src="${methodImg}" class="w-full h-full object-contain" crossorigin="anonymous">
+                </div>
+            </div>`;
         } else if (isElim) {
             capBg = "#9CA3AF"; capBorder = "#5E4B8B"; shadowColor = "#5E4B8B"; textColor = "text-white"; 
             cursor = "cursor-pointer hover:brightness-110";
@@ -10147,14 +10165,38 @@ window.switchMobileTab = function(tabId) {
             confirmCallback: null
         };
 
-        // 获取特殊方式名字的终极工具 (已加固容错处理)
+// 获取特殊方式名字的终极工具 (四重保险防断层版)
         window.getSpecialMethodName = function(type, num) {
             let data = type === 'win' ? gameData.customMethods.win : gameData.customMethods.lose;
-            let strNum = String(num); // 强制转换为字符串，杜绝匹配失败
-            if (data && data.specialRules && data.specialRules[strNum]) {
+            let strNum = String(num); // 强制转换为字符串 "1", "2"
+            let targetName = 'D' + strNum; // 目标寻找名字 "D1", "D2"
+
+            if (!data) return '特殊' + (type === 'win' ? '胜利' : '淘汰') + strNum + '(未设置)';
+
+            // 1. 查旧字典：通过底层绑定的 specialRules ID 查找（兼容4月5日的旧数据）
+            if (data.specialRules && data.specialRules[strNum]) {
                 let item = data.items.find(i => i.id === data.specialRules[strNum]);
                 if (item && item.name) return item.name;
             }
+
+            // 2. 查新名字：如果用户自己新建了叫 "D1", "D2" 的卡片，无脑直接用！(解决新建后ID变更的致命BUG)
+            let exactNameMatch = data.items.find(i => i.name === targetName);
+            if (exactNameMatch) return exactNameMatch.name;
+
+            // 3. 查旧分类：降级去找默认的 D 分类（兼容旧版的 _def 后缀），按顺序提取
+            if (data.categories) {
+                let catD = data.categories.find(c => c.code === 'D' || c.id.endsWith('_def'));
+                if (catD) {
+                    let items = data.items.filter(i => i.categoryId === catD.id);
+                    // 优先按卡片录入的 num 数字找
+                    let exactNumMatch = items.find(i => String(i.num) === strNum);
+                    if (exactNumMatch && exactNumMatch.name) return exactNumMatch.name;
+                    // 如果都没写，按列表里的物理排列顺序找
+                    if (items.length >= num && items[num - 1].name) return items[num - 1].name;
+                }
+            }
+            
+            // 4. 彻底找不到的最终兜底
             return '特殊' + (type === 'win' ? '胜利' : '淘汰') + strNum + '(未设置)';
         };
 
@@ -10498,36 +10540,66 @@ window.switchMobileTab = function(tabId) {
             document.getElementById('simultaneousElimDialog').classList.add('hidden');
         });
 
-        safeBind('confirmSimultaneousBtn', () => {
+safeBind('confirmSimultaneousBtn', () => {
             if(window.tempSimultaneousIds.size === 0) {
                 alert("请至少选择一名需要淘汰的玩家！"); return;
             }
             
             let group = Array.from(window.tempSimultaneousIds);
-            v2State.eliminationEvents = v2State.eliminationEvents ||[];
-            v2State.eliminated = v2State.eliminated || {};
-            v2State.eliminationDetails = v2State.eliminationDetails || {};
-
-            let defMethod = '未设置方式';
-            if (gameData.customMethods && gameData.customMethods.lose) {
-                let dItem = gameData.customMethods.lose.items.find(i => i.id === gameData.customMethods.lose.defaultMethodId);
-                if (dItem) defMethod = dItem.name;
-            }
-
-            let currentTime = typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0;
-
-            // 核心魔法：把所有选中的人，统统打包塞进“同一血层级”，并给默认状态！
-            group.forEach(pid => {
-                v2State.eliminated[pid] = defMethod;
-                v2State.eliminationDetails[pid] = { killerId: null, cards: 0, time: currentTime };
-            });
-            v2State.eliminationEvents.push(group);
-
+            
+            // 1. 隐藏多选框
             document.getElementById('simultaneousElimDialog').classList.add('hidden');
             
-            if(typeof startTimer === 'function') startTimer(); 
-            if(typeof checkWinCondition === 'function') checkWinCondition(); 
-            if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+// 2. 借用图2的二次确认弹窗，并动态注入所有被淘汰者的头像！
+            const cBox = document.getElementById('v2DialogQuickElimConfirm');
+            const cText = cBox.querySelector('.bg-\\[\\#E11D48\\]');
+            if(cText) {
+                let avatarsHtml = group.map(pid => {
+                    let p = gameData.players.find(x=>x.id===pid);
+                    return `<img src="${p.avatar}" class="w-6 h-6 sm:w-8 sm:h-8 rounded-[4px] border-[1.5px] border-white inline-block object-cover shadow-sm">`;
+                }).join('');
+                cText.innerHTML = `<div class="mb-1.5 text-sm sm:text-base">确认同时淘汰以下 ${group.length} 名玩家？</div><div class="flex justify-center flex-wrap gap-1 mt-1">${avatarsHtml}</div>`;
+            }
+
+            // 3. 绑定二次确认后的动作：弹出统一设置弹窗
+            const cBtn = document.getElementById('quickElimConfirmBtn');
+            cBtn.onclick = () => {
+                let currentTime = typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0;
+                
+                // 将选中的这批人，统统塞进临时操作台！
+                window.v2App.tempElim = { players: group, killerId: null, methodName: null, score: '', freezeTime: currentTime };
+
+                v2State.eliminationEvents = v2State.eliminationEvents ||[];
+                v2State.eliminated = v2State.eliminated || {};
+                v2State.eliminationDetails = v2State.eliminationDetails || {};
+
+                let defMethod = '未设置方式';
+                if (gameData.customMethods && gameData.customMethods.lose) {
+                    let dItem = gameData.customMethods.lose.items.find(i => i.id === gameData.customMethods.lose.defaultMethodId);
+                    if (dItem) defMethod = dItem.name;
+                }
+
+                // 底层先把人给杀了，塞入同一血层级
+                group.forEach(pid => {
+                    v2State.eliminated[pid] = defMethod;
+                    v2State.eliminationDetails[pid] = { killerId: null, cards: 0, time: currentTime };
+                });
+                v2State.eliminationEvents.push(group);
+
+                // 隐藏确认框
+                cBox.classList.add('hidden');
+                
+                // 唤醒主界面引擎，启动结算判定
+                if(typeof startTimer === 'function') startTimer(); 
+                if(typeof checkWinCondition === 'function') checkWinCondition(); 
+                if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+
+                // ★ 弹出通用的设置详情弹窗 ★
+                window.renderElimInfoDialog();
+                document.getElementById('v2DialogSetElimInfo').classList.remove('hidden');
+            };
+
+            cBox.classList.remove('hidden');
         });
 
 
@@ -10772,8 +10844,8 @@ window.renderMethodManager = function() {
             const data = window.v2App.currentMethodTab === 'lose' ? gameData.customMethods.lose : gameData.customMethods.win;
             const cat = data.categories.find(c => c.id === catId);
             
-            // 核心合并：分类码 + 数字
-            const finalName = cat.code + num;
+// 核心合并：分类码(兼容旧版无code的情况，强行赋予'D') + 数字
+            const finalName = (cat.code || 'D') + num;
 
             if (window.v2App.mmTargetId) {
                 const item = data.items.find(i => i.id === window.v2App.mmTargetId);
@@ -10911,8 +10983,8 @@ window.renderElimInfoDialog = function() {
             // 1. 渲染凶手选择区 (保持原逻辑)
             const killerBtn = document.getElementById('elimInfoKillerBtn');
             // 【小白修改区：凶手列表生成器】
-// 修复逻辑：允许玩家自己淘汰自己！只要是活跃玩家，且（未被淘汰 或者 就是当前正在处理的受害者本人 targetPid），都显示在头像列表里！
-const activeKillers = gameData.players.filter(p => p.isActive && (!v2State.eliminated[p.id] || p.id === targetPid));
+// 修复逻辑：允许自己淘汰自己。如果是同时淘汰多人，他们也可以出现在凶手列表里。
+            const activeKillers = gameData.players.filter(p => p.isActive && (!v2State.eliminated[p.id] || window.v2App.tempElim.players.includes(p.id)));
             killerBtn.className = "grid grid-cols-4 gap-1.5 sm:gap-2 w-full px-1";
             killerBtn.innerHTML = activeKillers.map(p => {
                 const isSelected = window.v2App.tempElim.killerId === p.id;
@@ -10994,6 +11066,16 @@ const activeKillers = gameData.players.filter(p => p.isActive && (!v2State.elimi
             // 3. ★ 同步外界的主分数框 ★
             const mainScoreInput = document.querySelector(`.v2-score-input[data-id="${targetPid}"]`);
             const diagScoreInput = document.getElementById('elimInfoScoreInput');
+
+// 【小白修改区：如果是同时淘汰多人，隐藏分数输入框，让玩家在主界面各自输入】
+            const scoreAreaContainer = diagScoreInput.parentElement;
+            if (window.v2App.tempElim.players.length > 1) {
+                scoreAreaContainer.classList.add('hidden');
+                scoreAreaContainer.classList.remove('flex');
+            } else {
+                scoreAreaContainer.classList.remove('hidden');
+                scoreAreaContainer.classList.add('flex');
+            }
             
             // 把外部已填写的分数，复制到弹窗里显示
 // 【小白修改区：淘汰弹窗分数显示逻辑】
@@ -11377,14 +11459,16 @@ safeBind('elimInfoConfirmBtn', () => {
             let savedTime = window.v2App.tempElim.freezeTime !== undefined ? window.v2App.tempElim.freezeTime : (typeof trElapsedSeconds !== 'undefined' ? trElapsedSeconds : 0);
 
 window.v2App.tempElim.players.forEach(pid => {
-                // 把刚才系统给的“未设置方式”更新为你现在选好的死法和凶手
+                // 批量将你选好的死法和凶手，赋给这批同时被淘汰的人
                 v2State.eliminated[pid] = finalMethodName;
                 v2State.eliminationDetails[pid] = { killerId: window.v2App.tempElim.killerId, cards: 0, time: savedTime };
                 
-                // 分数同步回主面板
-                const mainScoreInput = document.querySelector(`.v2-score-input[data-id="${pid}"]`);
-                if (mainScoreInput) {
-                    mainScoreInput.value = finalScore;
+                // 分数同步回主面板（仅当弹窗里真的填了分数时才同步，防止把外面填好的独立分数抹掉）
+                if (finalScore !== '') {
+                    const mainScoreInput = document.querySelector(`.v2-score-input[data-id="${pid}"]`);
+                    if (mainScoreInput) {
+                        mainScoreInput.value = finalScore;
+                    }
                 }
             });
 
@@ -11455,9 +11539,11 @@ window.v2App.tempElim.players.forEach(pid => {
                      * ========================================================
                      */
                     let lastVictimId = null;
-                    if (v2State.eliminationEvents && v2State.eliminationEvents.length > 0) {
+if (v2State.eliminationEvents && v2State.eliminationEvents.length > 0) {
                         let lastGroup = v2State.eliminationEvents[v2State.eliminationEvents.length - 1];
-                        if (lastGroup.length === 1) lastVictimId = lastGroup[0];
+                        // 【核心逻辑重构】：无视最后这一批死的是1个人还是10个人！
+                        // 只要他们是一起死的，提取其中第一个人的死法来判断即可，不再设 length === 1 的前提条件！
+                        lastVictimId = lastGroup[0];
                     }
                     
                     if (lastVictimId && v2State.eliminationDetails && v2State.eliminationDetails[lastVictimId]) {
@@ -11651,6 +11737,11 @@ if(v2State.eliminated[pid]) {
                     const qBtn = document.getElementById('quickElimBtn');
                     qBtn.onclick = () => {
                         document.getElementById('v2DialogQuickElimOptions').classList.add('hidden');
+// 恢复单人淘汰的弹窗文本，防止被多人淘汰带头像的文本污染！
+                        const cBoxReset = document.getElementById('v2DialogQuickElimConfirm');
+                        const cTextReset = cBoxReset.querySelector('.bg-\\[\\#E11D48\\]');
+                        if(cTextReset) cTextReset.innerHTML = '确认淘汰此玩家？';
+
                         
 // 绑定 图2 中“确认”按钮的事件
                         const cBtn = document.getElementById('quickElimConfirmBtn');
@@ -11941,41 +12032,54 @@ const calcElem = document.getElementById('v2CalculateBtn');
                 const bloodBgColors =['#9c0a00', '#ba1b0f', '#d43024', '#eb483a', '#f5695d', '#fa8a82', '#ffaba6', '#ffcfcc'];
                 const bloodNames =['一血', '二血', '三血', '四血', '五血', '六血', '七血', '八血'];
 
-                // 渲染赢家卡片
+// =====================================================
+                // 【小白调节区：字体自适应缩放小工具】
+                // 防止数字公式太长撑爆屏幕！
+                // =====================================================
+                const getDynamicTextClass = (str) => {
+                    let len = str.length;
+                    if (len > 25) return 'text-[8px] sm:text-[9px]';
+                    if (len > 18) return 'text-[10px] sm:text-[11px]';
+                    return 'text-[12px] sm:text-[14px]'; // 默认大小
+                };
+
+                // ★ 渲染赢家卡片 (像素级复刻图5)
                 let wp = active.find(p => p.id === parseInt(winIdStr));
                 let winMethod = v2State.winMethod || '默认胜利';
                 let winImg = getMethodUrl(winMethod, 'win');
                 
+// 拼接赢家的加法公式 (修复版：去掉错误过滤，所有人都要给赢家送分)
+                let winFormulaStr = active.filter(p => p.id !== wp.id).map(p => {
+                    let pScore = scores[p.id] !== undefined ? scores[p.id] : 0;
+                    return Math.max(0, pScore - winnerScore);
+                }).join('+') + '=';
+                let winTextClass = getDynamicTextClass(winFormulaStr);
+
                 let html = `
-                <!-- 
-                  ========================================================
-                  【小白调节区：弹窗-赢家模块】
-                  [底色] bg-[#f0fdf4] 淡淡的绿色。
-                  [边框] border-[3px] border-[#5E4B8B] 紫色描边。
-                  ========================================================
-                -->
-                <div class="w-full bg-[#f0fdf4] border-[3px] border-[#5E4B8B] rounded-xl p-2 flex items-center gap-2 shadow-[0_3px_0_#5E4B8B] shrink-0">
-                    <div class="w-12 h-[72px] bg-[#111111] border-[2px] border-[#5E4B8B] rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
-                        <img src="${winImg}" class="w-full h-full object-contain" crossorigin="anonymous">
+                <!-- 【图5 像素级复刻：赢家绿色框】 -->
+                <div class="w-full bg-[#f0f9eb] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-2xl p-1.5 flex items-center gap-2 shadow-[0_3px_0_#5E4B8B] shrink-0">
+                    
+                    <div class="flex flex-col gap-1 w-[28%] shrink-0">
+                        <div class="bg-[#7bc365] border-[2px] border-[#5E4B8B] rounded-full text-white font-black text-center text-xs py-0.5 shadow-sm">赢家</div>
+                        <div class="border-[2px] border-[#5E4B8B] rounded-full flex items-center gap-1 p-0.5 shadow-sm bg-white">
+                            <div class="w-4 h-4 rounded-[4px] border-[1.5px] border-[#5E4B8B] overflow-hidden shrink-0"><img src="${wp.avatar}" class="w-full h-full object-cover"></div>
+                            <span class="font-black text-[12px] truncate" style="color: ${wp.color}; -webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">${wp.name.slice(-1)}</span>
+                        </div>
                     </div>
-                    <div class="flex-1 flex flex-col gap-1 min-w-0 justify-center">
-                        <div class="flex items-center gap-1.5">
-                            <div class="bg-[#4ADE80] border-[2px] border-[#5E4B8B] rounded-md px-1.5 text-white font-black text-[10px] whitespace-nowrap">赢家</div>
-                            <div class="flex items-center gap-1 border-[2px] border-[#5E4B8B] rounded-full px-2 py-0.5 bg-white shrink-0">
-                                <img src="${wp.avatar}" class="w-4 h-4 rounded-[4px] border-[1.5px] border-[#5E4B8B] object-cover">
-                                <span class="font-black text-[11px] truncate max-w-[60px]" style="color: ${wp.color}; -webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">${wp.name.slice(-1)}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between mt-0.5">
-                            <span class="text-[#5E4B8B] font-black text-[10px] truncate max-w-[50%]">${winMethod}</span>
-                            <span class="text-[#16a34a] font-black text-[18px] tracking-wider" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">+${changes[wp.id]}</span>
-                        </div>
+
+                    <div class="w-[22%] aspect-[2/3] bg-[#111111] border-[2.5px] border-[#1f8316] rounded-md overflow-hidden shrink-0 shadow-sm flex items-center justify-center">
+                        <img src="${winImg}" class="w-full h-full object-contain">
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-end justify-center min-w-0">
+                        <span class="font-black text-[#5E4B8B] ${winTextClass} truncate w-full text-right">${winFormulaStr}</span>
+                        <span class="font-black text-[#7bc365] text-xl sm:text-2xl tracking-wider" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">+${changes[wp.id]}</span>
                     </div>
                 </div>
                 `;
 
-                // 渲染淘汰者卡片 (按照一血先后顺序)
-                let elimOrder = [];
+                // ★ 渲染淘汰者卡片 (像素级复刻图4)
+                let elimOrder =[];
                 v2State.eliminationEvents.forEach(group => { group.forEach(id => elimOrder.push(id)); });
                 active.forEach(p => { if (v2State.eliminated[p.id] && !elimOrder.includes(p.id)) elimOrder.push(p.id); });
 
@@ -11992,46 +12096,42 @@ const calcElem = document.getElementById('v2CalculateBtn');
                         let bloodName = bIndex >= 0 ? bloodNames[bIndex] : '淘汰';
                         let bloodColor = bloodBgColors[Math.min(bIndex >= 0 ? bIndex : 0, bloodBgColors.length - 1)];
 
+                        // 拼接淘汰者的减法公式
+                        let pScore = scores[p.id] !== undefined ? scores[p.id] : 0;
+                        let loseFormulaStr = `${pScore}-${winnerScore}=`;
+                        let loseTextClass = getDynamicTextClass(loseFormulaStr);
+
                         html += `
-                        <!-- 
-                          ========================================================
-                          【小白调节区：弹窗-淘汰者模块】
-                          [底色] bg-[#fef2f2] 淡淡的粉红色。
-                          ========================================================
-                        -->
-                        <div class="w-full bg-[#fef2f2] border-[3px] border-[#5E4B8B] rounded-xl p-1.5 flex items-center gap-2 shadow-[0_3px_0_#5E4B8B] shrink-0">
-                            <!-- 黑底图片框与几血标签 -->
-                            <div class="w-10 h-[60px] bg-[#111111] border-[2px] border-[#5E4B8B] rounded-lg overflow-hidden shrink-0 flex items-center justify-center relative">
-                                <div class="absolute -top-1 -left-1 border-[1.5px] border-[#5E4B8B] rounded-sm px-1 py-0.5 z-10 scale-75 origin-top-left" style="background-color: ${bloodColor};">
-                                    <span class="text-white font-black text-[10px] leading-none">${bloodName}</span>
-                                </div>
-                                <img src="${loseImg}" class="w-full h-full object-contain" crossorigin="anonymous">
-                            </div>
+                        <!-- 【图4 像素级复刻：淘汰粉色框】 -->
+                        <div class="w-full bg-[#fceceb] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-2xl p-1.5 flex items-center gap-2 shadow-[0_3px_0_#5E4B8B] shrink-0">
                             
-                            <div class="flex-1 flex items-center justify-between min-w-0 pr-1">
-                                <div class="flex flex-col min-w-0 justify-center">
-                                    <div class="flex items-center gap-1 border-[2px] border-[#5E4B8B] rounded-full px-1.5 py-0.5 bg-white w-fit">
-                                        <img src="${p.avatar}" class="w-3 h-3 rounded-[3px] border-[1.5px] border-[#5E4B8B] object-cover">
-                                        <span class="font-black text-[10px] truncate max-w-[45px]" style="color: ${p.color}; -webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
-                                    </div>
-                                    <span class="text-[#5E4B8B] font-black text-[9px] mt-1 truncate max-w-[85px]">${method}</span>
+                            <div class="flex flex-col gap-1 w-[28%] shrink-0">
+                                <div class="border-[2px] border-[#5E4B8B] rounded-full text-white font-black text-center text-xs py-0.5 shadow-sm text-stroke" style="background-color: ${bloodColor}; -webkit-text-stroke: 0.5px #800000; paint-order: stroke fill;">${bloodName}</div>
+                                <div class="border-[2px] border-[#5E4B8B] rounded-full flex items-center gap-1 p-0.5 shadow-sm" style="background-color: ${hexToRgba(p.color, 0.4)};">
+                                    <div class="w-4 h-4 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-white overflow-hidden shrink-0"><img src="${p.avatar}" class="w-full h-full object-cover"></div>
+                                    <span class="font-black text-white text-[12px] truncate text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
                                 </div>
-                                <!-- 扣分数字 -->
-                                <span class="text-[#dc2626] font-black text-[16px] tracking-wider" style="-webkit-text-stroke: 1px #5E4B8B; paint-order: stroke fill;">${changes[p.id]}</span>
+                            </div>
+
+                            <div class="w-[22%] aspect-[2/3] bg-[#111111] border-[2.5px] border-[#800000] rounded-md overflow-hidden shrink-0 shadow-sm flex items-center justify-center">
+                                <img src="${loseImg}" class="w-full h-full object-contain">
+                            </div>
+
+                            <div class="flex-1 flex flex-col items-end justify-center min-w-0">
+                                <!-- 蓝紫色的数学公式 -->
+                                <span class="font-black text-[#606a9f] ${loseTextClass} truncate w-full text-right">${loseFormulaStr}</span>
+                                <!-- 鲜红色的最终得分 -->
+                                <span class="font-black text-[#e5004f] text-xl sm:text-2xl tracking-wider">${changes[p.id]}</span>
                             </div>
                         </div>
                         `;
                     });
                 }
 
-                // 如果 DOM 里没有这个弹窗，动态将它插入页面底部
+// 如果 DOM 里没有这个弹窗，动态将它插入页面底部
                 let dialogBox = document.getElementById('v2DialogFinalCalcConfirm');
                 if (!dialogBox) {
                     const boxHtml = `
-                    <!-- 
-                      【小白调节区：弹窗外层大边框】
-                      如果你想要弹窗呼吸发光，可以把 className 里的 hidden 后面空一格加上：magic-glow 
-                    -->
                     <div id="v2DialogFinalCalcConfirm" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
                         <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-3 sm:p-4 max-w-[340px] w-[95%] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-3 max-h-[85vh]">
                             <div class="bg-[#F59E0B] border-[3px] border-[#5E4B8B] rounded-2xl py-1.5 px-6 font-black text-white text-lg shadow-sm w-[85%] text-center tracking-widest text-stroke shrink-0">确认本局结算</div>
@@ -12039,9 +12139,15 @@ const calcElem = document.getElementById('v2CalculateBtn');
                             <!-- 滑动展示区 -->
                             <div id="finalCalcConfirmContent" class="w-full flex flex-col gap-2 overflow-y-auto custom-scroll pr-1 py-1"></div>
 
-                            <div class="flex justify-between gap-3 w-full px-1 mt-1 shrink-0">
+                            <!-- 主机专用的确认/取消按钮 -->
+                            <div id="hostFinalBtns" class="flex justify-between gap-3 w-full px-1 mt-1 shrink-0">
                                 <button id="finalCalcOkBtn" class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">确认结算</button>
                                 <button id="finalCalcCancelBtn" class="flex-1 bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-xl active:translate-y-1 active:shadow-none hover:brightness-110 shadow-[0_4px_0_#5E4B8B] tracking-widest transition-all">返回修改</button>
+                            </div>
+                            
+                            <!-- 副机专用的等待提示 -->
+                            <div id="clientWaitingTips" class="hidden w-full bg-[#E2E8F0] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-[#5E4B8B] text-center shadow-inner tracking-widest mt-1 flex items-center justify-center">
+                                <i class="fa-solid fa-spinner fa-spin mr-2"></i>等待主机确认中...
                             </div>
                         </div>
                     </div>`;
@@ -12056,16 +12162,37 @@ const calcElem = document.getElementById('v2CalculateBtn');
                 
                 if (contentBox && dialogBox) {
                     contentBox.innerHTML = html;
+                    
+                    // 确保主机显示的是按钮而不是等待提示
+                    document.getElementById('hostFinalBtns').classList.remove('hidden');
+                    document.getElementById('clientWaitingTips').classList.add('hidden');
+                    
                     dialogBox.classList.remove('hidden');
+
+                    // 【核心魔法：将画好的结算弹窗 HTML 实时投射到副机屏幕上！】
+                    if (typeof myRole !== 'undefined' && myRole === 'host' && typeof mqttClient !== 'undefined' && mqttClient) {
+                        mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({
+                            action: 'SHOW_CALC_CONFIRM',
+                            htmlContent: html
+                        }));
+                    }
 
                     // 【按钮事件：取消】
                     cancelBtn.onclick = () => {
                         dialogBox.classList.add('hidden');
+                        // 告诉副机：主机取消了，把你们的弹窗也关掉
+                        if (typeof myRole !== 'undefined' && myRole === 'host' && typeof mqttClient !== 'undefined' && mqttClient) {
+                            mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({ action: 'HIDE_CALC_CONFIRM' }));
+                        }
                     };
 
                     // 【按钮事件：确认入库】
                     okBtn.onclick = () => {
                         dialogBox.classList.add('hidden');
+                        // 告诉副机：主机点确认了，准备迎接数据风暴吧！
+                        if (typeof myRole !== 'undefined' && myRole === 'host' && typeof mqttClient !== 'undefined' && mqttClient) {
+                            mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({ action: 'HIDE_CALC_CONFIRM' }));
+                        }
 
                         // 真正入库！
                         gameData.rounds.push({
@@ -12917,29 +13044,39 @@ window.nlHideLobby();
                     mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify(syncData));
                 }
 
-                // 【情景 B】副机接住了主机砸过来的全量数据！
+// 【情景 B】副机接住了主机砸过来的全量数据！
                 if (payload.action === 'FULL_SYNC_DATA' && myRole === 'client') {
                     // 1. 覆盖本地数据
                     gameData = payload.gameData;
                     if(payload.v2State) v2State = payload.v2State;
                     saveData(); // 存入本地缓存
 
-                    // 2. 界面切换：隐藏输入框，显示【选座界面】
-                    document.getElementById('nlJoinMenu').classList.add('hidden');
-                    document.getElementById('nlJoinMenu').classList.remove('flex');
-                    document.getElementById('nlSeatMenu').classList.remove('hidden');
-                    document.getElementById('nlSeatMenu').classList.add('flex');
+                    // 【Bug修复核心】：判断当前是否已经选座
+                    if (mySeatId === null) {
+                        // 如果还没入座，说明是刚加入房间：显示【选座界面】
+                        document.getElementById('nlJoinMenu').classList.add('hidden');
+                        document.getElementById('nlJoinMenu').classList.remove('flex');
+                        document.getElementById('nlSeatMenu').classList.remove('hidden');
+                        document.getElementById('nlSeatMenu').classList.add('flex');
 
-                    // 3. 用收到的数据，画出全场玩家头像供副机选择
-                    const seatGrid = document.getElementById('nlSeatGrid');
-                    seatGrid.innerHTML = gameData.players.filter(p => p.isActive).map(p => `
-                        <div onclick="window.nlSelectSeat(${p.id})" class="flex flex-col items-center border-[3px] border-[#5E4B8B] rounded-xl py-2 shadow-sm cursor-pointer active:scale-95 transition-transform bg-white">
-                            <div class="w-10 h-10 rounded-[6px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden mb-1">
-                                <img src="${p.avatar}" class="w-full h-full object-cover">
+                        // 3. 用收到的数据，画出全场玩家头像供副机选择
+                        const seatGrid = document.getElementById('nlSeatGrid');
+                        seatGrid.innerHTML = gameData.players.filter(p => p.isActive).map(p => `
+                            <div onclick="window.nlSelectSeat(${p.id})" class="flex flex-col items-center border-[3px] border-[#5E4B8B] rounded-xl py-2 shadow-sm cursor-pointer active:scale-95 transition-transform bg-white">
+                                <div class="w-10 h-10 rounded-[6px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden mb-1">
+                                    <img src="${p.avatar}" class="w-full h-full object-cover">
+                                </div>
+                                <span class="font-black text-[15px]" style="color: ${p.color}; -webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
                             </div>
-                            <span class="font-black text-[15px]" style="color: ${p.color}; -webkit-text-stroke: 0.5px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
-                        </div>
-                    `).join('');
+                        `).join('');
+                    } else {
+                        // 【如果已经在座位上（游戏中）】：收到新数据立刻全屏疯狂刷新！！！
+                        gameData.currentSessionIndex = -1; // 强制回到全局视角
+                        if(typeof updateViewRounds === 'function') updateViewRounds();
+                        if(typeof recalculateStats === 'function') recalculateStats();
+                        if(typeof updateAllUI === 'function') updateAllUI();
+                        if(typeof renderV2ScoreArea === 'function') renderV2ScoreArea();
+                    }
                 }
                 
                 // --- 下方预留空位：下一步处理战斗中的增量同步操作 ---
@@ -13106,6 +13243,45 @@ const earlyBtn = document.getElementById('earlyWinBtn');
 
                 if (payload.action === 'GAME_CALCULATED' && myRole === 'client') {
                     mqttClient.publish(`uno_room_${roomCode}`, JSON.stringify({ action: 'REQ_FULL_SYNC' }));
+                }
+
+// 【新增】：副机接收主机发来的结算确认弹窗，并投影在自己的屏幕上
+                if (payload.action === 'SHOW_CALC_CONFIRM' && myRole === 'client') {
+                    let dialogBox = document.getElementById('v2DialogFinalCalcConfirm');
+                    if (!dialogBox) {
+                        const boxHtml = `
+                        <div id="v2DialogFinalCalcConfirm" class="fixed inset-0 bg-[#5E4B8B]/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+                            <div class="bg-[#FEFCE8] border-[4px] border-[#5E4B8B] rounded-[1.5rem] p-3 sm:p-4 max-w-[340px] w-[95%] mx-4 shadow-[0_8px_0_rgba(94,75,139,0.5)] flex flex-col items-center gap-3 max-h-[85vh]">
+                                <div class="bg-[#F59E0B] border-[3px] border-[#5E4B8B] rounded-2xl py-1.5 px-6 font-black text-white text-lg shadow-sm w-[85%] text-center tracking-widest text-stroke shrink-0">确认本局结算</div>
+                                <div id="finalCalcConfirmContent" class="w-full flex flex-col gap-2 overflow-y-auto custom-scroll pr-1 py-1"></div>
+                                <div id="hostFinalBtns" class="flex justify-between gap-3 w-full px-1 mt-1 shrink-0 hidden">
+                                    <button id="finalCalcOkBtn" class="flex-1 bg-[#4ADE80] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-xl shadow-[0_4px_0_#5E4B8B] tracking-widest">确认结算</button>
+                                    <button id="finalCalcCancelBtn" class="flex-1 bg-[#E11D48] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-white text-stroke text-xl shadow-[0_4px_0_#5E4B8B] tracking-widest">返回修改</button>
+                                </div>
+                                <div id="clientWaitingTips" class="w-full bg-[#E2E8F0] border-[3px] border-[#5E4B8B] rounded-xl py-2 font-black text-[#5E4B8B] text-center shadow-inner tracking-widest mt-1 flex items-center justify-center">
+                                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>等待主机确认中...
+                                </div>
+                            </div>
+                        </div>`;
+                        document.body.insertAdjacentHTML('beforeend', boxHtml);
+                        dialogBox = document.getElementById('v2DialogFinalCalcConfirm');
+                    }
+                    const contentBox = document.getElementById('finalCalcConfirmContent');
+                    if (contentBox) contentBox.innerHTML = payload.htmlContent; // 完美镜像主机的画面！
+                    
+                    // 副机只能看，不能点：隐藏按钮，显示等待转圈圈
+                    const hostBtns = document.getElementById('hostFinalBtns');
+                    const clientTips = document.getElementById('clientWaitingTips');
+                    if (hostBtns) hostBtns.classList.add('hidden');
+                    if (clientTips) clientTips.classList.remove('hidden');
+                    
+                    dialogBox.classList.remove('hidden');
+                }
+
+                // 【新增】：副机接收主机取消或确认完毕后，隐藏弹窗
+                if (payload.action === 'HIDE_CALC_CONFIRM' && myRole === 'client') {
+                    const dialogBox = document.getElementById('v2DialogFinalCalcConfirm');
+                    if (dialogBox) dialogBox.classList.add('hidden');
                 }
 
             } catch (e) {}
