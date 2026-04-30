@@ -533,8 +533,11 @@
 <div id="detailDataStickyHeader" class="sticky top-[70px] sm:top-[70px] z-[90] mb-2 w-[calc(100%+8px)] -ml-1 hidden transition-all duration-300" style="order: -1;">
     <div class="bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.5rem] p-1 sm:p-1.5 flex gap-1 justify-between cursor-pointer active:scale-95 transition-all shadow-[0_3px_0_#5E4B8B]" onclick="openSessionModal()">
         <div id="ddRoundLabel" class="bg-[#e11d48] border-[2px] sm:border-[3px] border-[#5E4B8B] text-white rounded-full px-3 py-1 text-[11px] sm:text-sm font-black flex items-center justify-center min-w-[50px] shrink-0">ALL</div>
-        <div id="ddDateLabel" class="bg-[#93c5fd] border-[2px] sm:border-[3px] border-[#5E4B8B] text-[#5E4B8B] rounded-full px-3 py-1 text-[11px] sm:text-sm font-black flex items-center justify-center min-w-[65px] shrink-0 text-white">260214</div>
+        <div id="ddDateLabel" class="bg-[#389ff5] border-[2px] sm:border-[3px] border-[#5E4B8B] text-[#5E4B8B] rounded-full px-3 py-1 text-[11px] sm:text-sm font-black flex items-center justify-center min-w-[65px] shrink-0 text-white">260214</div>
         <div id="ddRangeLabel" class="bg-[#fefce8] border-[2px] sm:border-[3px] border-[#5E4B8B] text-[#5E4B8B] rounded-full px-2 py-1 text-[11px] sm:text-sm font-black flex-1 flex items-center justify-center text-center truncate">第001~129局</div>
+        
+        <!-- 【新增：总局数胶囊 (绿底白字)】 -->
+        <div id="ddTotalLabel" class="bg-[#eb6100] border-[2px] sm:border-[3px] border-[#5E4B8B] text-white rounded-full px-2 sm:px-3 py-1 text-[11px] sm:text-sm font-black flex items-center justify-center shrink-0">总:0局</div>
     </div>
 </div>
 
@@ -556,7 +559,7 @@
 <!-- ======================================================== -->
 <!-- 【优化版】最新战况区域 (图1 1:1 像素复刻) 开始 -->
 <!-- ======================================================== -->
-        <section id="latestStatusSection" class="kawaii-card p-4 sm:p-5 mb-6 bg-[#FEFCE8]" style="order: 0;">
+        <section id="latestStatusSection" class="bg-white/65 border-[3px] sm:border-4 border-[#5E4B8B] rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-4 shadow-[0_4px_0_#5E4B8B] mb-6">
             <div class="flex flex-col items-center w-full relative">
                 
 
@@ -602,14 +605,28 @@
 <!-- ======================================================== -->
 
     <!-- 下半部：被融合进来的 ROUND 动态条区域 -->
-    <div id="barSection" class="bg-white border-[3px] sm:border-4 border-[#5E4B8B] rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-4 shadow-[0_4px_0_#5E4B8B]">
-        <!-- 动态条标题 -->
-        <div class="flex justify-center mb-3">
-            <div class="bg-[#FEFCE8] border-[3px] sm:border-4 border-[#5E4B8B] rounded-full px-6 py-1 sm:py-1.5 shadow-[0_3px_0_#5E4B8B]">
-                <span class="font-black text-[#5E4B8B] text-base sm:text-xl tracking-widest leading-none">总局数 <span id="currentRoundBar"></span></span>
+    <div id="barSection" class="bg-white/65 border-[3px] sm:border-4 border-[#5E4B8B] rounded-[1.5rem] sm:rounded-[2rem] p-3 sm:p-4 shadow-[0_4px_0_#5E4B8B]">
+<!-- 动态条标题 (全新三胶囊拆分版 + 总耗时) -->
+        <div class="flex flex-col items-center justify-center w-full px-1 mb-3 sm:mb-4 gap-2">
+            <!-- 顶排：原三胶囊 -->
+            <div class="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 max-w-[320px] w-full cursor-pointer hover:brightness-105 active:scale-95 transition-all" onclick="if(typeof openSessionModal === 'function') openSessionModal()">
+                <!-- 第一个：日期 (蓝底白字) -->
+                <div id="barDateLabel" class="bg-[#389ff5] border-[2.5px] border-[#5E4B8B] text-white rounded-full px-2 sm:px-3 py-1 text-[15px] sm:text-xs font-black shadow-[0_3px_0_#5E4B8B] shrink-0">ALL</div>
+                <!-- 第二个：第几局到第几局 (黄底紫字) -->
+                <div id="barRangeLabel" class="bg-[#fefce8] border-[2.5px] border-[#5E4B8B] text-[#5E4B8B] rounded-full px-2 sm:px-3 py-1 text-[20px] sm:text-xs font-black shadow-[0_3px_0_#5E4B8B] flex-1 text-center truncate">第0局</div>
+                <!-- 第三个：总局数 (红底白字) -->
+                <div id="barTotalLabel" class="bg-[#e11d48] border-[2.5px] border-[#5E4B8B] text-white rounded-full px-2 sm:px-3 py-1 text-[15px] sm:text-xs font-black shadow-[0_3px_0_#5E4B8B] shrink-0">总:0局</div>
+            </div>
+            
+            <!-- 底排：全新区间总耗时胶囊 (图1红框要求) -->
+            <!-- 
+              [颜色] bg-[#e2e8f0] 浅灰底色
+              [文字] font-leslie 电子屏幕专用字体，增强时间的高级感 
+            -->
+            <div class="bg-[#e2e8f0] border-[2px] border-[#5E4B8B] text-[#5E4B8B] rounded-full px-4 py-0.5 text-[10px] sm:text-xs font-black shadow-[0_2px_0_#5E4B8B] flex items-center justify-center gap-1 opacity-90">
+                <i class="fa-solid fa-stopwatch"></i> 耗时 <span id="barTotalTimeLabel" class="font-leslie tracking-widest text-[12px] sm:text-[14px] translate-y-[1px]">00:00</span>
             </div>
         </div>
-        <!-- 排行榜本体 -->
         <div class="space-y-3 sm:space-y-5" id="barRanking"></div>
     </div>
 
@@ -622,17 +639,29 @@
     <!-- 顶部：粘性局次控制台 (复用系统的组件，这里我们放个占位标识即可，底层JS会把真控制台吸附过来) -->
     <div class="w-full h-[0px] mb-0 pointer-events-none"></div>
 
-    <!-- 【全新拆分】：容器 1-1：显示当前播放到的局数 (独立悬浮在白框上方) -->
-    <!-- [底色] bg-[#389ff5] 蓝色底色，文字白色 text-white -->
-    <div class="flex justify-center mb-3 sm:mb-4 z-20 relative w-full">
-        <div class="bg-[#389ff5] border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[0.8rem] px-8 py-1.5 shadow-[0_4px_0_#5E4B8B]">
-            <span id="ddPlayRoundText" class="font-black text-white text-[20px] sm:text-[24px] tracking-widest leading-none drop-shadow-sm">第000局</span>
+<!-- 【全新升级：仪表盘控制台 (中间黄底跳动局数，定宽防抖版)】 -->
+    <div class="flex items-center justify-center gap-1.5 sm:gap-3 mb-3 sm:mb-4 z-20 relative w-full px-1">
+        
+        <!-- 左侧：日期保持不动 [粉底白字] -->
+        <div id="ddDateCapsule" class="bg-[#e5004f] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-2 sm:px-4 py-0.4 sm:py-1.5 shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] shrink-0 opacity-0 transition-opacity">
+            <span id="ddDateText" class="font-black text-white text-[11px] sm:text-[14px] tracking-widest leading-none drop-shadow-sm text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">260214</span>
+        </div>
+
+        <!-- 中间：总进度局数 (图1红框要求) [黄底紫字] -->
+        <!-- 【防抖动魔法】：w-[60px] sm:w-[75px] 固定了它的死宽度，留足3位数字余量，就算从总9局变成总10局，长度也不会左右伸缩！ -->
+        <div id="ddTotalCapsule" class="bg-[white] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full py-1 sm:py-1.5 shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] shrink-0 opacity-0 transition-opacity w-[120px] sm:w-[75px] flex justify-center items-center">
+            <span id="ddTotalText" class="font-black text-[#5E4B8B] text-[20px] sm:text-[14px] tracking-widest leading-none drop-shadow-sm">1局</span>
+        </div>
+
+        <!-- 右侧：固定区间 (图1要求不再跳动) [蓝底白字加强描边] -->
+        <div class="bg-[#389ff5] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-full px-2 sm:px-6 py-1 sm:py-1.5 shadow-[0_3px_0_#5E4B8B] sm:shadow-[0_4px_0_#5E4B8B] flex-1 max-w-[130px] sm:max-w-[200px] flex justify-center items-center truncate">
+            <span id="ddPlayRoundText" class="font-black text-white text-[14px] sm:text-[18px] tracking-widest leading-none drop-shadow-sm text-stroke truncate" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">第000~000局</span>
         </div>
     </div>
 
     <!-- 核心大容器 (白底紫边) -->
     <!-- [高度自适应] 稍微减少了一点高度分配，保证不遮挡底部 -->
-    <div class="bg-[white] border-[4px] border-[#5E4B8B] rounded-[1rem] w-full flex flex-col shadow-[0_6px_0_#5E4B8B] relative overflow-hidden" style="height: calc(100dvh - 410px); min-height: 400px;">
+    <div class="bg-[white]/50 border-[4px] border-[#5E4B8B] rounded-[1rem] w-full flex flex-col shadow-[0_6px_0_#5E4B8B] relative overflow-hidden" style="height: calc(100dvh - 410px); min-height: 400px;">
         
         <!-- 容器 1-2：玩家数据动态可视化画板 -->
         <!-- mt-2 取代了以前硬留的 mt-[60px] 顶部空白 -->
@@ -1261,7 +1290,7 @@
 </section>
 
 <!-- 【图1像素级复刻】奖杯荣誉墙 -->
-        <section id="badgeSection" class="bg-[#FDFCE6] border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 sm:p-5 mb-8 flex flex-col items-center shadow-[0_4px_0_#5E4B8B]">
+        <section id="badgeSection" class="bg-white/65 border-[4px] border-[#5E4B8B] rounded-[2rem] p-4 sm:p-5 mb-8 flex flex-col items-center shadow-[0_4px_0_#5E4B8B]">
             
 <!-- 【修复红框】顶部标题胶囊，缩窄居中 + 金光特效 -->
             <!-- 小白调节区：px-8 控制胶囊长短，shiny-gold 呼叫了刚刚写的金光特效 -->
@@ -1299,7 +1328,27 @@
                 </div>
 
             </div>
+
+<!-- ======================================================== -->
+            <!-- ★ 【新增】：个人荣誉履历区域 ★ -->
+            <!-- ======================================================== -->
             
+            <!-- 玩家个人奖杯履历分割线与标题 -->
+            <div class="w-full flex items-center justify-center gap-3 mt-6 sm:mt-8 mb-4 px-2">
+                <div class="h-[3px] flex-1 bg-[#5E4B8B]/20 rounded-full"></div>
+                <!-- 
+                  【小白调节区：分隔标题胶囊】
+                  [颜色] bg-[#A3D977] 绿色底色
+                  [动画] transform -rotate-2 稍微倾斜，增加动感
+                -->
+                <div class="bg-[#A3D977] border-[3px] border-[#5E4B8B] rounded-full px-5 py-1 shadow-[0_3px_0_#5E4B8B] flex items-center justify-center transform -rotate-2">
+                    <span class="font-black text-white text-sm sm:text-base tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">个人荣誉履历</span>
+                </div>
+                <div class="h-[3px] flex-1 bg-[#5E4B8B]/20 rounded-full"></div>
+            </div>
+            
+            <!-- 动态卡片容器：JS 引擎会将每个玩家的专属奖杯统计卡片画进这里 -->
+            <div id="playerTrophyStatsContainer" class="w-full flex flex-col gap-4 sm:gap-5 pb-2"></div>            
     
         </section>
 
@@ -3279,6 +3328,10 @@ function renderSessionSelectorUI() {
 
             sfRange.textContent = rangeStr;
             if (sfSessionIndex) sfSessionIndex.textContent = sessionIndexStr;
+// 【新增：给粘性栏的总局数赋值 (使用当前过滤出的 viewRounds 的长度)】
+            const ddTotal = document.getElementById('ddTotalLabel');
+            if (ddTotal) ddTotal.textContent = `总 ${viewRounds.length} 局`;
+ 
 
             // 【核心优化】动态调整右上角数字大小，坚决不换行
             let len = rangeStr.length;
@@ -5913,6 +5966,151 @@ let scrollAccumulator = 0; // 【新增】用来积攒小数，实现慢速滚�
                         if (wrapper.scrollLeft >= grid1.offsetWidth + 6) { 
                             wrapper.scrollLeft = 0;
                         }
+// ==========================================
+            // 🏆 第五阶段：玩家个人奖杯履历卡片生成
+            // ==========================================
+            let playerStats = active.map(p => {
+                let stats = { SSS:0, SS:0, S:0, A:0, B:0, C:0, D:0 };
+                let total = 0;
+                let earnedBadges =[];
+
+                badgeDefs.forEach(b => {
+                    if (unlockedBadges[b.id] && unlockedBadges[b.id].has(p.id)) {
+                        stats[b.rarity] = (stats[b.rarity] || 0) + 1;
+                        total++;
+                        earnedBadges.push(b);
+                    }
+                });
+
+                // 将赢得的奖杯按稀有度从高到低排序 (SSS > SS > S ...)
+                earnedBadges.sort((a, b) => raritySortMap[b.rarity] - raritySortMap[a.rarity]);
+                return { p, stats, total, earnedBadges };
+            });
+
+            // 排序法则：总数降序 -> SSS数量 -> SS数量 -> ...
+            playerStats.sort((a, b) => {
+                if (b.total !== a.total) return b.total - a.total;
+                if (b.stats.SSS !== a.stats.SSS) return b.stats.SSS - a.stats.SSS;
+                if (b.stats.SS !== a.stats.SS) return b.stats.SS - a.stats.SS;
+                if (b.stats.S !== a.stats.S) return b.stats.S - a.stats.S;
+                return 0;
+            });
+
+            const statsContainer = document.getElementById('playerTrophyStatsContainer');
+            if (statsContainer) {
+                let validPlayers = playerStats.filter(ps => ps.total > 0);
+                if (validPlayers.length === 0) {
+                    statsContainer.innerHTML = '<div class="text-center text-[#5E4B8B] font-bold text-sm bg-white border-[3px] border-[#5E4B8B] rounded-xl py-4 opacity-70">暂无玩家获得奖杯</div>';
+                } else {
+                    statsContainer.innerHTML = validPlayers.map(ps => {
+                        let rarities =['SSS', 'SS', 'S', 'A', 'B', 'C', 'D'];
+                        let barHtml = '';
+                        let statTextHtml = '';
+                        
+                        // 1. 拆解生成进度条和文字统计方块
+                        rarities.forEach(r => {
+                            if (ps.stats[r] > 0) {
+                                let count = ps.stats[r];
+                                let pct = ((count / ps.total) * 100).toFixed(1) + '%';
+                                let color = rarityColors[r] || '#ccc';
+                                
+                                // 色彩进度条片段
+                                barHtml += `<div class="h-full border-r-[1.5px] border-[#5E4B8B] last:border-r-0" style="width: ${pct}; background-color: ${color};"></div>`;
+                                
+                                // 数据统计小方块
+                                statTextHtml += `
+                                <div class="flex flex-col items-center justify-center p-1 sm:p-1.5 border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-lg bg-[#f8fafc] shadow-sm flex-1 min-w-[40px] sm:min-w-[48px]">
+                                    <span class="font-black text-[10px] sm:text-[11px] leading-none mb-1 text-stroke tracking-tighter" style="-webkit-text-stroke: 0.5px #5E4B8B; color: ${color}; paint-order: stroke fill;">${r}</span>
+                                    <span class="font-black text-[#E11D48] text-[14px] sm:text-[16px] leading-none mb-1 drop-shadow-sm">${count}</span>
+                                    <div class="bg-white border-[1.5px] border-[#5E4B8B] rounded-full px-1 py-[1px] w-full text-center flex items-center justify-center mt-0.5">
+                                        <span class="font-bold text-[#5E4B8B] text-[8px] sm:text-[9px] leading-none transform scale-90 whitespace-nowrap">${pct}</span>
+                                    </div>
+                                </div>`;
+                            }
+                        });
+
+// 2. 奖杯图标展示柜 (搭载点击弹窗魔法)
+                        let badgesListHtml = ps.earnedBadges.map(b => {
+                            let rColor = rarityColors[b.rarity] || '#10B981';
+                            // 增加 badge-item 和 data-id，完美保留点击直接弹超大详细信息的功能！
+                            return `
+                            <!-- 
+                              ========================================================
+                              【小白调节区：履历内的豪华版奖杯卡片】
+                              [尺寸] w-[65px] sm:w-[80px]：控制卡片的宽窄。
+                              [色彩] 上半部 bg-[white]，下半部 bg-[#ffe788]。[特效] hover:scale-105：鼠标悬停微微放大。
+                              ========================================================
+                            -->
+                            <div class="flex flex-col w-[65px] sm:w-[80px] shrink-0 cursor-pointer badge-item hover:scale-105 transition-transform mt-1" data-id="${b.id}">
+                                <!-- 上半部分：图标 + 标题 -->
+                                <div class="relative w-full bg-[white] border-[3px] sm:border-[3.5px] border-[#5E4B8B] rounded-t-[0.6rem] sm:rounded-t-[0.8rem] rounded-b-sm flex flex-col items-center justify-center p-1 sm:p-1.5 z-10">
+                                    <!-- 悬浮级别标 -->
+                                    <div class="absolute -top-2.5 -left-2 px-1 py-0.5 rounded-md font-black text-[9px] sm:text-[10px] text-white border-[2px] sm:border-[2.5px] border-[#5E4B8B] leading-none shadow-[0_2px_0_#aa6c00] tracking-tighter" style="background-color: ${rColor};">${b.rarity}</div>
+                                    
+                                    <i class="fa-solid ${b.icon} text-xl sm:text-3xl mb-0.5 mt-1 sm:mt-1.5 text-stroke pointer-events-none" style="color: ${b.color};"></i>
+                                    <div class="font-black text-[7px] sm:text-[9px] text-[#5E4B8B] truncate w-[110%] text-center leading-none tracking-tighter pointer-events-none transform scale-90">${b.name}</div>
+                                </div>
+                                <!-- 下半部分：动态等高描述 -->
+                                <div class="w-full bg-[#ffe788] border-[2.5px] sm:border-[3px] border-[#5E4B8B] shadow-[0_3px_0_#aa6c00] border-t-0 rounded-b-[0.6rem] sm:rounded-b-[0.8rem] p-1 flex-grow flex items-center justify-center -mt-1 pt-1.5 pointer-events-none">
+                                    <div class="font-bold text-[7px] sm:text-[8px] text-[#5E4B8B] text-center leading-tight break-words tracking-tighter">${b.desc}</div>
+                                </div>
+                            </div>`;
+                        }).join('');
+
+                        // 3. 组装玩家的独立数据卡片
+                        return `
+                        <!-- 
+                          ========================================================
+                          【小白调节区：个人奖杯履历大卡片】
+                          [底色与边框] bg-white 白底, border-[3px] 深紫粗边
+                          [阴影] shadow-[0_4px_0_#5E4B8B] 厚重立体底座
+                          ========================================================
+                        -->
+                        <div class="w-full bg-white border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] p-2 sm:p-3 flex flex-col gap-2 sm:gap-2.5 shadow-[0_4px_0_#5E4B8B]">
+                            
+                            <!-- 头部栏：头像、名字、百分比彩虹条、总计 -->
+                            <div class="flex items-center gap-1.5 sm:gap-2 w-full">
+                                <!-- 玩家胶囊 -->
+                                <div class="flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:py-1 rounded-full border-[2px] sm:border-[2.5px] border-[#5E4B8B] shadow-[0_2px_0_#5E4B8B] shrink-0" style="background-color: ${ps.p.color};">
+                                    <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shrink-0">
+                                        <img src="${ps.p.avatar}" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="font-black text-white text-[12px] sm:text-[14px] tracking-widest text-stroke leading-none pb-[1px]" style="-webkit-text-stroke: 1px #5E4B8B;">${ps.p.name.slice(-1)}</span>
+                                </div>
+                                
+                                <!-- 比例彩虹条 -->
+                                <div class="flex-1 h-3 sm:h-4 bg-gray-200 border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-full overflow-hidden flex shadow-inner mx-0.5">
+                                    ${barHtml}
+                                </div>
+                                
+                                <!-- 总数红标胶囊 -->
+                                <div class="bg-[#FEFCE8] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-full px-2 py-1 font-black text-[#5E4B8B] text-[10px] sm:text-xs shadow-[0_2px_0_#5E4B8B] shrink-0 whitespace-nowrap flex items-center justify-center leading-none">
+                                    共<span class="text-[#E11D48] text-[14px] sm:text-[16px] mx-0.5 translate-y-[0.5px]">${ps.total}</span>个
+                                </div>
+                            </div>
+
+                            <!-- 类别统计网格 -->
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2 w-full px-0.5 mt-0.5">
+                                ${statTextHtml}
+                            </div>
+
+                            <!-- 具体获得的卡牌展示柜 -->
+                            <!-- 
+                              【小白调节区：大相框】
+                              max-h-[240px] 稍微加高了内部视窗，防止卡片被挡住太多！
+                              gap-2 sm:gap-3 增加了卡片之间的距离，看起来绝不拥挤。
+                            -->
+                            <div class="w-full bg-[#E2E8F0] border-[2px] sm:border-[2.5px] border-[#5E4B8B] rounded-[8px] p-2 sm:p-3 shadow-inner mt-0.5">
+                                <div class="flex flex-wrap gap-2 sm:gap-3 max-h-[240px] overflow-y-auto custom-scroll pr-1 py-1 pl-1">
+                                    ${badgesListHtml}
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+
+                }
+            }
                     }
                     window.badgeScrollTimer = requestAnimationFrame(playScroll);
                 };
@@ -6409,9 +6607,50 @@ pointLabels: {
             });
         }
 
-        function renderBarRanking() {
+     
+function renderBarRanking() {
             const active = gameData.players.filter(p => p.isActive).sort((a,b) => b.total - a.total);
-            els.currentRoundBar.textContent = viewRounds.length || 0;
+            
+            // 【全新：动态条三胶囊 + 总耗时 注入引擎】
+            const barDateLbl = document.getElementById('barDateLabel');
+            const barRangeLbl = document.getElementById('barRangeLabel');
+            const barTotalLbl = document.getElementById('barTotalLabel');
+            const barTimeLbl = document.getElementById('barTotalTimeLabel'); // 抓取新胶囊
+            
+            if (barDateLbl && barRangeLbl && barTotalLbl) {
+                let sDate = "ALL";
+                let sRange = "第0局"; 
+                let sTotal = "总:0局";
+                let totalElapsed = 0; // 累计耗时容器
+                
+                // 只有当有游戏记录时才去计算
+                if (viewRounds && viewRounds.length > 0) {
+                    let firstRound = viewRounds[0].round;
+                    let lastRound = viewRounds[viewRounds.length - 1].round;
+                    
+                    sRange = `第${firstRound}~${lastRound}局`;
+                    sTotal = `总:${viewRounds.length}局`;
+                    
+                    if (gameData.currentSessionIndex !== undefined && gameData.currentSessionIndex !== -1 && gameData.sessions[gameData.currentSessionIndex]) {
+                        sDate = gameData.sessions[gameData.currentSessionIndex].date;
+                    } else {
+                        sDate = "ALL";
+                    }
+
+                    // 遍历该区间所有局，把时间加起来！
+                    viewRounds.forEach(r => {
+                        if (r.v2Stats && r.v2Stats.stopwatchTime) totalElapsed += r.v2Stats.stopwatchTime;
+                    });
+                }
+                
+                // 把算好的数据印到屏幕上
+                barDateLbl.textContent = sDate;
+                barRangeLbl.textContent = sRange;
+                barTotalLbl.textContent = sTotal;
+                // 利用写好的时间转换器，填入 00:00 格式
+                if(barTimeLbl) barTimeLbl.textContent = typeof formatTrTime === 'function' ? formatTrTime(totalElapsed) : '00:00'; 
+            }
+            
             const maxAbs = Math.max(...active.map(p => Math.abs(p.total)), 1);
 
             const oldPositions = {};
@@ -6927,7 +7166,7 @@ function renderAchievements() {
                     </div>
 
                     <!-- 白框内容区：紧凑排版，去掉多余高度，背景为极浅白色 -->
-                    <div class="w-full bg-[white] border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[10px] shadow-[0_4px_0_#5E4B8B] sm:rounded-[12px] pt-[25px] sm:pt-[20px] pb-[8px] sm:pb-[4px] px-1.5 flex ${isCol ? 'flex-col gap-1.5' : 'flex-wrap justify-center gap-1 sm:gap-1.5'} items-center z-10">
+                    <div class="w-full bg-[white]/65 border-[2.5px] sm:border-[3px] border-[#5E4B8B] rounded-[10px] shadow-[0_4px_0_#5E4B8B] sm:rounded-[12px] pt-[25px] sm:pt-[20px] pb-[8px] sm:pb-[4px] px-1.5 flex ${isCol ? 'flex-col gap-1.5' : 'flex-wrap justify-center gap-1 sm:gap-1.5'} items-center z-10">
                         ${innerHTML}
                     </div>
 
@@ -6960,13 +7199,13 @@ function renderAchievements() {
             // =================================================================
             let html = '';
 
-            // 1. 累计最高分 (绿 #84CC16) -> [玩家] [白底绿字+分] [白底紫字局数]
+            // 1. 历史最高分 (绿 #84CC16) -> [玩家] [白底绿字+分] [白底紫字局数]
             let p1 = getP(ach.maxTotal.p);
-            html += makeCard('累计最高分', '#84CC16', uiPlayer(p1) + (p1 ? uiVal('+'+ach.maxTotal.s, '#65A30D') + uiRound(ach.maxTotal.r) : ''));
+            html += makeCard('历史最高分', '#84CC16', uiPlayer(p1) + (p1 ? uiVal('+'+ach.maxTotal.s, '#65A30D') + uiRound(ach.maxTotal.r) : ''));
 
-            // 2. 累计最低分 (红 #E11D48) -> [玩家] [红底白字-分] [白底紫字局数]
+            // 2. 历史最低分 (红 #E11D48) -> [玩家] [红底白字-分] [白底紫字局数]
             let p2 = getP(ach.minTotal.p);
-            html += makeCard('累计最低分', '#E11D48', uiPlayer(p2) + (p2 ? uiVal(ach.minTotal.s, 'white', 'bg-[#E11D48]') + uiRound(ach.minTotal.r) : ''));
+            html += makeCard('历史最低分', '#E11D48', uiPlayer(p2) + (p2 ? uiVal(ach.minTotal.s, 'white', 'bg-[#E11D48]') + uiRound(ach.minTotal.r) : ''));
 
             // 3. 单局最高分 (绿 #84CC16)
             let p3 = getP(ach.maxSingle.p);
@@ -6978,18 +7217,18 @@ function renderAchievements() {
 
             // 5. 最长连胜 (黄 #FDE047) -> [玩家] [黄底紫字数字] [白底紫字局数]
             let p5 = getP(ach.maxStreak.p);
-            html += makeCard('最长连胜', '#FDE047', uiPlayer(p5) + (p5 ? uiVal(ach.maxStreak.s, '#5E4B8B', 'bg-[#FDE047]') + uiRound(ach.maxStreak.r) : ''));
+            html += makeCard('最长连胜', '#f39800', uiPlayer(p5) + (p5 ? uiVal(ach.maxStreak.s, '#5E4B8B', 'bg-[#FDE047]') + uiRound(ach.maxStreak.r) : ''));
 
             // 6. 最长连输 (粉紫 #E879F9) -> [玩家] [粉底紫字数字] [白底紫字局数]
             let p6 = getP(ach.maxLoseStreak.p);
-            html += makeCard('最长连输', '#E879F9', uiPlayer(p6) + (p6 ? uiVal(ach.maxLoseStreak.s, '#5E4B8B', 'bg-[#F472B6]') + uiRound(ach.maxLoseStreak.r) : ''));
+            html += makeCard('最长连输', '#920783', uiPlayer(p6) + (p6 ? uiVal(ach.maxLoseStreak.s, '#5E4B8B', 'bg-[#F472B6]') + uiRound(ach.maxLoseStreak.r) : ''));
 
             // 7. 最多奖杯 (黄 #FDE047) -> [玩家] [白底紫字数字]
-            html += makeCard('最多奖杯', '#FDE047', uiPlayer(trophyKing) + (trophyKing ? uiVal(maxTrophyCount, '#5E4B8B') : ''));
+            html += makeCard('最多奖杯', '#f39800', uiPlayer(trophyKing) + (trophyKing ? uiVal(maxTrophyCount, '#5E4B8B') : ''));
 
             // 8. 最长一局 (淡蓝 #93C5FD) -> [玩家] [白底紫字时间] [白底绿字分] [白底紫字局数]
             let p8 = getP(longestGame.winner);
-            html += makeCard('最长一局', '#93C5FD', uiPlayer(p8) + (p8 ? uiVal(formatTime(longestGame.time), '#5E4B8B') + uiVal('+'+longestGame.score, '#65A30D') + uiRound(longestGame.rNum) : ''));
+            html += makeCard('最长一局', '#32b16c', uiPlayer(p8) + (p8 ? uiVal(formatTime(longestGame.time), '#5E4B8B') + uiVal('+'+longestGame.score, '#65A30D') + uiRound(longestGame.rNum) : ''));
 
             // 9. 最短一局 (浅紫 #D8B4E2)
             let p9 = getP(shortestGame.winner);
@@ -7000,17 +7239,17 @@ function renderAchievements() {
             html += makeCard('最快淘汰', '#F472B6', uiPlayer(p10) + (p10 ? uiVal(formatTime(fastestElim.time), '#5E4B8B') + uiVal(fastestElim.score, '#E11D48') + uiRound(fastestElim.rNum) : ''));
 
             // 11. 最多一血 (红 #DC2626) -> [玩家] [白底红字数字]
-            html += makeCard('最多一血', '#DC2626', uiPlayer(topFB.p) + (topFB.p ? uiVal(topFB.c, '#E11D48') : ''));
+            html += makeCard('最多一血', '#e5004f', uiPlayer(topFB.p) + (topFB.p ? uiVal(topFB.c, '#E11D48') : ''));
 
 
             // 13. 最多复活 (亮绿 #4ADE80) -> [玩家] [白底绿字数字]
-            html += makeCard('最多复活', '#4ADE80', uiPlayer(topRev.p) + (topRev.p ? uiVal(topRev.c, '#65A30D') : ''));
+            html += makeCard('最多复活', '#00ff00', uiPlayer(topRev.p) + (topRev.p ? uiVal(topRev.c, '#65A30D') : ''));
 
             // 14. 最多被毒 (红 #EF4444) -> [玩家] [白底红字数字]
-            html += makeCard('最多被毒', '#EF4444', uiPlayer(topPoison.p) + (topPoison.p ? uiVal(topPoison.c, '#E11D48') : ''));
+            html += makeCard('最多被毒', '#a40000', uiPlayer(topPoison.p) + (topPoison.p ? uiVal(topPoison.c, '#E11D48') : ''));
 
             // 15. 淘汰别人最多次 (淡蓝 #93C5FD) -> [玩家] [白底紫字数字]
-            html += makeCard('淘汰别人最多次', '#93C5FD', uiPlayer(topKill.p) + (topKill.p ? uiVal(topKill.c, '#5E4B8B') : ''));
+            html += makeCard('淘汰别人最多次', '#389ff5', uiPlayer(topKill.p) + (topKill.p ? uiVal(topKill.c, '#5E4B8B') : ''));
 
             // 最终拼装输出！
             grid.innerHTML = html;
@@ -9902,12 +10141,23 @@ window.initDDEngine = function() {
             }
         });
         
-        window.ddEngine.timelineData.push(frameObj);
+
+
+window.ddEngine.timelineData.push(frameObj);
         window.ddEngine.maxScorePerFrame.push(frameMax);
     });
 
+    // 【全新逻辑：将右侧蓝色胶囊的内容死死锁死为当前筛选的区间！】
+    const blueCap = document.getElementById('ddPlayRoundText');
+    if (blueCap && viewRounds.length > 0) {
+        let fRound = viewRounds[0].round;
+        let lRound = viewRounds[viewRounds.length - 1].round;
+        blueCap.textContent = `第${fRound}~${lRound}局`;
+    }
+
     const track = document.getElementById('ddRaceTrack');
     if(!track) return;
+
     
 track.innerHTML = active.map(p => {
         let shortName = p.name ? p.name.slice(-1) : '?';
@@ -9970,7 +10220,37 @@ window.renderDDFrame = function(progressVal) {
     
     const currentMax = max1 + (max2 - max1) * pRatio;
 
-    document.getElementById('ddPlayRoundText').textContent = `第${viewRounds[frame1].round}局`;
+const currentRound = viewRounds[frame1].round;
+    
+    // 【修改】：蓝色胶囊已被移到右侧并在 initDDEngine 中被固定锁死，这里不再强制刷新它跳动局数。
+
+    // --- 【新增魔法：实时同步更新左右两侧的仪表盘数据】 ---
+    const dateTextEl = document.getElementById('ddDateText');
+    const dateCapEl = document.getElementById('ddDateCapsule');
+    const totalTextEl = document.getElementById('ddTotalText');
+    const totalCapEl = document.getElementById('ddTotalCapsule');
+
+    if (dateTextEl && dateCapEl && totalTextEl && totalCapEl) {
+        // 1. 获取这局对应的日期
+        let sDate = "ALL";
+        if (gameData.sessions && gameData.sessions.length > 0) {
+            let s = gameData.sessions.find(session => currentRound >= session.start && currentRound <= session.end);
+            if (s) sDate = s.date;
+        }
+        
+        // 如果能找到准确的日期（不是在没有记录的早期版本），就浮现显示！
+        if (sDate !== "ALL") {
+            dateTextEl.textContent = sDate;
+            dateCapEl.classList.remove('opacity-0');
+        } else {
+            dateCapEl.classList.add('opacity-0');
+        }
+
+        // 2. 获取当前播放的进度 (相当于在这个区间里，播放到了第几场)
+        totalTextEl.textContent = `总${frame1 + 1}局`;
+        totalCapEl.classList.remove('opacity-0');
+    }
+    // ---------------------------------------------
 
     const active = gameData.players.filter(pl => pl.isActive);
     
@@ -12833,25 +13113,31 @@ if (typeof renderTrHistoryList === 'function') renderTrHistoryList();
     const sfCloseBtn = document.getElementById('closeSessionFilterBtn');
     if (sfCloseBtn) sfCloseBtn.onclick = () => document.getElementById('sessionFilterDialog').classList.add('hidden');
 
-    window.renderSessionSelectorUI = function() {
-        const ddRound = document.getElementById('ddRoundLabel');
-        const ddDate = document.getElementById('ddDateLabel');
-        const ddRange = document.getElementById('ddRangeLabel');
-        if (!ddRound) return;
+window.renderSessionSelectorUI = function() {
+            const ddRound = document.getElementById('ddRoundLabel');
+            const ddDate = document.getElementById('ddDateLabel');
+            const ddRange = document.getElementById('ddRangeLabel');
+            if (!ddRound) return;
 
-        if (gameData.currentSessionIndex === undefined || gameData.currentSessionIndex === -1 || !gameData.sessions || gameData.sessions.length === 0) {
-            ddRound.textContent = "ALL";
-            if (gameData.sessions && gameData.sessions.length > 0) {
-                ddDate.textContent = gameData.sessions[gameData.sessions.length - 1].date;
-                ddRange.textContent = `第001~${String(gameData.rounds.length).padStart(3, '0')}局`;
-            } else { ddDate.textContent = "暂无"; ddRange.textContent = "第000~000局"; }
-        } else {
-            const idx = gameData.currentSessionIndex; const session = gameData.sessions[idx];
-            ddRound.textContent = `R-${String(idx + 1).padStart(2, '0')}`;
-            ddDate.textContent = session.date;
-            ddRange.textContent = `第${String(session.start).padStart(3, '0')}~${String(session.end).padStart(3, '0')}局`;
-        }
-    };
+            if (gameData.currentSessionIndex === undefined || gameData.currentSessionIndex === -1 || !gameData.sessions || gameData.sessions.length === 0) {
+                ddRound.textContent = "ALL";
+                if (gameData.sessions && gameData.sessions.length > 0) {
+                    ddDate.textContent = gameData.sessions[gameData.sessions.length - 1].date;
+                    ddRange.textContent = `第001~${String(gameData.rounds.length).padStart(3, '0')}局`;
+                } else { ddDate.textContent = "暂无"; ddRange.textContent = "第000~000局"; }
+            } else {
+                const idx = gameData.currentSessionIndex; const session = gameData.sessions[idx];
+                ddRound.textContent = `R-${String(idx + 1).padStart(2, '0')}`;
+                ddDate.textContent = session.date;
+                ddRange.textContent = `第${String(session.start).padStart(3, '0')}~${String(session.end).padStart(3, '0')}局`;
+            }
+
+            // 【核心修复】：抓取总局数胶囊，并赋上准确的局数！
+            const ddTotal = document.getElementById('ddTotalLabel');
+            if (ddTotal) {
+                ddTotal.textContent = `总: ${viewRounds.length} 局`;
+            }
+        };
 
     setTimeout(attachSliderEvents, 200);
 })();
@@ -12941,14 +13227,28 @@ if(btnSelRevive && btnSelUndo && btnConfirmUI) {
             setTimeout(() => document.getElementById('networkLobby').classList.add('hidden'), 500);
         };
 
-        // 1. 点击【单机模式】
+// 1. 点击【单机模式】
         window.nlStartSingle = function() {
+            // 【新增：密码锁验证】
+            let pwd = prompt("【安全锁验证】\n请输入管理员密码以进入单机模式：");
+            if (pwd !== "TW19931995") {
+                alert("❌ 密码错误，访问被拒绝！");
+                return;
+            }
+            
             myRole = 'single';
             window.nlHideLobby();
         };
 
         // 2. 主机：点击【创建房间】
         window.nlShowCreateRoom = function() {
+            // 【新增：密码锁验证】
+            let pwd = prompt("【安全锁验证】\n请输入管理员密码以获取创建房间权限：");
+            if (pwd !== "TW19931995") {
+                alert("❌ 密码错误，访问被拒绝！");
+                return;
+            }
+
             document.getElementById('nlMainMenu').classList.add('hidden');
             document.getElementById('nlCreateMenu').classList.remove('hidden');
             document.getElementById('nlCreateMenu').classList.add('flex');
