@@ -7541,7 +7541,7 @@ window.renderDetailedRecords = function() {
 
 
 // ====================================================================
-// ★★★ 【全新神级画笔】分数走向轮盘图 (防遮挡 + 颜色修复版) ★★★
+// ★★★ 【全新神级画笔】分数走向轮盘图 (360度平均环绕 + 极短连线版) ★★★
 // ====================================================================
 window.renderScoreFlowSection = function() {
     const container = document.getElementById('scoreFlowContainer');
@@ -7554,20 +7554,13 @@ window.renderScoreFlowSection = function() {
     }
 
     // 1. 【溯源算法核心】：精准测算每个人赚的每一分来自谁，亏的每一分去了哪
-    let grossWin = {}; 
-    let grossLose = {}; 
-    let totalGrossWin = {};
-    let totalGrossLose = {};
+    let grossWin = {}; let grossLose = {}; 
+    let totalGrossWin = {}; let totalGrossLose = {};
 
     active.forEach(p => {
-        grossWin[p.id] = {};
-        grossLose[p.id] = {};
-        totalGrossWin[p.id] = 0;
-        totalGrossLose[p.id] = 0;
-        active.forEach(p2 => {
-            grossWin[p.id][p2.id] = 0;
-            grossLose[p.id][p2.id] = 0;
-        });
+        grossWin[p.id] = {}; grossLose[p.id] = {};
+        totalGrossWin[p.id] = 0; totalGrossLose[p.id] = 0;
+        active.forEach(p2 => { grossWin[p.id][p2.id] = 0; grossLose[p.id][p2.id] = 0; });
     });
 
     viewRounds.forEach(r => {
@@ -7576,21 +7569,28 @@ window.renderScoreFlowSection = function() {
         active.forEach(p => {
             if (p.id !== winnerId && r.changes[p.id] !== undefined && r.changes[p.id] < 0) {
                 let lostPts = Math.abs(r.changes[p.id]);
-                grossLose[p.id][winnerId] += lostPts;
-                totalGrossLose[p.id] += lostPts;
-                grossWin[winnerId][p.id] += lostPts;
-                totalGrossWin[winnerId] += lostPts;
+                if (grossLose[p.id] && grossLose[p.id][winnerId] !== undefined) {
+                    grossLose[p.id][winnerId] += lostPts; 
+                    totalGrossLose[p.id] += lostPts;
+                }
+                if (grossWin[winnerId] && grossWin[winnerId][p.id] !== undefined) {
+                    grossWin[winnerId][p.id] += lostPts; 
+                    totalGrossWin[winnerId] += lostPts;
+                }
             }
         });
     });
 
     let sortedPlayers = [...active].sort((a,b) => b.total - a.total);
     let html = '';
+    let allFlowData = {};
 
-    const PIE_SIZE = 260;     
-    const CENTER_SIZE = 85;   
+    // ========================================================
+    // 【小白调节区 1：中心饼图物理尺寸】
+    // ========================================================
+    const PIE_SIZE = 135;     
+    const CENTER_SIZE = 60;   
     const R = PIE_SIZE / 2;
-    const BASE_LABEL_R = R * 0.65; // 标签默认挂在扇形半径 65% 的位置
 
     sortedPlayers.forEach(p => {
         if (p.total === 0) return; 
@@ -7620,124 +7620,174 @@ window.renderScoreFlowSection = function() {
 
         let gradientStops =[];
         let currentAngle = 0;
-        let labelsHtml = '';
-
-        // 【全新：记录已经放好位置的标签，用来做防重叠计算】
-        let placedLabels =[]; 
 
         flowData.forEach(d => {
             let sliceAngle = (d.rawPct / 100) * 360;
-
             gradientStops.push(`${d.p.color} ${currentAngle}deg ${currentAngle + sliceAngle - 1.5}deg`);
             gradientStops.push(`#5E4B8B ${currentAngle + sliceAngle - 1.5}deg ${currentAngle + sliceAngle}deg`);
-
-            let midAngleCSS = currentAngle + (sliceAngle / 2);
-            let midAngleMath = (midAngleCSS - 90) * (Math.PI / 180);
-
-            // ========================================================
-            // ★★★ 【小白调节区：防重叠射线弹射引擎】(修复图1蓝框) ★★★
-            // 如果系统发现两个标签挤在一起，会自动把后面的标签沿着射线向外推出去！
-            // ========================================================
-            let currentRadius = BASE_LABEL_R;
-            let lx, ly;
-            let isOverlapping = true;
-            let pushAttempts = 0;
-
-            // 最多往外推 6 次，防止无限循环跑出屏幕
-            while (isOverlapping && pushAttempts < 6) {
-                lx = R + currentRadius * Math.cos(midAngleMath);
-                ly = R + currentRadius * Math.sin(midAngleMath);
-
-                isOverlapping = false;
-                for (let prev of placedLabels) {
-                    let dx = lx - prev.x;
-                    let dy = ly - prev.y;
-                    // 计算当前标签和之前已经放好的标签之间的绝对距离
-                    let distance = Math.sqrt(dx*dx + dy*dy);
-                    
-                    // [安全距离调节参数] 55: 代表两个标签中心点至少要隔开 55px 才算安全。
-                    // 如果你发现字多的时候还是有点重叠，就把 55 改成 65；如果觉得弹得太远了，改成 45。
-                    if (distance < 55) { 
-                        isOverlapping = true;
-                        break;
-                    }
-                }
-
-                if (isOverlapping) {
-                    // [弹射距离调节参数] 20: 每次发现重叠，就向外弹射 20 像素再测一次。
-                    currentRadius += 20; 
-                    pushAttempts++;
-                }
-            }
-            // 位置测算安全，钉死在这里！
-            placedLabels.push({x: lx, y: ly}); 
-            // ========================================================
-
-            let displayScore = isWinner ? `-${Math.round(d.score)}` : `+${Math.round(d.score)}`;
-            let scoreColor = isWinner ? '#E11D48' : '#4ADE80'; 
-            let pctStr = Math.round(d.rawPct) + '%';
             
-            labelsHtml += `
-            <div class="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md z-10 hover:scale-110 transition-transform cursor-pointer" style="left: ${lx}px; top: ${ly}px;">
-                <div class="flex items-center gap-1 mb-1">
-                    <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shadow-sm">
-                        <img src="${d.p.avatar}" class="w-full h-full object-cover">
-                    </div>
-                    <!-- 名字保持白字+紫边，防止不管底色有多乱都能绝对看清 -->
-                    <span class="font-black text-white text-[12px] sm:text-[14px] tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${d.p.name.slice(-1)}</span>
-                </div>
-                <div class="bg-white border-[2px] border-[#5E4B8B] rounded-[6px] px-2 py-0.5 flex flex-col items-center justify-center shadow-[0_2px_0_#5E4B8B] min-w-[45px]">
-                    <span class="font-black text-[14px] sm:text-[16px] leading-none pt-[1px]" style="color: ${scoreColor};">${displayScore}</span>
-                    <span class="font-black text-[#5E4B8B] text-[10px] sm:text-[11px] leading-none mt-0.5 opacity-80">${pctStr}</span>
-                </div>
-            </div>
-            `;
-
+            let midAngleCSS = currentAngle + (sliceAngle / 2);
+            d.midAngleMath = (midAngleCSS - 90) * (Math.PI / 180); // 转换为数学弧度
+            
             currentAngle += sliceAngle;
         });
 
         let centerTitle = isWinner ? `+${p.total}` : `${p.total}`;
         let centerColor = isWinner ? '#4ADE80' : '#E11D48'; 
         let centerOuterBg = isWinner ? '#E11D48' : '#3B82F6'; 
+        allFlowData[p.id] = { isWinner, flowData };
 
         html += `
-        <!-- 去除了顶部的红色框标题 (修复图1红框) -->
-        <div class="relative w-full border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] bg-[#F1F5F9] p-20 sm:p-4 shadow-[0_4px_0_#5E4B8B] flex flex-col items-center overflow-hidden">
+        <!-- 
+          ========================================================
+          【小白调节区 2：画框与背景】
+          删除了原本顶部的红框标题，现在只有纯净的轮盘！
+          因此高度 h-[290px] 也相应缩减，让排版更紧凑不留大白边。
+          ========================================================
+        -->
+        <div class="relative w-full border-[3px] sm:border-[4px] border-[#5E4B8B] rounded-[1rem] sm:rounded-[1.2rem] bg-[#F1F5F9] shadow-[0_4px_0_#5E4B8B] flex flex-col items-center justify-center overflow-hidden h-[290px] sm:h-[310px]">
             
-            <div class="relative rounded-full border-[3px] sm:border-[4px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B] mt-1" style="width: ${PIE_SIZE}px; height: ${PIE_SIZE}px; background: conic-gradient(${gradientStops.join(', ')});">
-                
-                <!-- 周围悬浮排版防重叠的标签 -->
-                ${labelsHtml}
+            <!-- 绝对居中的彩色大轮盘本体 -->
+            <div class="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none">
+                <div class="rounded-full border-[3px] sm:border-[4px] border-[#5E4B8B] shadow-[0_4px_0_#5E4B8B] relative" style="width: ${PIE_SIZE}px; height: ${PIE_SIZE}px; background: conic-gradient(${gradientStops.join(', ')});">
+                    
+                    <!-- 中心玩家头像与得分 -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#5E4B8B] flex flex-col items-center justify-center shadow-inner z-20" style="width: ${CENTER_SIZE}px; height: ${CENTER_SIZE}px; background-color: ${p.color}; box-shadow: 0 0 0 5px ${centerOuterBg}, 0 0 0 8px #5E4B8B;">
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-[4px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden mb-0.5 shadow-sm">
+                            <img src="${p.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                        </div>
+                        <span class="font-black text-[12px] text-white leading-none mb-0.5 text-stroke tracking-widest" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
+                        
+                        <div class="bg-white border-[2px] border-[#5E4B8B] rounded-[4px] px-1.5 shadow-[0_2px_0_#5E4B8B] flex items-center justify-center">
+                            <span class="font-black text-[12px] sm:text-[14px] leading-none pt-[1px] tracking-wider" style="color: ${centerColor};">${centerTitle}</span>
+                        </div>
+                    </div>
 
-                <!-- 
-                  ========================================================
-                  【小白调节区：中心圆背景色与文字 (修复图1绿框)】
-                  [background-color] ${p.color}：强制把中心底色变成当前玩家代表色！
-                  [文本颜色与描边] 将名字变成白字+深紫描边，保证在任何代表色上都绝对清晰！
-                  ========================================================
-                -->
-                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#5E4B8B] flex flex-col items-center justify-center shadow-inner z-20" style="width: ${CENTER_SIZE}px; height: ${CENTER_SIZE}px; background-color: ${p.color}; box-shadow: 0 0 0 6px ${centerOuterBg}, 0 0 0 9px #5E4B8B;">
-                    
-                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-[4px] border-[2px] border-[#5E4B8B] bg-black overflow-hidden mb-0.5 shadow-sm">
-                        <img src="${p.avatar}" class="w-full h-full object-cover">
-                    </div>
-                    
-                    <!-- 核心修改：名字变为白字+紫描边，防变色瞎眼 -->
-                    <span class="font-black text-[12px] sm:text-[13px] text-white leading-none mb-1 text-stroke tracking-widest" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${p.name.slice(-1)}</span>
-                    
-                    <div class="bg-white border-[2px] border-[#5E4B8B] rounded-[6px] px-2 py-0.5 shadow-[0_2px_0_#5E4B8B] flex items-center justify-center">
-                        <span class="font-black text-[15px] sm:text-[18px] leading-none pt-[1px] tracking-wider" style="color: ${centerColor};">${centerTitle}</span>
-                    </div>
                 </div>
-
             </div>
+
+            <!-- ★ 折线画布层 (绝对覆盖整个框) ★ -->
+            <canvas id="flow_canvas_${p.id}" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
+            
+            <!-- ★ 悬浮信息框层 (绝对覆盖整个框) ★ -->
+            <div id="flow_labels_${p.id}" class="absolute inset-0 w-full h-full z-20 pointer-events-none"></div>
+            
         </div>
         `;
     });
 
-    container.innerHTML = html || '<div class="text-center text-gray-400 font-bold py-4">所选区间内暂无净胜负数据</div>';
-};
+    container.innerHTML = html;
 
+    // ====================================================================
+    // ★★★ 核心革命：360度均分计算 + 极短平滑拉线引擎 ★★★
+    // ====================================================================
+    setTimeout(() => {
+        Object.keys(allFlowData).forEach(pid => {
+            const data = allFlowData[pid];
+            const canvas = document.getElementById(`flow_canvas_${pid}`);
+            const labelsContainer = document.getElementById(`flow_labels_${pid}`);
+            if(!canvas || !labelsContainer) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    observer.disconnect(); 
+
+                    const ctx = canvas.getContext('2d');
+                    const rect = canvas.getBoundingClientRect();
+                    
+                    const W = rect.width || canvas.parentElement.clientWidth || 300;
+                    const H = rect.height || canvas.parentElement.clientHeight || 290;
+
+                    canvas.width = W * window.devicePixelRatio;
+                    canvas.height = H * window.devicePixelRatio;
+                    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+                    const cx = W / 2;
+                    const cy = H / 2;
+
+                    // 【小白调节区 3：标签环绕半径】
+                    // 105：代表标签距离圆心的绝对距离。
+                    // 因为饼图半径是 67.5，所以 105 意味着标签就在饼图外面一点点，连线极其短且精致！
+                    const R_LABEL = 105;
+
+                    let labelsHtml = '';
+                    
+                    // ==================================
+                    // 步骤1：按角度排序，并计算 360 度均分靶点
+                    // ==================================
+                    let sortedData = [...data.flowData].sort((a, b) => a.midAngleMath - b.midAngleMath);
+                    let N = sortedData.length;
+                    
+                    // 以第一个标签的自然角度作为起点，往后均匀切割 360 度
+                    let startAngle = sortedData[0].midAngleMath;
+
+                    sortedData.forEach((item, index) => {
+                        const { midAngleMath, rawPct, score, p: otherP } = item;
+                        
+                        // 核心：把圆周平分为 N 份，计算出这个标签应该在的“完美靶点角度”
+                        let targetAngle = startAngle + index * ((2 * Math.PI) / N);
+                        
+                        // 1. 折线起点：饼图外圈边缘
+                        const x0 = cx + R * Math.cos(midAngleMath);
+                        const y0 = cy + R * Math.sin(midAngleMath);
+                        
+                        // 2. 折线终点：靶点位置 (就是标签正中心)
+                        const targetX = cx + R_LABEL * Math.cos(targetAngle);
+                        const targetY = cy + R_LABEL * Math.sin(targetAngle);
+
+                        // 3. 贝塞尔平滑拉线 (为了优雅过渡，设定两个平滑控制点)
+                        const cpR = R + (R_LABEL - R) / 2; // 控制点半径在两者的中间
+                        const cp1x = cx + cpR * Math.cos(midAngleMath);
+                        const cp1y = cy + cpR * Math.sin(midAngleMath);
+                        const cp2x = cx + cpR * Math.cos(targetAngle);
+                        const cp2y = cy + cpR * Math.sin(targetAngle);
+
+                        ctx.beginPath();
+                        ctx.moveTo(x0, y0);
+                        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, targetX, targetY);
+                        ctx.strokeStyle = '#5E4B8B'; // 深紫线条
+                        ctx.lineWidth = 1.5;         // 线条粗细
+                        ctx.stroke();
+
+                        // ==================================
+                        // 步骤2：挂载 HTML 标签到靶点上
+                        // ==================================
+                        let displayScore = data.isWinner ? `-${Math.round(score)}` : `+${Math.round(score)}`;
+                        let scoreColor = data.isWinner ? '#E11D48' : '#4ADE80';
+                        let pctStr = Math.round(rawPct) + '%';
+                        
+                        // 直接利用 translate(-50%, -50%) 把标签的正中心死死钉在靶点上！
+                        let stylePos = `left: ${targetX}px; top: ${targetY}px; transform: translate(-50%, -50%);`;
+
+                        labelsHtml += `
+                        <div class="absolute flex flex-col items-center justify-center z-20 pointer-events-auto cursor-pointer hover:scale-110 transition-transform" style="${stylePos}">
+                            
+                            <!-- 上半截：小头像 + 名字 -->
+                            <div class="flex items-center gap-1 mb-0.5">
+                                <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-[4px] border-[1.5px] border-[#5E4B8B] bg-black overflow-hidden shadow-sm">
+                                    <img src="${otherP.avatar}" class="w-full h-full object-cover" crossorigin="anonymous">
+                                </div>
+                                <span class="font-black text-white text-[12px] sm:text-[14px] tracking-widest text-stroke" style="-webkit-text-stroke: 1.5px #5E4B8B; paint-order: stroke fill;">${otherP.name.slice(-1)}</span>
+                            </div>
+                            
+                            <!-- 下半截：白底紫边数据框 -->
+                            <div class="bg-white border-[2px] border-[#5E4B8B] rounded-[6px] px-2 py-0.5 flex flex-col items-center justify-center shadow-[0_2px_0_#5E4B8B] min-w-[45px]">
+                                <span class="font-black text-[13px] sm:text-[15px] leading-none pt-[1px]" style="color: ${scoreColor};">${displayScore}</span>
+                                <span class="font-black text-[#5E4B8B] text-[9px] sm:text-[10px] leading-none mt-0.5 opacity-80">${pctStr}</span>
+                            </div>
+
+                        </div>`;
+                    });
+
+                    labelsContainer.innerHTML = labelsHtml;
+                }
+            });
+            
+            observer.observe(canvas);
+        });
+    }, 50); 
+};
+// ====================================================================
 
 window.renderMethodDetailSection = function() {
     const table = document.getElementById('methodDetailTable');
